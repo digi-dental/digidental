@@ -1,0 +1,10 @@
+{
+  "name": "digidental",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Digi Dental — one-page conversion funnel (static front-end + Vercel serverless functions)",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "resend": "^4.0.0"
+  }
+}

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>AI Receptionist for Dental Practices | Digi Dental</title>
+<meta name="description" content="A 24/7 AI receptionist that answers your dental practice's calls and books patients straight into your calendar. Set up entirely for you. Live in days.">
+<meta property="og:title" content="Digi Dental | AI Receptionist for Dental Practices">
+<meta property="og:description" content="Your phone rings. A patient gets booked. You never lifted a finger.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer async></script>
+<style>
+#vapi-support-btn,#vapi-btn{display:none !important}
+html{scroll-behavior:smooth}
+body{margin:0;background:#FAF9F6;color:#0A1A2F;font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#0F8B80;text-decoration:none}
+a:hover{color:#0B6E66;text-decoration:underline}
+input,select,button,textarea{font-family:inherit}
+@keyframes toothy-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes toothy-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.12)}}
+@keyframes dd-bar{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+@keyframes dd-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes dd-fadeup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dd-pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes dd-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic-bezier(.4,0,.2,1),transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1),border-color .25s cubic-bezier(.4,0,.2,1)}
+:focus-visible{outline:2px solid #0F8B80;outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}html{scroll-behavior:auto}}
+</style>
+</helmet>
+
+<!-- ================= CRASH FALLBACK (error boundary) ================= -->
+<sc-if value="{{ crashed }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF9F6;padding:24px">
+    <div role="alert" style="max-width:420px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px">
+      <img src="uploads/denty_happy.png" alt="" width="88" height="88" style="image-rendering:pixelated;object-fit:contain">
+      <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:#0A1A2F;letter-spacing:-0.02em">A momentary hiccup.</div>
+      <p style="font-size:15px;line-height:1.65;color:#3D4F66;margin:0;text-wrap:pretty">This page had trouble rendering. A quick reload fixes it. Nothing you entered is lost.</p>
+      <button onClick="{{ reloadPage }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:14px 30px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Reload the page</button>
+      <a href="mailto:bennysworkspace@gmail.com" style="font-size:13px">bennysworkspace@gmail.com</a>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ appOk }}" hint-placeholder-val="{{ true }}">
+<!-- ================= NAV ================= -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(16px,4vw,32px);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:{{ navBg }};transition:background .35s ease">
+  <div style="display:flex;align-items:center;gap:10px">
+    <img src="uploads/denty_neutral.png" alt="" width="34" height="34" style="display:block;width:34px;height:34px;object-fit:contain;image-rendering:pixelated">
+    <div style="font-family:'Fraunces',serif;font-weight:600;font-size:21px;letter-spacing:-0.02em;line-height:1;color:{{ navFg }};transition:color .35s ease">Digi<span style="color:#0F8B80"> Dental</span></div>
+  </div>
+  <button onClick="{{ openBooking }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header style="background:#FAF9F6;padding:170px 24px 150px;display:flex;flex-direction:column;align-items:center;text-align:center">
+  <div style="max-width:820px;display:flex;flex-direction:column;align-items:center;gap:28px">
+    <!-- Headline candidates:
+      1. "Your phone rings. A patient gets booked. You never lifted a finger."  (shipped — concrete, sequential, zero jargon)
+      2. "Every call answered. Every opening filled. Nobody hired."
+      3. "The receptionist that never sleeps, never sighs, and never misses a call." -->
+    <h1 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2.5rem,6vw,4.25rem);line-height:1.05;letter-spacing:-0.025em;margin:0;text-wrap:balance">Your phone rings. A patient gets booked. You never lifted a finger.</h1>
+    <p style="font-size:19px;line-height:1.65;color:#3D4F66;max-width:560px;margin:0;text-wrap:pretty">A 24/7 human-sounding AI receptionist that answers every call and writes appointments straight into your calendar, set up entirely for you.</p>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <button onClick="{{ openBooking }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(10,26,47,0.2)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+      <div style="font-size:13px;color:#5A6E86;font-variant-numeric:tabular-nums">Guaranteed: it books a patient within 14 days, or you keep $1,000.</div>
+      <a href="#demo" onClick="{{ scrollToToothy }}" style="font-size:15px;color:#0F8B80;background:none;border:none;cursor:pointer">Or talk to the AI yourself ↓</a>
+    </div>
+  </div>
+  <!-- Hero animation loop: call card → transcript → booked -->
+  <div style="margin-top:72px;width:min(440px,90vw);min-height:230px" aria-hidden="true">
+    <sc-if value="{{ heroLoading }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:24px 28px;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:flex;flex-direction:column;gap:14px">
+        <div style="height:26px;width:42%;border-radius:6px;background:linear-gradient(90deg,#EFECE4 25%,#F7F4EC 50%,#EFECE4 75%);background-size:200% 100%;animation:dd-shimmer 1.4s linear infinite"></div>
+        <div style="height:14px;width:88%;border-radius:6px;background:linear-gradient(90deg,#EFECE4 25%,#F7F4EC 50%,#EFECE4 75%);background-size:200% 100%;animation:dd-shimmer 1.4s linear infinite"></div>
+        <div style="height:14px;width:64%;border-radius:6px;background:linear-gradient(90deg,#EFECE4 25%,#F7F4EC 50%,#EFECE4 75%);background-size:200% 100%;animation:dd-shimmer 1.4s linear infinite"></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hp0 }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:24px 28px;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:flex;align-items:center;gap:16px;animation:dd-fadeup .6s cubic-bezier(.22,1,.36,1) both">
+        <div style="width:44px;height:44px;border-radius:50%;background:#0F8B80;display:flex;align-items:center;justify-content:center;animation:dd-pulse 1.4s ease-in-out infinite;flex-shrink:0">
+          <div style="width:14px;height:14px;border-radius:50%;background:#FAF9F6"></div>
+        </div>
+        <div style="text-align:left">
+          <div style="font-weight:600;font-size:15px">Incoming call</div>
+          <div style="font-size:13px;color:#5A6E86;font-variant-numeric:tabular-nums">{{ heroTag }}</div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hp1 }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:24px 28px;box-shadow:0 18px 44px rgba(10,26,47,0.1);text-align:left;animation:dd-fadeup .5s cubic-bezier(.22,1,.36,1) both">
+        <div style="display:flex;align-items:flex-end;gap:3px;height:26px;margin-bottom:18px">
+          <sc-for list="{{ heroBars }}" as="bar" hint-placeholder-count="8">
+            <div style="width:4px;height:100%;border-radius:2px;background:#0F8B80;transform-origin:bottom;animation:dd-bar 0.9s ease-in-out infinite;animation-delay:{{ bar.delay }}"></div>
+          </sc-for>
+        </div>
+        <div style="font-size:14px;line-height:1.6;color:#3D4F66;animation:dd-fadeup .6s cubic-bezier(.22,1,.36,1) both">{{ heroL1 }}</div>
+        <div style="font-size:14px;line-height:1.6;color:#0A1A2F;font-weight:500;margin-top:10px;animation:dd-fadeup .6s cubic-bezier(.22,1,.36,1) 1.4s both">{{ heroL2 }}</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hp2 }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:24px 28px;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:flex;flex-direction:column;align-items:center;gap:12px;animation:dd-fadeup .5s cubic-bezier(.22,1,.36,1) both">
+        <div style="width:44px;height:44px;border-radius:50%;background:#2F7D5A;display:flex;align-items:center;justify-content:center;color:#FAF9F6;font-size:20px;animation:dd-pop .5s cubic-bezier(.34,1.56,.64,1) both">✓</div>
+        <div style="font-weight:600;font-size:16px;font-variant-numeric:tabular-nums">{{ heroBooked }}</div>
+        <div style="font-size:13px;color:#5A6E86">{{ heroCap }}</div>
+      </div>
+    </sc-if>
+  </div>
+</header>
+
+<!-- ================= 3. THE COST ================= -->
+<!-- Statistics sourced June 2026 — refresh annually. Sources listed in footnotes below. -->
+<section style="background:#FAF9F6;padding:150px 24px;border-top:1px solid #EEEAE0">
+  <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:150px">
+    <div data-reveal="" style="text-align:center">
+      <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#5A6E86;margin-bottom:56px">What missed calls actually cost</div>
+      <div style="font-family:'Fraunces',serif;font-size:clamp(3rem,7vw,4.75rem);font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#0F8B80"><span data-count="32">32</span>–38%<sup style="font-size:0.3em"><a href="https://peerlogic.com" target="_blank" rel="noopener" data-linkpreview="https://peerlogic.com" title="Source: Peerlogic 2026 study, 4,280 calls across 26 practices" style="color:#5A6E86;text-decoration:none;padding:2px 4px">1</a></sup></div>
+      <p style="font-size:18px;line-height:1.6;color:#3D4F66;max-width:480px;margin:20px auto 0;text-wrap:pretty">of calls to dental practices go unanswered. During business hours.</p>
+    </div>
+    <div data-reveal="" style="text-align:center">
+      <div style="font-family:'Fraunces',serif;font-size:clamp(3rem,7vw,4.75rem);font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#0F8B80"><span data-count="78">78</span>%<sup style="font-size:0.3em"><a href="https://www.getweave.com" target="_blank" rel="noopener" data-linkpreview="https://www.getweave.com" title="Source: Weave / Forbes Healthcare 2025; DenteMax call-tracking data" style="color:#5A6E86;text-decoration:none;padding:2px 4px">2</a></sup></div>
+      <p style="font-size:18px;line-height:1.6;color:#3D4F66;max-width:480px;margin:20px auto 0;text-wrap:pretty">of callers who hit voicemail hang up without leaving a message. Most dial the next practice on Google.</p>
+    </div>
+    <div data-reveal="" style="text-align:center">
+      <div style="font-family:'Fraunces',serif;font-size:clamp(3rem,7vw,4.75rem);font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#0F8B80">$<span data-count="8000">8,000</span>–$10,000<sup style="font-size:0.3em"><a href="https://www.resonate.com" target="_blank" rel="noopener" data-linkpreview="https://www.resonate.com" title="Source: Resonate; patient lifetime-value analyses" style="color:#5A6E86;text-decoration:none;padding:2px 4px">3</a></sup></div>
+      <p style="font-size:18px;line-height:1.6;color:#3D4F66;max-width:480px;margin:20px auto 0;text-wrap:pretty">A missed new patient isn't one appointment. It's that much lifetime value, walking to a competitor.</p>
+    </div>
+    <div data-reveal="" style="text-align:center">
+      <div style="font-family:'Fraunces',serif;font-size:clamp(3rem,7vw,4.75rem);font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#0F8B80">$<span data-count="200000">200,000</span>+<sup style="font-size:0.3em"><a href="#sources" title="Source: 2026 industry phone-statistics analyses" style="color:#5A6E86;text-decoration:none">4</a></sup></div>
+      <p style="font-size:18px;line-height:1.6;color:#3D4F66;max-width:500px;margin:20px auto 0;text-wrap:pretty">what after-hours calls alone can cost a practice per year. 63% of dental emergencies happen outside office hours.</p>
+    </div>
+    <div data-reveal="" style="text-align:center">
+      <p style="font-size:20px;line-height:1.65;color:#0A1A2F;max-width:560px;margin:0 auto;font-variant-numeric:tabular-nums;text-wrap:pretty">Meanwhile, a full-time front desk hire runs <strong>$39,000–$54,000 a year</strong><sup style="font-size:0.55em"><a href="https://www.ziprecruiter.com" target="_blank" rel="noopener" data-linkpreview="https://www.ziprecruiter.com" title="Source: ZipRecruiter national average; Salary.com California" style="color:#5A6E86;text-decoration:none;padding:2px 4px">5</a></sup>, and covers 40 of the week's 168 hours.</p>
+      <div id="sources" style="font-size:12px;line-height:1.8;color:#8A93A1;max-width:640px;margin:72px auto 0;text-align:left;border-top:1px solid #EEEAE0;padding-top:20px">
+        1. Peerlogic 2026 study of 4,280 calls across 26 practices; corroborated by multiple industry analyses. &nbsp;
+        2. Industry call-tracking data: Weave / Forbes Healthcare 2025; DenteMax. &nbsp;
+        3. Resonate; industry patient-lifetime-value analyses. &nbsp;
+        4. 2026 industry phone-statistics analyses. &nbsp;
+        5. ZipRecruiter national average $38,966; Salary.com California $42,132; CA staffing placements ~$27/hr. Figures sourced June 2026.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. THE FIX ================= -->
+<section style="background:#FFFFFF;padding:160px 24px;border-top:1px solid #EEEAE0">
+  <div data-reveal="" style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:72px">
+    <div style="text-align:center;display:flex;flex-direction:column;gap:12px">
+      <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0">Before and after.</h2>
+      <p style="font-size:15px;color:#5A6E86;margin:0;text-wrap:pretty">Your front desk alone, then with the AI overflow receptionist. Same sourced numbers as above.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;box-shadow:0 18px 44px rgba(10,26,47,0.08);overflow-x:auto">
+      <div style="min-width:480px">
+        <div style="display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;padding:16px 24px;background:#FAF9F6;border-bottom:1px solid #EEEAE0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;align-items:center">
+          <div style="color:#8A93A1">The moment</div>
+          <div style="color:#8A93A1;text-align:center">Front desk alone</div>
+          <div style="color:#0F8B80;text-align:center;font-weight:600">With Digi Dental</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;padding:17px 24px;border-bottom:1px solid #F1EEE6;align-items:center">
+          <div style="font-size:14px;font-weight:500">A weekday call</div>
+          <div style="font-size:13.5px;color:#8A93A1;text-align:center;line-height:1.45;font-variant-numeric:tabular-nums">32–38% ring out</div>
+          <div style="font-size:13.5px;text-align:center;line-height:1.45;font-weight:500">Answered on the first ring</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;padding:17px 24px;border-bottom:1px solid #F1EEE6;align-items:center">
+          <div style="font-size:14px;font-weight:500">A 9 PM emergency</div>
+          <div style="font-size:13.5px;color:#8A93A1;text-align:center;line-height:1.45;font-variant-numeric:tabular-nums">Voicemail. 78% hang up</div>
+          <div style="font-size:13.5px;text-align:center;line-height:1.45;font-weight:500">Answered, and booked</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;padding:17px 24px;border-bottom:1px solid #F1EEE6;align-items:center">
+          <div style="font-size:14px;font-weight:500">Two calls at once</div>
+          <div style="font-size:13.5px;color:#8A93A1;text-align:center;line-height:1.45">One caller waits</div>
+          <div style="font-size:13.5px;text-align:center;line-height:1.45;font-weight:500">Every line, at once</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;padding:17px 24px;border-bottom:1px solid #F1EEE6;align-items:center">
+          <div style="font-size:14px;font-weight:500">The appointment</div>
+          <div style="font-size:13.5px;color:#8A93A1;text-align:center;line-height:1.45">Written down, entered later</div>
+          <div style="font-size:13.5px;text-align:center;line-height:1.45;font-weight:500">Lands in the calendar itself</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;padding:17px 24px;border-bottom:1px solid #F1EEE6;align-items:center">
+          <div style="font-size:14px;font-weight:500">Hours covered</div>
+          <div style="font-size:13.5px;color:#8A93A1;text-align:center;line-height:1.45;font-variant-numeric:tabular-nums">40 of the week's 168</div>
+          <div style="font-size:13.5px;text-align:center;line-height:1.45;font-weight:500;font-variant-numeric:tabular-nums">All 168</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;padding:17px 24px;align-items:center">
+          <div style="font-size:14px;font-weight:500">What it costs</div>
+          <div style="font-size:13.5px;color:#8A93A1;text-align:center;line-height:1.45;font-variant-numeric:tabular-nums">$39,000–$54,000 a year</div>
+          <div style="font-size:13.5px;text-align:center;line-height:1.45;font-weight:600;color:#0F8B80;font-variant-numeric:tabular-nums">$2,000, once</div>
+        </div>
+      </div>
+      </div>
+      <div style="font-size:12.5px;color:#8A93A1;text-align:center;line-height:1.6;text-wrap:pretty">Your staff keeps the front desk. The AI catches what they physically can't.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:0">
+      <video controls="controls" preload="metadata" playsInline="{{ true }}" src="https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/sign/digi_dental-VSL/Digi%20Dental.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjgzNDRkYS1mNzlkLTQ5MzAtOWNhZC1hOTk1NzYzYzhmN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkaWdpX2RlbnRhbC1WU0wvRGlnaSBEZW50YWwubXA0Iiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NDMxMDg0OSwiZXhwIjoxODE1ODQ2ODQ5fQ.3OXHy4eap74pUTx4xRrbBi_Gmyt3yOaAJnBirIuujpQ" style="width:min(320px,80vw);aspect-ratio:9/16;border-radius:16px;border:1px solid #E8E4DA;background:#0A1A2F;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:block;object-fit:cover"></video>
+      <div style="font-size:13px;color:#5A6E86">Two minutes: watch a real call get answered and booked.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:24px;margin-top:16px">
+      <div style="font-size:15px;color:#5A6E86">Set up entirely by us. Live in days.</div>
+      <button onClick="{{ openBooking }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. THE MATH ================= -->
+<section style="background:#FAF9F6;padding:160px 24px;border-top:1px solid #EEEAE0">
+  <div data-reveal="" style="max-width:560px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
+    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-0.02em;margin:0">The math is short.</h2>
+    <div style="width:100%;display:flex;flex-direction:column;gap:14px">
+      <label for="dd-slider" style="font-size:15px;color:#3D4F66">Missed calls per week at your practice</label>
+      <div style="font-family:'Fraunces',serif;font-size:44px;font-variant-numeric:tabular-nums;color:#0A1A2F">{{ slider }}</div>
+      <input id="dd-slider" type="range" min="1" max="60" value="{{ slider }}" onChange="{{ setSlider }}" onInput="{{ setSlider }}" style="width:100%;accent-color:#0F8B80;cursor:pointer" aria-label="Missed calls per week">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:14px;color:#5A6E86">Estimated revenue lost per year</div>
+      <div style="font-family:'Fraunces',serif;font-size:clamp(2.6rem,6vw,3.8rem);font-weight:600;color:#0F8B80;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">{{ lostYear }}</div>
+      <div style="font-size:15px;color:#0A1A2F;margin-top:8px;font-variant-numeric:tabular-nums">Cost of never missing another one: <strong>$2,000, once.</strong></div>
+    </div>
+    <details style="font-size:13px;color:#5A6E86;max-width:420px">
+      <summary style="cursor:pointer;color:#0F8B80">Our math</summary>
+      <p style="line-height:1.7;text-align:left;font-variant-numeric:tabular-nums">Conservative assumptions: 30% of missed calls are booking opportunities (industry call-tracking data), $850 average first-visit value (industry analyses). Missed calls × 52 weeks × 30% × $850. Lifetime value not included. The real number is higher.</p>
+    </details>
+    <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" style="display:inline-block;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">See exactly where you're leaking revenue</a>
+  </div>
+</section>
+
+<!-- ================= 6. BRIDGE TO DEMO ================= -->
+<section style="background:#FFFFFF;padding:110px 24px;border-top:1px solid #EEEAE0">
+  <div data-reveal="" style="max-width:720px;margin:0 auto;text-align:center">
+    <p style="font-family:'Fraunces',serif;font-size:clamp(1.5rem,3.2vw,2rem);line-height:1.45;margin:0;text-wrap:balance">Don't take anyone's word for it. Talk to the receptionist yourself.</p>
+  </div>
+</section>
+
+<!-- ================= 7. TOOTHY — LIVE DEMO ================= -->
+<section id="demo" data-toothy="" style="background:#0A1A2F;padding:160px 24px;color:#FAF9F6">
+  <div style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center">
+    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.9rem,4.5vw,2.8rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">Meet the receptionist. Right now.</h2>
+    <!-- Speech bubble -->
+    <div style="min-height:64px;display:flex;align-items:flex-end;justify-content:center">
+      <sc-if value="{{ bubbleOn }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="background:#FAF9F6;color:#0A1A2F;border-radius:14px;padding:14px 20px;font-size:15px;line-height:1.5;max-width:380px;box-shadow:0 12px 32px rgba(0,0,0,0.35);animation:dd-fadeup .45s cubic-bezier(.22,1,.36,1) both">{{ bubble }}</div>
+      </sc-if>
+    </div>
+    <!-- Toothy + countdown ring -->
+    <div style="position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center">
+      <sc-if value="{{ ringOn }}" hint-placeholder-val="{{ false }}">
+        <svg width="150" height="150" viewBox="0 0 150 150" style="position:absolute;inset:0;transform:rotate(-90deg)" aria-hidden="true">
+          <circle cx="75" cy="75" r="68" fill="none" stroke="#22344E" stroke-width="4"></circle>
+          <circle cx="75" cy="75" r="68" fill="none" stroke="{{ ringColor }}" stroke-width="4" stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="{{ ringOffset }}" style="transition:stroke-dashoffset 1s linear, stroke .4s"></circle>
+        </svg>
+      </sc-if>
+      <button onClick="{{ startDemo }}" aria-label="Talk to the AI receptionist. Free 60 second demo call" style="position:relative;width:100px;height:100px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
+        <img id="denty-sprite" src="uploads/denty_neutral.png" alt="Toothy, the pixel-art tooth receptionist" style="width:100px;height:100px;image-rendering:pixelated;display:block;object-fit:contain;position:absolute;inset:0">
+      </button>
+    </div>
+    <sc-if value="{{ tLive }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+        <div style="display:flex;align-items:flex-end;gap:3px;height:28px" aria-hidden="true">
+          <sc-for list="{{ demoBars }}" as="bar" hint-placeholder-count="8">
+            <div style="width:4px;height:100%;border-radius:2px;background:#0F8B80;transform-origin:bottom;animation:dd-bar 0.8s ease-in-out infinite;animation-delay:{{ bar.delay }}"></div>
+          </sc-for>
+        </div>
+        <div style="font-size:15px;font-variant-numeric:tabular-nums;color:#B9C4D4">{{ remaining }}s remaining</div>
+        <button onClick="{{ endDemo }}" style="background:none;border:none;color:#5A6E86;font-size:13px;cursor:pointer;text-decoration:underline">End the call</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ tEnded }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ openBooking }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:14px 30px;font-size:15px;font-weight:600;cursor:pointer;animation:dd-fadeup .5s cubic-bezier(.22,1,.36,1) both" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+    </sc-if>
+    <div style="font-size:12px;color:#5A6E86;max-width:380px;line-height:1.6">Demo limited to 60 seconds. Audio is processed by our voice AI provider. <a href="#privacy" onClick="{{ openPrivacy }}" style="color:#8A9BB5">Privacy</a></div>
+  </div>
+</section>
+
+<!-- ================= 8. PRICING ================= -->
+<section style="background:#FAF9F6;padding:160px 24px">
+  <div data-reveal="" style="max-width:520px;margin:0 auto">
+    <div style="background:#FFFFFF;border:1px solid #E8E4DA;border-radius:20px;padding:48px 44px;box-shadow:0 24px 60px rgba(10,26,47,0.1);display:flex;flex-direction:column;gap:28px">
+      <div style="text-align:center;display:flex;flex-direction:column;gap:6px">
+        <div style="font-family:'Fraunces',serif;font-size:clamp(2.8rem,6vw,3.6rem);font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">$2,000</div>
+        <div style="font-size:15px;color:#5A6E86">one-time. Everything included.</div>
+      </div>
+      <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;font-size:15px;line-height:1.5;color:#3D4F66">
+        <li style="display:flex;gap:12px"><span style="color:#0F8B80">•</span>Voice AI configured to your practice</li>
+        <li style="display:flex;gap:12px"><span style="color:#0F8B80">•</span>Calendar integration, appointments written directly</li>
+        <li style="display:flex;gap:12px"><span style="color:#0F8B80">•</span>Call scripting for your services and insurance FAQs</li>
+        <li style="display:flex;gap:12px"><span style="color:#0F8B80">•</span>Testing, tuning, and go-live</li>
+      </ul>
+      <div style="font-size:13px;color:#5A6E86;line-height:1.6">Optional Care Plan, $50/month: monitoring, updates, script refinements. Cancel anytime.</div>
+      <div style="font-size:13px;color:#5A6E86;line-height:1.6;border-top:1px solid #EEEAE0;padding-top:18px">Voice-AI usage is billed at cost on your own account with our voice platform. Digi Dental takes no markup on usage.</div>
+      <div style="border:1.5px solid #0F8B80;border-radius:12px;padding:20px 22px;display:flex;gap:16px;align-items:flex-start;background:rgba(15,139,128,0.04)">
+        <div style="width:34px;height:34px;border-radius:50%;border:1.5px solid #0F8B80;color:#0F8B80;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:15px;flex-shrink:0">14</div>
+        <div style="font-size:14px;line-height:1.6;color:#0A1A2F;font-variant-numeric:tabular-nums"><strong>Start for half. Pay the rest only when it books.</strong> If your AI receptionist doesn't book a patient into your calendar within 14 days, you keep the $1,000 difference.</div>
+      </div>
+      <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" style="display:block;text-align:center;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:17px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Claim your practice audit slot</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 9. FAQ ================= -->
+<section style="background:#FFFFFF;padding:150px 24px;border-top:1px solid #EEEAE0">
+  <div data-reveal="" style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:8px">
+    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0 0 40px;text-align:center">Questions owners ask</h2>
+    <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="6">
+      <div style="border-bottom:1px solid #EEEAE0">
+        <button onClick="{{ f.toggle }}" aria-expanded="{{ f.open }}" style="width:100%;background:none;border:none;padding:22px 4px;display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;font-size:16.5px;font-weight:500;color:#0A1A2F;text-align:left">
+          <span>{{ f.q }}</span><span style="color:#0F8B80;font-size:20px;flex-shrink:0">{{ f.icon }}</span>
+        </button>
+        <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+          <p style="margin:0;padding:0 4px 24px;font-size:15px;line-height:1.7;color:#3D4F66;text-wrap:pretty">{{ f.a }}</p>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<!-- ================= 10. FINAL + FOOTER ================= -->
+<section style="background:#0A1A2F;color:#FAF9F6;padding:160px 24px 0">
+  <div data-reveal="" style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;padding-bottom:130px">
+    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2rem,5vw,3rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">Every call answered. Every opening filled.</h2>
+    <p style="font-size:16px;color:#B9C4D4;margin:0;font-variant-numeric:tabular-nums">It books a patient within 14 days, or you keep $1,000.</p>
+    <button onClick="{{ openBooking }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,0.3)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+  </div>
+  <footer style="border-top:1px solid #22344E;max-width:1080px;margin:0 auto;padding:64px clamp(20px,5vw,32px) 28px;display:flex;flex-direction:column;gap:44px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:44px">
+      <div style="display:flex;flex-direction:column;gap:14px;max-width:280px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <img src="uploads/denty_neutral.png" alt="" width="28" height="28" style="display:block;width:28px;height:28px;object-fit:contain;image-rendering:pixelated">
+          <div style="font-family:'Fraunces',serif;font-weight:600;font-size:19px;letter-spacing:-0.02em">Digi<span style="color:#0F8B80"> Dental</span></div>
+        </div>
+        <p style="font-size:13.5px;line-height:1.65;color:#8A9BB5;margin:0;text-wrap:pretty">A 24/7 AI receptionist that answers your practice's calls and books patients straight into your calendar.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#5A6E86">Contact</div>
+        <a href="mailto:bennysworkspace@gmail.com" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">bennysworkspace@gmail.com</a>
+        <a href="https://web.facebook.com/meetdigidenty" target="_blank" rel="noopener" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Facebook</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#5A6E86">Legal</div>
+        <a href="#privacy" onClick="{{ openPrivacy }}" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Privacy</a>
+        <a href="#terms" onClick="{{ openTerms }}" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Terms</a>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <button onClick="{{ scrollToToothy }}" aria-label="Talk to the AI receptionist" title="Talk to the AI receptionist" style="width:60px;height:60px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
+          <img src="uploads/denty_neutral.png" alt="" width="60" height="60" style="display:block;width:60px;height:60px;object-fit:contain;image-rendering:pixelated">
+        </button>
+        <div style="font-size:12px;color:#5A6E86">Talk to the receptionist</div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #22344E;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:11.5px;color:#3D4F66">
+      <div>© 2026 Digi Dental. Powered by Voice Infrastructure.</div>
+      <div>Developed by: <a href="https://bennys-portfolio.vercel.app/" target="_blank" rel="noopener" style="color:#5A6E86" style-hover="color:#8A9BB5">Benny</a></div>
+    </div>
+  </footer>
+</section>
+
+<!-- ================= STICKY MOBILE CTA ================= -->
+<sc-if value="{{ showSticky }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:0;left:0;right:0;z-index:40;padding:12px 16px;background:rgba(10,26,47,0.92);backdrop-filter:blur(10px)">
+    <button onClick="{{ openBooking }}" style="width:100%;background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px;font-size:16px;font-weight:600;cursor:pointer">Book a Strategy Call</button>
+  </div>
+</sc-if>
+
+<!-- ================= BOOKING MODAL ================= -->
+<sc-if value="{{ mBooking }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(10,26,47,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px">
+    <div role="dialog" aria-modal="true" aria-label="Book a strategy call" onClick="{{ stopProp }}" style="background:#FAF9F6;border-radius:20px;width:min(560px,100%);min-height:420px;max-height:92vh;overflow-y:auto;padding:clamp(26px,5vw,44px);display:flex;flex-direction:column;box-shadow:0 40px 100px rgba(0,0,0,0.4);animation:dd-fadeup .4s cubic-bezier(.22,1,.36,1) both">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:36px">
+        <div style="display:flex;gap:8px">
+          <sc-for list="{{ dots }}" as="d" hint-placeholder-count="6">
+            <div style="width:8px;height:8px;border-radius:50%;background:{{ d.bg }};transition:background .3s"></div>
+          </sc-for>
+        </div>
+        <button onClick="{{ closeModal }}" aria-label="Close" style="background:none;border:none;font-size:22px;color:#5A6E86;cursor:pointer;line-height:1">×</button>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px">
+        <sc-if value="{{ st0 }}" hint-placeholder-val="{{ true }}">
+          <label for="bk0" style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">What's your name?</label>
+          <input id="bk0" type="text" value="{{ bName }}" onChange="{{ setName }}" onKeyDown="{{ bookingKey }}" placeholder="Dr. Jane Rivera" autoFocus="{{ true }}" style="font-size:20px;padding:12px 2px;border:none;border-bottom:2px solid #D8D2C4;background:none;outline:none;color:#0A1A2F" style-focus="border-bottom-color:#0F8B80">
+        </sc-if>
+        <sc-if value="{{ st1 }}" hint-placeholder-val="{{ false }}">
+          <label for="bk1" style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Your practice's name?</label>
+          <input id="bk1" type="text" value="{{ bPractice }}" onChange="{{ setPractice }}" onKeyDown="{{ bookingKey }}" placeholder="Riverside Family Dental" autoFocus="{{ true }}" style="font-size:20px;padding:12px 2px;border:none;border-bottom:2px solid #D8D2C4;background:none;outline:none;color:#0A1A2F" style-focus="border-bottom-color:#0F8B80">
+        </sc-if>
+        <sc-if value="{{ st2 }}" hint-placeholder-val="{{ false }}">
+          <label for="bk2" style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Which country is your practice in?</label>
+          <select id="bk2" value="{{ bCountry }}" onChange="{{ setCountry }}" style="font-size:18px;padding:12px;border:2px solid #D8D2C4;border-radius:10px;background:#FFFFFF;color:#0A1A2F;outline:none">
+            <option value="">Select a country</option>
+            <option value="United States">United States</option>
+            <option value="Canada">Canada</option>
+            <option value="Australia">Australia</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="New Zealand">New Zealand</option>
+            <option value="Ireland">Ireland</option>
+            <option value="Other">Other</option>
+          </select>
+        </sc-if>
+        <sc-if value="{{ st3 }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Roughly how many calls per month?</div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px">
+            <sc-for list="{{ volumeChips }}" as="c" hint-placeholder-count="4">
+              <button onClick="{{ c.pick }}" style="padding:12px 22px;border-radius:999px;border:1.5px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:15px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums">{{ c.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ st4 }}" hint-placeholder-val="{{ false }}">
+          <label for="bk4" style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">How many locations?</label>
+          <input id="bk4" type="number" min="1" value="{{ bLocations }}" onChange="{{ setLocations }}" onKeyDown="{{ bookingKey }}" placeholder="1" autoFocus="{{ true }}" style="font-size:20px;padding:12px 2px;border:none;border-bottom:2px solid #D8D2C4;background:none;outline:none;color:#0A1A2F;font-variant-numeric:tabular-nums;width:120px" style-focus="border-bottom-color:#0F8B80">
+        </sc-if>
+        <sc-if value="{{ st5 }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Best email and phone?</div>
+          <input type="email" value="{{ bEmail }}" onChange="{{ setEmail }}" onKeyDown="{{ bookingKey }}" placeholder="you@practice.com" aria-label="Email" autoFocus="{{ true }}" style="font-size:19px;padding:12px 2px;border:none;border-bottom:2px solid #D8D2C4;background:none;outline:none;color:#0A1A2F" style-focus="border-bottom-color:#0F8B80">
+          <input type="tel" value="{{ bPhone }}" onChange="{{ setPhone }}" onKeyDown="{{ bookingKey }}" placeholder="+1 (555) 000-0000" aria-label="Phone" style="font-size:19px;padding:12px 2px;border:none;border-bottom:2px solid #D8D2C4;background:none;outline:none;color:#0A1A2F;font-variant-numeric:tabular-nums" style-focus="border-bottom-color:#0F8B80">
+        </sc-if>
+        <sc-if value="{{ st6 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center">
+            <div style="width:52px;height:52px;border-radius:50%;background:#2F7D5A;color:#FAF9F6;display:flex;align-items:center;justify-content:center;font-size:24px;animation:dd-pop .55s cubic-bezier(.34,1.56,.64,1) both">✓</div>
+            <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:600">{{ qualifyTitle }}</div>
+            <p style="font-size:14.5px;line-height:1.65;color:#3D4F66;margin:0;max-width:400px;text-wrap:pretty">{{ qualifyBody }}</p>
+            <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" style="display:inline-block;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:15px 32px;font-size:15px;font-weight:600;text-decoration:none;box-shadow:0 6px 18px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px)">Pick your strategy-call time now</a>
+            <div style="font-size:12.5px;color:#5A6E86">{{ sentNote }}</div>
+            <a href="https://wa.me/351912859130" target="_blank" rel="noopener" style="font-size:14px">Prefer to text? WhatsApp us instead</a>
+          </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ stNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:36px">
+          <button onClick="{{ back }}" style="background:none;border:none;color:{{ backColor }};font-size:14px;cursor:pointer">← Back</button>
+          <button onClick="{{ next }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:13px 28px;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">{{ nextLabel }}</button>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ================= PRIVACY / TERMS MODALS ================= -->
+<sc-if value="{{ mPrivacy }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(10,26,47,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px">
+    <div role="dialog" aria-modal="true" aria-label="Privacy policy" onClick="{{ stopProp }}" style="background:#FAF9F6;border-radius:20px;width:min(640px,100%);max-height:80vh;overflow-y:auto;padding:clamp(26px,5vw,44px);box-shadow:0 40px 100px rgba(0,0,0,0.4);animation:dd-fadeup .4s cubic-bezier(.22,1,.36,1) both">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+        <h3 style="font-family:'Fraunces',serif;font-size:24px;margin:0">Privacy Policy</h3>
+        <button onClick="{{ closeModal }}" aria-label="Close" style="background:none;border:none;font-size:22px;color:#5A6E86;cursor:pointer">×</button>
+      </div>
+      <!-- PLACEHOLDER — replace with reviewed legal copy before launch -->
+      <div style="font-size:14px;line-height:1.75;color:#3D4F66;display:flex;flex-direction:column;gap:16px">
+        <p style="margin:0"><strong>PLACEHOLDER legal copy.</strong> Digi Dental collects the information you submit through this site: name, practice name, contact details, and call-volume estimates, solely to respond to your inquiry and schedule a strategy call.</p>
+        <p style="margin:0"><strong>Demo calls.</strong> Audio from the in-browser demo call is processed by a third-party voice AI provider to power the conversation. Demo calls are limited to 60 seconds. Do not share patient or health information during the demo.</p>
+        <p style="margin:0"><strong>Storage.</strong> Form submissions are stored securely and used only to respond to inquiries. We do not sell your information.</p>
+        <p style="margin:0"><strong>Contact.</strong> Questions: <a href="mailto:bennysworkspace@gmail.com">bennysworkspace@gmail.com</a></p>
+      </div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ mTerms }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(10,26,47,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px">
+    <div role="dialog" aria-modal="true" aria-label="Terms of service" onClick="{{ stopProp }}" style="background:#FAF9F6;border-radius:20px;width:min(640px,100%);max-height:80vh;overflow-y:auto;padding:clamp(26px,5vw,44px);box-shadow:0 40px 100px rgba(0,0,0,0.4);animation:dd-fadeup .4s cubic-bezier(.22,1,.36,1) both">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+        <h3 style="font-family:'Fraunces',serif;font-size:24px;margin:0">Terms of Service</h3>
+        <button onClick="{{ closeModal }}" aria-label="Close" style="background:none;border:none;font-size:22px;color:#5A6E86;cursor:pointer">×</button>
+      </div>
+      <!-- PLACEHOLDER — replace with reviewed legal copy before launch -->
+      <div style="font-size:14px;line-height:1.75;color:#3D4F66;display:flex;flex-direction:column;gap:16px">
+        <p style="margin:0"><strong>PLACEHOLDER legal copy.</strong> The setup fee covers configuration, calendar integration, call scripting, testing, and go-live for one practice location unless otherwise agreed.</p>
+        <p style="margin:0"><strong>Guarantee.</strong> If the AI receptionist does not book a patient into your calendar within 14 days of go-live, the remaining $1,000 balance is waived.</p>
+        <p style="margin:0"><strong>Usage.</strong> Voice-AI usage is billed at cost on the practice's own platform account. Digi Dental applies no markup on usage.</p>
+        <p style="margin:0"><strong>Cancellation.</strong> The optional Care Plan may be cancelled anytime, effective the next billing cycle.</p>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ================= EXIT-INTENT MODAL (desktop, once per session) ================= -->
+<sc-if value="{{ mExit }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ dismissExit }}" style="position:fixed;inset:0;z-index:100;background:rgba(10,26,47,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px">
+    <div role="dialog" aria-modal="true" aria-label="Before you go" onClick="{{ stopProp }}" style="background:#FAF9F6;border-radius:18px;width:min(440px,100%);padding:clamp(26px,6vw,40px);text-align:center;display:flex;flex-direction:column;gap:22px;box-shadow:0 40px 100px rgba(0,0,0,0.4);animation:dd-fadeup .35s cubic-bezier(.22,1,.36,1) both">
+      <div style="font-family:'Fraunces',serif;font-size:23px;font-weight:600;line-height:1.35">Before you go: talk to the AI for 60 seconds. Then decide.</div>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button onClick="{{ tryDemoFromExit }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:13px 26px;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Try the demo</button>
+        <button onClick="{{ dismissExit }}" style="background:none;border:1px solid #D8D2C4;border-radius:10px;padding:13px 26px;font-size:15px;color:#5A6E86;cursor:pointer">No thanks</button>
+      </div>
+      <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" style="font-size:13.5px;color:#0F8B80">Or go straight to the calendar: secure your clinic's overflow calls</a>
+    </div>
+  </div>
+</sc-if>
+
+</sc-if></x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {&quot;width&quot;: 1280},
+  &quot;demoSeconds&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 60, &quot;min&quot;: 15, &quot;max&quot;: 120, &quot;step&quot;: 5, &quot;unit&quot;: &quot;s&quot;, &quot;section&quot;: &quot;Demo call&quot;, &quot;tsType&quot;: &quot;number&quot;},
+  &quot;exitIntent&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;section&quot;: &quot;Behavior&quot;, &quot;tsType&quot;: &quot;boolean&quot;},
+  &quot;firstVisitValue&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 850, &quot;min&quot;: 300, &quot;max&quot;: 3000, &quot;section&quot;: &quot;ROI calculator&quot;, &quot;tsType&quot;: &quot;number&quot;},
+  &quot;bookingRate&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 0.3, &quot;min&quot;: 0.1, &quot;max&quot;: 0.6, &quot;step&quot;: 0.05, &quot;section&quot;: &quot;ROI calculator&quot;, &quot;tsType&quot;: &quot;number&quot;}
+}">
+class Component extends DCLogic {
+  state = {
+    heroPhase: 0, heroIdx: 0,
+    scrolled: false, showSticky: false,
+    slider: 15, faqOpen: -1,
+    modal: null, // null | 'booking' | 'privacy' | 'terms' | 'exit'
+    step: 0, bName: '', bPractice: '', bCountry: '', bVolume: '', bLocations: '', bEmail: '', bPhone: '',
+    toothy: 'idle', // idle | connecting | live | ended | limited
+    remaining: 60, bubble: '', demoUsed: false, sendState: null
+  };
+
+  CALLERS = [
+    { tag: 'New patient, 7:42 PM, after hours', l1: '\u201CHi, I chipped a tooth at dinner. Can I get in tomorrow?\u201D', l2: '\u201CDr. Patel has 2:00 PM Tuesday open. Shall I book it?\u201D', booked: 'Booked: Tuesday 2:00 PM', cap: 'Booked while the office was closed.' },
+    { tag: 'New patient, 12:15 PM, lunch rush', l1: '\u201CDo you take Delta Dental? I need a cleaning.\u201D', l2: '\u201CWe do. Thursday 10:30 AM is available. Shall I book it?\u201D', booked: 'Booked: Thursday 10:30 AM', cap: 'Booked while the line was busy.' },
+    { tag: 'New patient, 9:03 PM, Sunday', l1: '\u201CMy crown came off. How soon can someone see me?\u201D', l2: '\u201CMonday 8:00 AM, first slot. Shall I book it?\u201D', booked: 'Booked: Monday 8:00 AM', cap: 'Booked before the week began.' }
+  ];
+
+  // Denty sprite frames (user-provided pixel art in uploads/)
+  FRAMES = {
+    neutral: 'uploads/denty_neutral.png',
+    half: 'uploads/denty_half_mouth_yap.png',
+    full: 'uploads/denty_full_mouth_yap.png',
+    happy: 'uploads/denty_happy.png'
+  };
+  YAP_CYCLE = ['neutral', 'half', 'full', 'half'];
+
+  // Direct-to-Supabase fallback for static hosting (RLS insert-only policy required on `leads`).
+  // PLACEHOLDER: the publishable key below was truncated in the screenshot provided — paste the
+  // full key from Supabase → Settings → API Keys for direct inserts to work.
+  SUPABASE_URL = 'https://hctpvnqanwhxlmpmfmme.supabase.co';
+  SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_MWPe84PkAw7Zo1T_MMvlFg_ppAOL';
+
+  // Vapi voice agent. PUBLIC web key — safe in the browser. In the Vite build these come from
+  // import.meta.env.VITE_VAPI_PUBLIC_KEY / VITE_VAPI_ASSISTANT_ID (.env, gitignored); this static
+  // build inlines them since there is no bundler to substitute import.meta.env.
+  VAPI_PUBLIC_KEY = 'fd2dddbc-3c7d-4eed-9cea-cf4fc9828d9f';
+  VAPI_ASSISTANT_ID = 'e3c3d544-3023-4725-bc7a-cbe78b35d36c';
+
+  componentDidMount() {
+    this._timers = [];
+    Object.values(this.FRAMES).forEach(src => { const im = new Image(); im.src = src; }); // preload sprite frames
+
+    this._mq = window.matchMedia('(prefers-reduced-motion: reduce)'); // useReducedMotion equivalent, live-updating
+    this._reduced = this._mq.matches;
+    this._onMq = e => { this._reduced = e.matches; if (e.matches) clearInterval(this._yapTimer); this.forceUpdate(); };
+    if (this._mq.addEventListener) this._mq.addEventListener('change', this._onMq);
+    const heroReady = () => { if (!this.state.heroReady) this.setState({ heroReady: true }); };
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(heroReady);
+    this._timers.push(setTimeout(heroReady, 1200)); // cap: never skeleton longer than 1.2s
+    this._demoTotal = this.props.demoSeconds ?? 60;
+    this.setState({ demoUsed: !!localStorage.getItem('dd_demo_used'), formDone: !!localStorage.getItem('dd_form_done'), remaining: this._demoTotal });
+    this.cycleHero();
+    this._onScroll = () => {
+      const y = window.scrollY;
+      const scrolled = y > 60;
+      const showSticky = window.innerWidth < 768 && y > window.innerHeight * 0.9 && !this.state.modal && this.state.toothy !== 'live' && this.state.toothy !== 'connecting';
+      if (scrolled !== this.state.scrolled || showSticky !== this.state.showSticky) this.setState({ scrolled, showSticky });
+    };
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    this._onKey = (e) => {
+      if (e.key === 'Escape' && this.state.modal) { this.setState({ modal: null }); return; }
+      // Focus trap (react-focus-lock equivalent): Tab cycles inside the open dialog
+      if (e.key === 'Tab' && this.state.modal) {
+        const d = document.querySelector('[role="dialog"]');
+        if (!d) return;
+        const f = Array.from(d.querySelectorAll('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')).filter(el => !el.disabled && el.offsetParent !== null);
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && (document.activeElement === first || !d.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && (document.activeElement === last || !d.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
+      }
+    };
+    document.addEventListener('keydown', this._onKey);
+    // Exit intent — desktop only, once per session (tweakable via exitIntent prop)
+    this._onMouseOut = (e) => {
+      if ((this.props.exitIntent ?? true) && !e.relatedTarget && e.clientY <= 0 && window.innerWidth >= 1024 &&
+          !sessionStorage.getItem('dd_exit_shown') && !this.state.modal) {
+        sessionStorage.setItem('dd_exit_shown', '1');
+        this.setState({ modal: 'exit' });
+      }
+    };
+    document.addEventListener('mouseout', this._onMouseOut);
+    // Scroll reveals (fade + 16px rise, once)
+    if (!this._reduced && 'IntersectionObserver' in window) {
+      // Staggered child reveal: each block's children rise, de-blur, and settle in sequence
+      const els = document.querySelectorAll('[data-reveal]');
+      const ease = 'cubic-bezier(.22,1,.36,1)';
+      els.forEach(el => Array.from(el.children).forEach((ch, i) => {
+        ch.style.opacity = '0';
+        ch.style.transform = 'translateY(28px) scale(.96)';
+        ch.style.filter = 'blur(8px)';
+        ch.style.transition = `opacity .9s ${ease} ${i * 0.14}s, transform .9s ${ease} ${i * 0.14}s, filter .9s ${ease} ${i * 0.14}s`;
+      }));
+      this._rio = new IntersectionObserver(es => es.forEach(en => {
+        if (en.isIntersecting) {
+          Array.from(en.target.children).forEach(ch => { ch.style.opacity = '1'; ch.style.transform = 'none'; ch.style.filter = 'none'; });
+          this._rio.unobserve(en.target);
+        }
+      }), { threshold: 0.2 });
+      els.forEach(el => this._rio.observe(el));
+    }
+    // Count-up statistics
+    const counts = document.querySelectorAll('[data-count]');
+    if ('IntersectionObserver' in window) {
+      this._cio = new IntersectionObserver(es => es.forEach(en => {
+        if (en.isIntersecting) { this._cio.unobserve(en.target); this.animateCount(en.target); }
+      }), { threshold: 0.6 });
+      counts.forEach(el => this._cio.observe(el));
+    }
+    // Toothy idle bubble after 3s in view
+    if ('IntersectionObserver' in window) {
+      const t = document.querySelector('[data-toothy]');
+      if (t) {
+        this._tio = new IntersectionObserver(es => es.forEach(en => {
+          if (en.isIntersecting) {
+            this._tio.unobserve(en.target);
+            this._timers.push(setTimeout(() => {
+              if (this.state.toothy === 'idle' && !this.state.bubble) {
+                this.setState({ bubble: this.state.demoUsed ? "You've had your free call. Want one answering your practice's phone?" : 'Click me. Talk to the actual AI receptionist. 60 seconds, free.' });
+              }
+            }, 3000));
+          }
+        }), { threshold: 0.5 });
+        this._tio.observe(t);
+      }
+    }
+    if (window.matchMedia && window.matchMedia('(hover:hover)').matches) this.initLinkPreviews();
+    // Vapi SDK loads defer/async from helmet — poll until ready, then wire the call lifecycle.
+    this._vapiPoll = setInterval(() => {
+      if (!window.vapiSDK) return;
+      clearInterval(this._vapiPoll); this._vapiPoll = null;
+      try {
+        this._vapi = window.vapiSDK.run({ apiKey: this.VAPI_PUBLIC_KEY, assistant: this.VAPI_ASSISTANT_ID });
+        this._vapi.on('call-start', () => { this._vapiLive = true; this.goLive(); });
+        this._vapi.on('call-end', () => {
+          this._vapiLive = false;
+          if (this.state.toothy === 'live' || this.state.toothy === 'connecting') { clearInterval(this._callTimer); this.finishDemo(); }
+        });
+        this._vapi.on('error', () => {
+          this._vapiLive = false;
+          if (this.state.toothy === 'connecting' || this.state.toothy === 'live') {
+            clearInterval(this._callTimer); clearInterval(this._yapTimer);
+            this.setState({ toothy: 'idle', bubble: "Couldn't connect the call. Check your mic permission and try again." });
+          }
+        });
+      } catch (e) { console.error('Vapi init failed; demo falls back to simulation:', e); }
+    }, 400);
+    this._timers.push(setTimeout(() => { if (this._vapiPoll) { clearInterval(this._vapiPoll); this._vapiPoll = null; } }, 20000));
+  }
+
+  // Citation hover previews: microlink screenshot card, vanilla equivalent of the LinkPreview
+  // component (spring-in card above the link, subtle x-follow on mousemove). No dependencies.
+  initLinkPreviews() {
+    const links = document.querySelectorAll('[data-linkpreview]');
+    if (!links.length) return;
+    const card = document.createElement('div');
+    card.setAttribute('aria-hidden', 'true');
+    card.style.cssText = 'position:fixed;z-index:90;pointer-events:none;opacity:0;transform:translate(-50%,10px) scale(.7);transition:opacity .28s cubic-bezier(.22,1,.36,1),transform .32s cubic-bezier(.34,1.56,.64,1);background:#FFFFFF;border:1px solid #E8E4DA;border-radius:12px;padding:4px;box-shadow:0 18px 44px rgba(10,26,47,0.2)';
+    const img = document.createElement('img');
+    img.style.cssText = 'display:block;width:200px;height:125px;object-fit:cover;object-position:top;border-radius:8px;background:#F1EEE6';
+    img.alt = '';
+    const cap = document.createElement('div');
+    cap.style.cssText = 'font-size:11px;color:#5A6E86;padding:5px 4px 2px;text-align:center;font-family:Inter,system-ui,sans-serif';
+    card.appendChild(img); card.appendChild(cap);
+    document.body.appendChild(card);
+    this._lpCard = card;
+    let xTarget = 0, xCur = 0;
+    const tick = () => { xCur += (xTarget - xCur) * 0.14; card.style.marginLeft = xCur.toFixed(1) + 'px'; this._lpRaf = requestAnimationFrame(tick); };
+    links.forEach(a => {
+      a.addEventListener('mouseenter', () => {
+        const url = a.getAttribute('data-linkpreview');
+        const r = a.getBoundingClientRect();
+        img.src = 'https://api.microlink.io/?' + new URLSearchParams({ url, screenshot: 'true', meta: 'false', embed: 'screenshot.url', 'viewport.width': '800', 'viewport.height': '500' }).toString();
+        cap.textContent = url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+        card.style.left = (r.left + r.width / 2) + 'px';
+        card.style.top = Math.max(8, r.top - 178) + 'px';
+        xTarget = 0; xCur = 0; card.style.marginLeft = '0px';
+        card.style.opacity = '1';
+        card.style.transform = 'translate(-50%,0) scale(1)';
+        if (!this._lpRaf) tick();
+      });
+      a.addEventListener('mousemove', e => {
+        const r = a.getBoundingClientRect();
+        xTarget = (e.clientX - (r.left + r.width / 2)) / 2;
+      });
+      a.addEventListener('mouseleave', () => {
+        card.style.opacity = '0';
+        card.style.transform = 'translate(-50%,10px) scale(.7)';
+        if (this._lpRaf) { cancelAnimationFrame(this._lpRaf); this._lpRaf = null; }
+      });
+    });
+  }
+
+  componentWillUnmount() {
+    (this._timers || []).forEach(clearTimeout);
+    clearInterval(this._callTimer);
+    clearInterval(this._yapTimer);
+    window.removeEventListener('scroll', this._onScroll);
+    document.removeEventListener('keydown', this._onKey);
+    document.removeEventListener('mouseout', this._onMouseOut);
+    if (this._mq && this._mq.removeEventListener) this._mq.removeEventListener('change', this._onMq);
+    [this._rio, this._cio, this._tio].forEach(o => o && o.disconnect());
+    if (this._lpRaf) cancelAnimationFrame(this._lpRaf);
+    if (this._lpCard) this._lpCard.remove();
+    if (this._vapiPoll) clearInterval(this._vapiPoll);
+    if (this._vapi && this._vapiLive) { try { this._vapi.stop(); } catch (e) {} }
+  }
+
+  animateCount(el) {
+    const end = parseFloat(el.dataset.count);
+    const fmt = v => Math.round(v).toLocaleString('en-US');
+    if (this._reduced) { el.textContent = fmt(end); return; }
+    const t0 = performance.now(), dur = 1400;
+    const step = t => {
+      const p = Math.min(1, (t - t0) / dur);
+      el.textContent = fmt(end * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    el.textContent = '0';
+    requestAnimationFrame(step);
+  }
+
+  cycleHero() {
+    const durs = [2400, 4200, 2800];
+    const tick = () => {
+      this.setState(s => {
+        const nextPhase = (s.heroPhase + 1) % 3;
+        return { heroPhase: nextPhase, heroIdx: nextPhase === 0 ? (s.heroIdx + 1) % this.CALLERS.length : s.heroIdx };
+      }, () => this._timers.push(setTimeout(tick, durs[this.state.heroPhase])));
+    };
+    this._timers.push(setTimeout(tick, durs[0]));
+  }
+
+  scrollToEl(id) {
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 20, behavior: this._reduced ? 'auto' : 'smooth' });
+  }
+
+  // ---- Demo call ----
+  // Live voice via the Vapi HTML script-tag SDK (loaded in helmet, initialized in componentDidMount).
+  // Clicking Toothy starts a real in-browser call on the visitor's microphone. Duration limits and
+  // end messages are handled on the assistant side; the client countdown is a visual + safety net.
+  // If the SDK hasn't loaded (offline preview), a simulated call plays instead. Never a raw error.
+  startDemo() {
+    const s = this.state;
+    if (s.toothy === 'live' || s.toothy === 'connecting') return;
+    // After the form is in, the gate lifts: let them call and test the receptionist right here.
+    if (s.demoUsed && !s.formDone) {
+      this.setState({ toothy: 'limited', bubble: "You've had your free call. Want one answering your practice's phone?", modal: 'booking' });
+      return;
+    }
+    const total = this.props.demoSeconds ?? 60;
+    this.setState({ toothy: 'connecting', bubble: 'Calling…', remaining: total });
+    if (this._vapi) {
+      try { this._vapi.start(this.VAPI_ASSISTANT_ID); return; } catch (e) { console.error('Vapi start failed, simulating:', e); }
+    }
+    this._timers.push(setTimeout(() => this.goLive(), 1600));
+  }
+
+  goLive() {
+    if (this.state.toothy !== 'connecting') return;
+    this.setState({ toothy: 'live', bubble: '' });
+    if (!this._reduced) this._yapTimer = setInterval(() => this.setState(st => ({ yapIdx: ((st.yapIdx || 0) + 1) % this.YAP_CYCLE.length })), 150);
+    this._callTimer = setInterval(() => {
+      this.setState(st => {
+        const r = st.remaining - 1;
+        if (r <= 0) { clearInterval(this._callTimer); this.hangUp(); return { remaining: 0 }; }
+        return { remaining: r, bubble: r === 10 ? '10 seconds left' : st.bubble };
+      });
+    }, 1000);
+  }
+
+  hangUp() {
+    clearInterval(this._callTimer);
+    if (this._vapi && this._vapiLive) { try { this._vapi.stop(); return; } catch (e) {} } // call-end event finishes up
+    this.finishDemo();
+  }
+
+  currentFrame() {
+    const s = this.state;
+    if (s.toothy === 'live' || s.toothy === 'connecting') return this.YAP_CYCLE[s.yapIdx || 0];
+    if (s.toothy === 'ended' || s.toothy === 'limited') return 'happy';
+    return s.bubble ? 'happy' : 'neutral';
+  }
+
+  componentDidUpdate() {
+    // Focus management: move focus into an opening dialog, restore it on close
+    if (this.state.modal !== this._prevModal) {
+      if (this.state.modal) {
+        this._lastFocus = document.activeElement;
+        setTimeout(() => {
+          const d = document.querySelector('[role="dialog"]');
+          if (!d) return;
+          const f = d.querySelector('input, select, button:not([aria-label="Close"]), a[href]');
+          (f || d).focus();
+        }, 80);
+      } else if (this._lastFocus && this._lastFocus.focus) { this._lastFocus.focus(); }
+      this._prevModal = this.state.modal;
+    }
+    // Sprite src is set imperatively — a {{ }} hole in an img src fires a bogus fetch during raw HTML parse.
+    const el = document.getElementById('denty-sprite');
+    if (el) {
+      const src = this.FRAMES[this.currentFrame()];
+      if (el.getAttribute('src') !== src) el.setAttribute('src', src);
+    }
+  }
+
+  finishDemo() {
+    if (this.state.toothy === 'ended') return;
+    clearInterval(this._yapTimer);
+    localStorage.setItem('dd_demo_used', '1');
+    this.setState({ toothy: 'ended', demoUsed: true, bubble: 'That was the same receptionist your patients would reach.' });
+    // Post-form calls: once the conversation ends, bring the form popup back up.
+    if (this.state.formDone) this._timers.push(setTimeout(() => { if (!this.state.modal) this.setState({ modal: 'booking' }); }, 1400));
+    // PRODUCTION: POST /api/notify-lead { source: 'demo_call' } here.
+  }
+
+  // ---- Booking modal ----
+  valid(step) {
+    const s = this.state;
+    return [s.bName, s.bPractice, s.bCountry, s.bVolume, s.bLocations, s.bEmail][step] !== '' || step > 5;
+  }
+
+  next() {
+    const s = this.state;
+    if (s.step === 5) {
+      if (!s.bEmail.includes('@')) return;
+      // Lead delivery: /api/notify-lead inserts into Supabase and emails the owner via Resend.
+      localStorage.setItem('dd_form_done', '1');
+      this.setState({ step: 6, sendState: 'sending', formDone: true });
+      this.submitLead();
+    } else if (this.valid(s.step)) {
+      this.setState({ step: s.step + 1 });
+    }
+  }
+
+  submitLead() {
+    const s = this.state;
+    const payload = { name: s.bName, practice_name: s.bPractice, email: s.bEmail, phone: s.bPhone, country: s.bCountry, monthly_call_volume: s.bVolume, locations: s.bLocations, source: 'form' };
+    try {
+      // Primary: serverless route (Supabase insert + Resend email to the owner's inbox).
+      fetch('/api/notify-lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        .then(r => r.json())
+        .then(j => { if (j && j.ok) this.setState({ sendState: 'sent' }); else { this.insertDirect(payload); } })
+        .catch(() => this.insertDirect(payload));
+    } catch (e) { this.setState({ sendState: 'queued' }); }
+  }
+
+  insertDirect(payload) {
+    // Fallback when no serverless runtime exists: write the lead straight to Supabase from the browser.
+    try {
+      fetch(this.SUPABASE_URL + '/rest/v1/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: this.SUPABASE_PUBLISHABLE_KEY, Authorization: 'Bearer ' + this.SUPABASE_PUBLISHABLE_KEY, Prefer: 'return=minimal' },
+        body: JSON.stringify(payload)
+      }).then(r => this.setState({ sendState: r.ok ? 'saved' : 'queued' }))
+        .catch(() => this.setState({ sendState: 'queued' }));
+    } catch (e) { this.setState({ sendState: 'queued' }); }
+  }
+
+  componentDidCatch(err) { console.error('Boundary caught:', err); this.setState({ crashed: true }); }
+
+  renderVals() {
+    const fallback = { crashed: true, appOk: false, reloadPage: () => location.reload() };
+    if (this.state.crashed) return fallback;
+    try { return { crashed: false, appOk: true, ...this._vals() }; }
+    catch (e) { console.error('renderVals failed, showing fallback:', e); return fallback; }
+  }
+
+  _vals() {
+    const s = this.state;
+    const c = this.CALLERS[s.heroIdx];
+    const total = this._demoTotal || (this.props.demoSeconds ?? 60);
+    const fvv = this.props.firstVisitValue ?? 850; // $ first-visit value — sourced, editable
+    const rate = this.props.bookingRate ?? 0.30;   // share of missed calls that are booking opportunities
+    const lost = Math.round(s.slider * 52 * rate * fvv);
+    const bars = n => Array.from({ length: n }, (_, i) => ({ delay: (i * 0.11 % 0.9).toFixed(2) + 's' }));
+    const faqData = [
+      { q: "Will patients know it's AI?", a: "Some ask. The voice is natural enough that most don't. It never pretends to be human when asked directly. It says it's the practice's automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM." },
+      { q: 'What if it mishears something?', a: "It confirms every detail that matters. Name, phone number, and appointment time are read back before booking. If a caller needs something outside its script, it takes a message and flags it for your staff instead of guessing." },
+      { q: 'Does it replace my front desk?', a: "No. It catches what they physically can't: after-hours calls, lunch rushes, the second line while they're checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself." },
+      { q: 'What does usage roughly cost monthly?', a: 'Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us.' },
+      { q: 'How fast is go-live?', a: 'Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within one week of the strategy call.' },
+      { q: 'Contracts, cancellation, and data?', a: 'No long-term contract. The setup fee is one-time; the optional Care Plan cancels anytime. Call audio is processed by our voice AI provider to power conversations; form data is stored only to respond to you. PLACEHOLDER: confirm compliance language before launch; no certification claims are made here.' }
+    ];
+    const vols = ['<200', '200–500', '500–1,000', '1,000+'];
+    return {
+      // nav
+      navBg: s.scrolled ? 'rgba(10,26,47,0.88)' : 'rgba(10,26,47,0)',
+      navFg: s.scrolled ? '#FAF9F6' : '#0A1A2F',
+      // hero loop
+      heroLoading: !s.heroReady,
+      hp0: !!s.heroReady && s.heroPhase === 0, hp1: !!s.heroReady && s.heroPhase === 1, hp2: !!s.heroReady && s.heroPhase === 2,
+      heroTag: c.tag, heroL1: c.l1, heroL2: c.l2, heroBooked: c.booked, heroCap: c.cap,
+      heroBars: bars(10), demoBars: bars(12),
+      // calculator
+      slider: s.slider,
+      setSlider: e => this.setState({ slider: parseInt(e.target.value, 10) }),
+      lostYear: '$' + lost.toLocaleString('en-US'),
+      // toothy
+
+      bubbleOn: !!s.bubble, bubble: s.bubble,
+      tLive: s.toothy === 'live', tEnded: s.toothy === 'ended',
+      ringOn: s.toothy === 'live' || s.toothy === 'connecting',
+      ringColor: s.remaining <= 10 && s.toothy === 'live' ? '#0F8B80' : '#5A6E86',
+      ringOffset: Math.round(427 * (1 - s.remaining / total)),
+      remaining: s.remaining,
+      startDemo: () => this.startDemo(),
+      endDemo: () => this.hangUp(),
+      // faq
+      faqs: faqData.map((f, i) => ({ ...f, open: s.faqOpen === i, icon: s.faqOpen === i ? '−' : '+', toggle: () => this.setState({ faqOpen: s.faqOpen === i ? -1 : i }) })),
+      // modals + navigation
+      mBooking: s.modal === 'booking', mPrivacy: s.modal === 'privacy', mTerms: s.modal === 'terms', mExit: s.modal === 'exit',
+      openBooking: () => this.setState({ modal: 'booking' }),
+      openPrivacy: e => { e && e.preventDefault(); this.setState({ modal: 'privacy' }); },
+      openTerms: e => { e && e.preventDefault(); this.setState({ modal: 'terms' }); },
+      closeModal: () => this.setState({ modal: null }),
+      stopProp: e => e.stopPropagation(),
+      dismissExit: () => this.setState({ modal: null }),
+      tryDemoFromExit: () => { this.setState({ modal: null }); this.scrollToEl('demo'); },
+      scrollToToothy: e => { e && e.preventDefault(); this.scrollToEl('demo'); },
+      showSticky: s.showSticky,
+      // booking steps
+      st0: s.step === 0, st1: s.step === 1, st2: s.step === 2, st3: s.step === 3, st4: s.step === 4, st5: s.step === 5, st6: s.step === 6,
+      stNav: s.step < 6,
+      dots: Array.from({ length: 6 }, (_, i) => ({ bg: i <= s.step ? '#0F8B80' : '#D8D2C4' })),
+      bName: s.bName, bPractice: s.bPractice, bCountry: s.bCountry, bLocations: s.bLocations, bEmail: s.bEmail, bPhone: s.bPhone,
+      setName: e => this.setState({ bName: e.target.value }),
+      setPractice: e => this.setState({ bPractice: e.target.value }),
+      setCountry: e => this.setState({ bCountry: e.target.value, step: e.target.value ? 3 : 2 }),
+      setLocations: e => this.setState({ bLocations: e.target.value }),
+      setEmail: e => this.setState({ bEmail: e.target.value }),
+      setPhone: e => this.setState({ bPhone: e.target.value }),
+      bookingKey: e => { if (e.key === 'Enter') this.next(); },
+      volumeChips: vols.map(v => ({
+        label: v,
+        border: s.bVolume === v ? '#0F8B80' : '#D8D2C4',
+        bg: s.bVolume === v ? '#0F8B80' : '#FFFFFF',
+        color: s.bVolume === v ? '#FAF9F6' : '#0A1A2F',
+        pick: () => this.setState({ bVolume: v, step: 4 })
+      })),
+      next: () => this.next(),
+      back: () => this.setState({ step: Math.max(0, s.step - 1) }),
+      backColor: s.step === 0 ? 'transparent' : '#5A6E86',
+      nextLabel: s.step === 5 ? 'Submit' : 'Continue',
+      // step 6: qualification verdict + delivery status
+      qualifyTitle: (['200–500', '500–1,000', '1,000+'].includes(s.bVolume) || parseInt(s.bLocations, 10) > 1) ? "You're a fit." : 'Worth twenty minutes.',
+      qualifyBody: ['200–500', '500–1,000', '1,000+'].includes(s.bVolume)
+        ? `At ${s.bVolume} calls a month, even a small miss rate is real money. Pick a time below; on the call we'll map exactly where yours are going.`
+        : (parseInt(s.bLocations, 10) > 1
+          ? `Across ${s.bLocations} locations, missed calls multiply fast. Pick a time below; on the call we'll map exactly where yours are going.`
+          : 'Under 200 calls a month, the math still holds: five missed calls a week is roughly $66,000 a year at conservative numbers. The call will tell you if it makes sense, no pressure either way.'),
+      sentNote: s.sendState === 'sent' ? 'Your details just landed in our inbox. We reply within one business day.'
+        : (s.sendState === 'saved' ? 'Details received. We reply within one business day.'
+        : (s.sendState === 'sending' ? 'Sending your details to our inbox…' : 'Details saved. We reply within one business day.'))
+    };
+  }
+}
+</script>
+</body>
+</html>

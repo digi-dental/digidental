@@ -1,7 +1,8 @@
 # Digi Dental — one-page conversion funnel
 
 Single-page site selling a done-for-you AI receptionist for dental practices.
-Design + full front-end lives in `Digi Dental.dc.html` (open in a browser).
+Design + full front-end lives in `index.html` (open in a browser, or deploy the
+repo to Vercel — the root serves it automatically).
 Repo scaffolding for the production build (React + Vite + Tailwind + Vercel functions + Supabase):
 
 - `api/demo-session.ts` — one-demo-per-IP gate (called before every demo call)

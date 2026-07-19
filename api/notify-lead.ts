@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
 const supabase = createClient(process.env.VITE_SUPABASE_URL || 'https://hctpvnqanwhxlmpmfmme.supabase.co', (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)!);
-const resend = new Resend(process.env.RESEND_API_KEY || 're_PrBqU13q_CbS4xeiqtyXk1tdhgKYuYhVb'); // SECURITY: server-side only, never expose
+const resend = new Resend(process.env.RESEND_API_KEY!); // SECURITY: server-side only — set RESEND_API_KEY in .env / the hosting dashboard, never hardcode
 
 export default async function handler(req: any, res: any) {
   try {

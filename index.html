@@ -513,7 +513,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 </sc-if>
 
 </sc-if>
-<a href="#" onClick="{{ scrollTop }}" aria-label="Back to top" style="position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:60;width:36px;height:36px;border-radius:50%;background:rgba(250,249,246,0.85);backdrop-filter:blur(6px);border:1px solid #E8E4DA;box-shadow:0 6px 18px rgba(10,26,47,0.12);display:flex;align-items:center;justify-content:center;color:#5A6E86;text-decoration:none;transition:color .25s,border-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="color:#0F8B80;border-color:#0F8B80;text-decoration:none;transform:translateY(-50%) translateY(-2px)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 12V2M2.5 6.5L7 2l4.5 4.5"></path></svg></a></x-dc>
+</x-dc>
 <script type="text/x-dc" data-dc-script data-props="{
   &quot;$preview&quot;: {&quot;width&quot;: 1280},
   &quot;demoSeconds&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 60, &quot;min&quot;: 15, &quot;max&quot;: 120, &quot;step&quot;: 5, &quot;unit&quot;: &quot;s&quot;, &quot;section&quot;: &quot;Demo call&quot;, &quot;tsType&quot;: &quot;number&quot;},
@@ -971,7 +971,6 @@ class Component extends DCLogic {
       endDemo: () => this.hangUp(),
       // faq
       faqs: faqData.map((f, i) => ({ ...f, open: s.faqOpen === i, icon: s.faqOpen === i ? '−' : '+', toggle: () => this.setState({ faqOpen: s.faqOpen === i ? -1 : i }) })),
-      scrollTop: e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: this._reduced ? 'auto' : 'smooth' }); },
       // pricing card tilt
       tiltRef: el => { this._tiltEl = el; },
       glareRef: el => { this._glareEl = el; },

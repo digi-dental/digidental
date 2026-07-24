@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- ===================== SEO / crawler-facing head =====================
-     These live in the static <head>, NOT in <helmet>: the page renders
-     client-side, so anything inside <x-dc> is invisible to crawlers that
-     don't execute JavaScript. Keep canonical SEO tags here. -->
+     These live in the static head, NOT in the helmet block: the page renders
+     client-side, so anything inside the x-dc element is invisible to crawlers
+     that don't execute JavaScript. Keep canonical SEO tags here.
+     NOTE: never write the x-dc or helmet tag names in angle brackets anywhere
+     above the real element — the runtime finds them by regex over the raw
+     HTML and would treat the first match, comment or not, as the template. -->
 
 <title>AI Receptionist for Dental Practices | Digi Dental</title>
 <meta name="description" content="A 24/7 AI receptionist that answers your dental practice's calls and books patients straight into your calendar. Set up entirely for you. $2,000 one-time. Live in days.">
@@ -172,7 +175,7 @@
 <x-dc>
 <helmet>
 <!-- Title, description, OG/Twitter, canonical, hreflang and JSON-LD now live in the
-     static <head> so crawlers see them without running JS. Do not re-add them here:
+     static head so crawlers see them without running JS. Do not re-add them here:
      this block is injected client-side and would duplicate those tags. -->
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">

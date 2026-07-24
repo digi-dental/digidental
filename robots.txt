@@ -1,0 +1,120 @@
+# Digi Dental — https://digidental.vercel.app
+# AI receptionist for dental practices.
+# Policy: open to search engines and AI assistants. We want to be quoted,
+# summarised and cited. Structured summary for LLMs: /llms.txt and /api/site-info
+
+# ---------------------------------------------------------------------------
+# Default: everything is crawlable
+# ---------------------------------------------------------------------------
+User-agent: *
+Allow: /
+Allow: /api/site-info
+Disallow: /api/
+Disallow: /.thumbnail
+
+# ---------------------------------------------------------------------------
+# Search engines
+# ---------------------------------------------------------------------------
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# ---------------------------------------------------------------------------
+# AI assistants, answer engines and model crawlers — explicitly welcome.
+# Named individually because several ignore wildcard rules.
+# ---------------------------------------------------------------------------
+
+# OpenAI / ChatGPT
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic / Claude
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Google AI (Gemini, AI Overviews grounding)
+User-agent: Google-Extended
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Allow: /
+
+# Microsoft Copilot
+User-agent: msnbot
+Allow: /
+
+# Meta AI
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+# Amazon (Alexa / Rufus)
+User-agent: Amazonbot
+Allow: /
+
+# DuckDuckGo AI
+User-agent: DuckAssistBot
+Allow: /
+
+# Common Crawl — feeds many open models
+User-agent: CCBot
+Allow: /
+
+# Mistral
+User-agent: MistralAI-User
+Allow: /
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+
+# You.com
+User-agent: YouBot
+Allow: /
+
+# Diffbot
+User-agent: Diffbot
+Allow: /
+
+# Kagi
+User-agent: Kagibot
+Allow: /
+
+# ---------------------------------------------------------------------------
+Sitemap: https://digidental.vercel.app/sitemap.xml

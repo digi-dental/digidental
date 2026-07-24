@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Digi Dental — single-page conversion funnel.
+       All sections (how it works, pricing, FAQ, live demo) live on this one URL. -->
+  <url>
+    <loc>https://digidental.vercel.app/</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://digidental.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://digidental.vercel.app/"/>
+    <image:image>
+      <image:loc>https://digidental.vercel.app/og-image.png</image:loc>
+      <image:title>Digi Dental — AI receptionist for dental practices</image:title>
+    </image:image>
+  </url>
+
+</urlset>

@@ -1,17 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ===================== SEO / crawler-facing head =====================
+     These live in the static <head>, NOT in <helmet>: the page renders
+     client-side, so anything inside <x-dc> is invisible to crawlers that
+     don't execute JavaScript. Keep canonical SEO tags here. -->
+
+<title>AI Receptionist for Dental Practices | Digi Dental</title>
+<meta name="description" content="A 24/7 AI receptionist that answers your dental practice's calls and books patients straight into your calendar. Set up entirely for you. $2,000 one-time. Live in days.">
+<link rel="canonical" href="https://digidental.vercel.app/">
+
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+<link rel="alternate" hreflang="en" href="https://digidental.vercel.app/">
+<link rel="alternate" hreflang="x-default" href="https://digidental.vercel.app/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Digi Dental">
+<meta property="og:url" content="https://digidental.vercel.app/">
+<meta property="og:title" content="Digi Dental | AI Receptionist for Dental Practices">
+<meta property="og:description" content="Your phone rings. A patient gets booked. You never lifted a finger.">
+<meta property="og:image" content="https://digidental.vercel.app/og-image.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
+<meta property="og:image:alt" content="Digi Dental — your phone rings, a patient gets booked, you never lifted a finger.">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Digi Dental | AI Receptionist for Dental Practices">
+<meta name="twitter:description" content="Your phone rings. A patient gets booked. You never lifted a finger.">
+<meta name="twitter:image" content="https://digidental.vercel.app/og-image.png">
+<meta name="twitter:image:alt" content="Digi Dental — AI receptionist for dental practices.">
+
+<meta name="theme-color" content="#0A1A2F">
+<meta name="author" content="Digi Dental">
+
+<!-- Machine-readable summaries for AI agents: /llms.txt and /api/site-info -->
+<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-friendly summary">
+<link rel="alternate" type="application/json" href="/api/site-info" title="Digi Dental site info (JSON)">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://digidental.vercel.app/#organization",
+      "name": "Digi Dental",
+      "url": "https://digidental.vercel.app/",
+      "description": "Digi Dental sets up done-for-you AI receptionists for dental practices. Not a dental practice; provides no dental treatment or clinical advice.",
+      "image": "https://digidental.vercel.app/og-image.png",
+      "knowsAbout": ["AI receptionist", "dental practice front desk", "appointment booking", "missed call recovery"],
+      "contactPoint": [{
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "url": "https://calendly.com/digidental/digi-dental-inquiry",
+        "telephone": "+351912859130",
+        "availableLanguage": "English"
+      }]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://digidental.vercel.app/#website",
+      "url": "https://digidental.vercel.app/",
+      "name": "Digi Dental",
+      "publisher": { "@id": "https://digidental.vercel.app/#organization" },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://digidental.vercel.app/#webpage",
+      "url": "https://digidental.vercel.app/",
+      "name": "AI Receptionist for Dental Practices | Digi Dental",
+      "description": "A 24/7 AI receptionist that answers your dental practice's calls and books patients straight into your calendar.",
+      "isPartOf": { "@id": "https://digidental.vercel.app/#website" },
+      "about": { "@id": "https://digidental.vercel.app/#organization" },
+      "primaryImageOfPage": "https://digidental.vercel.app/og-image.png",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "Service",
+      "@id": "https://digidental.vercel.app/#service",
+      "name": "AI Receptionist for Dental Practices",
+      "serviceType": "AI phone receptionist setup and configuration",
+      "description": "A 24/7 human-sounding AI receptionist that answers every inbound call, answers service and insurance questions, and writes appointments straight into the practice's calendar. Configured, tested and launched for the practice.",
+      "provider": { "@id": "https://digidental.vercel.app/#organization" },
+      "audience": {
+        "@type": "BusinessAudience",
+        "name": "Dental practices"
+      },
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Setup",
+          "description": "One-time setup: voice AI configured to your practice, Google Calendar setup, call scripting for your services and insurance FAQs, testing, tuning and go-live.",
+          "price": "2000",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://calendly.com/digidental/digi-dental-inquiry"
+        },
+        {
+          "@type": "Offer",
+          "name": "Care plan — Google Calendar integration",
+          "description": "Optional monthly plan: monitoring, security, updates and ongoing script refinements. Cancel anytime.",
+          "priceCurrency": "USD",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "149",
+            "priceCurrency": "USD",
+            "unitText": "MONTH"
+          }
+        },
+        {
+          "@type": "Offer",
+          "name": "Care plan — practice-management (PMS) integration",
+          "description": "Optional monthly plan with PMS integration: monitoring, security, updates and ongoing script refinements. Cancel anytime.",
+          "priceCurrency": "USD",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "299",
+            "priceCurrency": "USD",
+            "unitText": "MONTH"
+          }
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://digidental.vercel.app/#faq",
+      "isPartOf": { "@id": "https://digidental.vercel.app/#webpage" },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What does usage roughly cost monthly?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How fast is go-live?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within one week of the strategy call."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Contracts, cancellation, and data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No long-term contract. The setup fee is one-time; care plans cancel anytime. Call audio is processed by our voice AI provider to power conversations; form data is stored only to respond to you."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+<!-- =================== end SEO / crawler-facing head =================== -->
+
 <script src="./support.js"></script>
 </head>
 <body>
 <x-dc>
 <helmet>
-<title>AI Receptionist for Dental Practices | Digi Dental</title>
-<meta name="description" content="A 24/7 AI receptionist that answers your dental practice's calls and books patients straight into your calendar. Set up entirely for you. Live in days.">
-<meta property="og:title" content="Digi Dental | AI Receptionist for Dental Practices">
-<meta property="og:description" content="Your phone rings. A patient gets booked. You never lifted a finger.">
+<!-- Title, description, OG/Twitter, canonical, hreflang and JSON-LD now live in the
+     static <head> so crawlers see them without running JS. Do not re-add them here:
+     this block is injected client-side and would duplicate those tags. -->
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer async></script>

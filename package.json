@@ -5,6 +5,7 @@
   "description": "Digi Dental — one-page conversion funnel (static front-end + Vercel serverless functions)",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
+    "@vercel/analytics": "^2.0.1",
     "resend": "^4.0.0"
   }
 }

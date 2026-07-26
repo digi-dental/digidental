@@ -400,10 +400,36 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   <div data-reveal="" style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
     <img src="uploads/denty_happy.png" alt="" width="72" height="72" style="width:72px;height:72px;object-fit:contain;image-rendering:pixelated;animation:toothy-bob 2.6s ease-in-out infinite">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-0.02em;margin:0">The math is short.</h2>
-    <div style="width:100%;display:flex;flex-direction:column;gap:14px">
-      <label for="dd-slider" style="font-size:15px;color:#3D4F66">Missed calls per week at your practice</label>
-      <div style="font-family:'Fraunces',serif;font-size:44px;font-variant-numeric:tabular-nums;color:#0A1A2F">{{ slider }}</div>
-      <input id="dd-slider" type="range" min="1" max="60" value="{{ slider }}" onChange="{{ setSlider }}" onInput="{{ setSlider }}" style="width:100%;accent-color:#0F8B80;cursor:pointer" aria-label="Missed calls per week">
+    <div style="width:100%;display:flex;flex-direction:column;gap:28px;text-align:left;background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:clamp(22px,4vw,34px);box-shadow:0 18px 44px rgba(10,26,47,0.06)">
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+          <label for="dd-size" style="font-size:15px;color:#3D4F66">Practice size <span style="color:#8A93A1;font-size:13px">(locations)</span></label>
+          <input id="dd-size" type="number" min="1" max="10" step="1" value="{{ calcSize }}" onChange="{{ setCalcSize }}" onBlur="{{ blurCalcSize }}" aria-label="Practice size, number of locations" style="width:104px;text-align:right;font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#0A1A2F;font-variant-numeric:tabular-nums;padding:8px 10px;border:1px solid #D8D2C4;border-radius:8px;background:#FAF9F6;outline:none" style-focus="border-color:#0F8B80">
+        </div>
+        <input type="range" min="1" max="10" step="1" value="{{ calcSizeN }}" onChange="{{ setCalcSize }}" onInput="{{ setCalcSize }}" aria-label="Practice size slider" style="width:100%;accent-color:#0F8B80;cursor:pointer">
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+          <label for="dd-calls" style="font-size:15px;color:#3D4F66">Average calls per day <span style="color:#8A93A1;font-size:13px">(per location)</span></label>
+          <input id="dd-calls" type="number" min="5" max="200" step="1" value="{{ calcCalls }}" onChange="{{ setCalcCalls }}" onBlur="{{ blurCalcCalls }}" aria-label="Average inbound calls per day per location" style="width:104px;text-align:right;font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#0A1A2F;font-variant-numeric:tabular-nums;padding:8px 10px;border:1px solid #D8D2C4;border-radius:8px;background:#FAF9F6;outline:none" style-focus="border-color:#0F8B80">
+        </div>
+        <input type="range" min="5" max="200" step="1" value="{{ calcCallsN }}" onChange="{{ setCalcCalls }}" onInput="{{ setCalcCalls }}" aria-label="Average calls per day slider" style="width:100%;accent-color:#0F8B80;cursor:pointer">
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+          <label for="dd-value" style="font-size:15px;color:#3D4F66">Average patient value <span style="color:#8A93A1;font-size:13px">(first visit)</span></label>
+          <div style="display:flex;align-items:center;gap:5px">
+            <span aria-hidden="true" style="font-family:'Fraunces',serif;font-size:20px;color:#5A6E86">$</span>
+            <input id="dd-value" type="number" min="300" max="3000" step="10" value="{{ calcValue }}" onChange="{{ setCalcValue }}" onBlur="{{ blurCalcValue }}" aria-label="Average patient value in dollars" style="width:104px;text-align:right;font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#0A1A2F;font-variant-numeric:tabular-nums;padding:8px 10px;border:1px solid #D8D2C4;border-radius:8px;background:#FAF9F6;outline:none" style-focus="border-color:#0F8B80">
+          </div>
+        </div>
+        <input type="range" min="300" max="3000" step="10" value="{{ calcValueN }}" onChange="{{ setCalcValue }}" onInput="{{ setCalcValue }}" aria-label="Average patient value slider" style="width:100%;accent-color:#0F8B80;cursor:pointer">
+      </div>
+
+      <div style="border-top:1px solid #EEEAE0;padding-top:18px;font-size:13.5px;color:#5A6E86;line-height:1.6;font-variant-numeric:tabular-nums;text-wrap:pretty">That works out to roughly <strong style="color:#0A1A2F">{{ calcMissedWeek }}</strong> missed calls a week, or <strong style="color:#0A1A2F">{{ calcMissedYear }}</strong> a year.</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <div style="font-size:14px;color:#5A6E86">Estimated revenue lost per year</div>
@@ -412,7 +438,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     </div>
     <details style="font-size:13px;color:#5A6E86;max-width:420px">
       <summary style="cursor:pointer;color:#0F8B80">Our math</summary>
-      <p style="line-height:1.7;text-align:left;font-variant-numeric:tabular-nums">Conservative assumptions: 30% of missed calls are booking opportunities (industry call-tracking data), $850 average first-visit value (industry analyses). Missed calls × 52 weeks × 30% × $850. Lifetime value not included. The real number is higher.</p>
+      <p style="line-height:1.7;text-align:left;font-variant-numeric:tabular-nums">Conservative assumptions: 17% of inbound calls go unanswered (the low end of the 17–38% range cited above), and 30% of those are booking opportunities (industry call-tracking data). Locations × calls per day × 5 days × 52 weeks × 17% × 30% × your patient value. Lifetime value not included. The real number is higher.</p>
     </details>
     <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" style="display:inline-block;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">See exactly where you're leaking revenue</a>
   </div>
@@ -700,7 +726,7 @@ class Component extends DCLogic {
   state = {
     heroPhase: 0, heroIdx: 0,
     scrolled: false, showSticky: false,
-    slider: 15, faqOpen: -1,
+    calcSize: '1', calcCalls: '20', calcValue: '850', faqOpen: -1,
     modal: null, // null | 'booking' | 'privacy' | 'terms' | 'exit'
     step: 0, bName: '', bPractice: '', bCountry: '', bVolume: '', bLocations: '', bEmail: '', bPhone: '',
     toothy: 'idle', // idle | connecting | live | ended | limited
@@ -1104,13 +1130,38 @@ class Component extends DCLogic {
     catch (e) { console.error('renderVals failed, showing fallback:', e); return fallback; }
   }
 
+  // ROI calculator bounds. Kept in one place so the number inputs, the range
+  // sliders and the clamp below can never drift apart.
+  CALC = {
+    size:  { min: 1,   max: 10   },
+    calls: { min: 5,   max: 200  },
+    value: { min: 300, max: 3000 }
+  };
+
+  // Fields hold raw strings so a half-typed or momentarily empty box doesn't fight
+  // the user. Clamp only when computing; normalise the text on blur.
+  _calcNum(raw, key) {
+    const b = this.CALC[key];
+    const n = parseInt(String(raw).replace(/[^\d]/g, ''), 10);
+    if (!Number.isFinite(n)) return key === 'value' ? (this.props.firstVisitValue ?? 850) : b.min;
+    return Math.max(b.min, Math.min(b.max, n));
+  }
+
   _vals() {
     const s = this.state;
     const c = this.CALLERS[s.heroIdx];
     const total = this._demoTotal || (this.props.demoSeconds ?? 60);
-    const fvv = this.props.firstVisitValue ?? 850; // $ first-visit value — sourced, editable
     const rate = this.props.bookingRate ?? 0.30;   // share of missed calls that are booking opportunities
-    const lost = Math.round(s.slider * 52 * rate * fvv);
+    const MISSED_RATE = 0.17;                      // unanswered share — low end of the cited 17–38%
+    const WORK_DAYS = 5, WEEKS = 52;
+
+    const calcSizeN = this._calcNum(s.calcSize, 'size');
+    const calcCallsN = this._calcNum(s.calcCalls, 'calls');
+    const calcValueN = this._calcNum(s.calcValue, 'value');
+
+    const callsYear = calcSizeN * calcCallsN * WORK_DAYS * WEEKS;
+    const missedYear = Math.round(callsYear * MISSED_RATE);
+    const lost = Math.round(missedYear * rate * calcValueN);
     const bars = n => Array.from({ length: n }, (_, i) => ({ delay: (i * 0.11 % 0.9).toFixed(2) + 's' }));
     const faqData = [
       { q: "Will patients know it's AI?", a: "Some ask. The voice is natural enough that most don't. It never pretends to be human when asked directly. It says it's the practice's automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM." },
@@ -1130,9 +1181,17 @@ class Component extends DCLogic {
       hp0: !!s.heroReady && s.heroPhase === 0, hp1: !!s.heroReady && s.heroPhase === 1, hp2: !!s.heroReady && s.heroPhase === 2,
       heroTag: c.tag, heroL1: c.l1, heroL2: c.l2, heroBooked: c.booked, heroCap: c.cap,
       heroBars: bars(10), demoBars: bars(12),
-      // calculator
-      slider: s.slider,
-      setSlider: e => this.setState({ slider: parseInt(e.target.value, 10) }),
+      // calculator — raw strings drive the number boxes, clamped numbers drive the sliders
+      calcSize: s.calcSize, calcCalls: s.calcCalls, calcValue: s.calcValue,
+      calcSizeN, calcCallsN, calcValueN,
+      setCalcSize: e => this.setState({ calcSize: e.target.value }),
+      setCalcCalls: e => this.setState({ calcCalls: e.target.value }),
+      setCalcValue: e => this.setState({ calcValue: e.target.value }),
+      blurCalcSize: () => this.setState({ calcSize: String(this._calcNum(this.state.calcSize, 'size')) }),
+      blurCalcCalls: () => this.setState({ calcCalls: String(this._calcNum(this.state.calcCalls, 'calls')) }),
+      blurCalcValue: () => this.setState({ calcValue: String(this._calcNum(this.state.calcValue, 'value')) }),
+      calcMissedWeek: Math.round(missedYear / WEEKS).toLocaleString('en-US'),
+      calcMissedYear: missedYear.toLocaleString('en-US'),
       lostYear: '$' + lost.toLocaleString('en-US'),
       // toothy
 

@@ -250,7 +250,9 @@ input,select,button,textarea{font-family:inherit}
 @keyframes dd-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
 @keyframes dd-shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
 .dd-navlink{display:none}
-@media (min-width:720px){.dd-navlink{display:inline}}
+.dd-navdemo{display:none}
+@media (min-width:600px){.dd-navdemo{display:inline}}
+@media (min-width:860px){.dd-navlink{display:inline}}
 button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic-bezier(.4,0,.2,1),transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1),border-color .25s cubic-bezier(.4,0,.2,1)}
 :focus-visible{outline:2px solid #0F8B80;outline-offset:2px;border-radius:4px}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}html{scroll-behavior:auto}}
@@ -274,13 +276,13 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 <nav style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(16px,4vw,32px);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:{{ navBg }};transition:background .35s ease">
   <div style="display:flex;align-items:center;gap:10px">
     <img src="uploads/denty_neutral.png" alt="" width="34" height="34" style="display:block;width:34px;height:34px;object-fit:contain;image-rendering:pixelated">
-    <div style="font-family:'Fraunces',serif;font-weight:600;font-size:21px;letter-spacing:-0.02em;line-height:1;color:{{ navFg }};transition:color .35s ease">Digi<span style="color:#0F8B80"> Dental</span></div>
+    <div style="font-family:'Fraunces',serif;font-weight:600;font-size:21px;letter-spacing:-0.02em;line-height:1;white-space:nowrap;color:{{ navFg }};transition:color .35s ease">Digi<span style="color:#0F8B80"> Dental</span></div>
   </div>
   <div style="display:flex;align-items:center;gap:clamp(12px,2.2vw,24px)">
-    <a href="#demo" onClick="{{ navDemo }}" style="font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap">Hear the demo</a>
+    <a href="#demo" onClick="{{ navDemo }}" class="dd-navdemo" style="font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap">Hear the demo</a>
     <a href="#pricing" class="dd-navlink" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">Pricing</a>
     <a href="#faq" class="dd-navlink" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">FAQ</a>
-    <button onClick="{{ openBookingNav }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+    <button onClick="{{ openBookingNav }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
   </div>
 </nav>
 
@@ -470,7 +472,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   <div data-reveal="" style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
     <img src="uploads/denty_happy.png" alt="" width="72" height="72" style="width:72px;height:72px;object-fit:contain;image-rendering:pixelated;animation:toothy-bob 2.6s ease-in-out infinite">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-0.02em;margin:0">The math is short.</h2>
-    <div style="width:100%;display:flex;flex-direction:column;gap:28px;text-align:left;background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:clamp(22px,4vw,34px);box-shadow:0 18px 44px rgba(10,26,47,0.06)">
+    <div style="width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:28px;text-align:left;background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:clamp(22px,4vw,34px);box-shadow:0 18px 44px rgba(10,26,47,0.06)">
 
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
@@ -724,7 +726,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   <div style="position:fixed;bottom:0;left:0;right:0;z-index:40;padding:12px 16px;background:rgba(10,26,47,0.92);backdrop-filter:blur(10px)">
     <div style="display:flex;gap:10px;align-items:stretch">
       <button onClick="{{ stickyDemo }}" style="flex:0 0 auto;background:rgba(250,249,246,0.08);color:#FAF9F6;border:1px solid rgba(250,249,246,0.32);border-radius:10px;padding:16px 14px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">Talk to the AI</button>
-      <button onClick="{{ openBookingSticky }}" style="flex:1;min-width:0;background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px;font-size:16px;font-weight:600;cursor:pointer">Book a Strategy Call</button>
+      <button onClick="{{ openBookingSticky }}" style="flex:1;min-width:0;background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 10px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">Book a Strategy Call</button>
     </div>
   </div>
 </sc-if>

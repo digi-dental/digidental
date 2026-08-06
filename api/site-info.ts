@@ -41,18 +41,23 @@ const siteInfo = {
       { name: 'Practice-management (PMS) integration', price: 299, billing: 'monthly', optional: true },
     ],
     carePlanNotes:
-      'Both plans include monitoring, security, updates and ongoing script refinements. Cancel anytime. Without a plan, Google Calendar setup is still included in the setup fee.',
+      'Care plans buy the ongoing service, not the integration itself: monitoring, updates and script tuning as the practice\u2019s services, insurance list and hours change. Optional, no minimum term, cancel anytime. Without a plan, Google Calendar setup is still included in the setup fee and the receptionist keeps answering.',
     usage: {
       model: 'Billed at cost on the practice’s own voice-platform account; Digi Dental takes no markup.',
       perMinuteUsd: '0.10-0.15',
       typicalMonthlyUsd: '60-150 for a practice handling ~300 answered calls',
     },
     splitStartOption:
-      'On request, setup may begin with $1,000 upfront. If a patient is booked within 14 days of go-live, the remaining $1,000 becomes due, completing the standard $2,000 setup fee.',
+      'On request, setup may begin with $1,000 upfront. The remaining $1,000 becomes due only once the receptionist books a real patient into the practice\u2019s calendar, completing the standard $2,000 setup fee. If it never books a patient, the balance is never owed.',
   },
 
   timeline: 'Days, not months. Most practices are live within one week of the strategy call.',
+  guarantee:
+    'Live within 7 days of the onboarding call or the setup fee is refunded. The 7 days start once the practice has provided its services list, insurance list and calendar access.',
   contractTerms: 'No long-term contract. The setup fee is one-time; care plans cancel anytime.',
+
+  compliance:
+    'Call audio is handled by enterprise voice-AI infrastructure and is not shared with Digi Dental unless the practice asks for a call to be reviewed. The assistant is configured not to ask for or repeat protected health information beyond what booking an appointment requires, and the website demo is limited to 60 seconds with no patient data. Digi Dental will sign a BAA or data-processing agreement with the practice where required. No compliance certification is claimed.',
 
   demo: {
     available: true,

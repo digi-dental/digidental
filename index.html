@@ -1291,9 +1291,20 @@ class Component extends DCLogic {
     } catch (e) { return Promise.resolve(true); }
   }
 
+  // Spends the demo, once, at the moment the call connects — not when the button is clicked.
+  // A denied microphone or a dropped connection therefore costs the visitor nothing.
+  claimDemo() {
+    if (this._claimed || this.state.formDone) return;
+    this._claimed = true;
+    try {
+      fetch('/api/demo-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ claim: true }), keepalive: true }).catch(() => {});
+    } catch (e) {}
+  }
+
   goLive() {
     if (this.state.toothy !== 'connecting') return;
     this.setState({ toothy: 'live', bubble: '' });
+    this.claimDemo(); // the call is actually connected — only now does it count as their demo
     if (!this._reduced) this._yapTimer = setInterval(() => this.setState(st => ({ yapIdx: ((st.yapIdx || 0) + 1) % this.YAP_CYCLE.length })), 150);
     this._callTimer = setInterval(() => {
       this.setState(st => {

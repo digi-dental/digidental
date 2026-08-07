@@ -715,7 +715,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 
   <!-- ================= FOUNDER ================= -->
   <!-- Portrait + overlapping note, adapted from the profile-card pattern into this page's
-       own markup and palette. BENNY: the photo is uploads/founder-benny.jpg. Until that file
+       own markup and palette. BENNY: the photo is uploads/profile.jpg. Until that file
        exists the card falls back to the monogram automatically, so nothing ever renders broken. -->
   <div data-reveal="" class="dd-wrap" style="padding-bottom:120px">
     <div class="dd-founder">
@@ -739,6 +739,9 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
           </a>
           <a href="mailto:bennysworkspace@gmail.com" onClick="{{ trackFounderEmail }}" aria-label="Email Benny" title="Email" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FAF9F6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"></rect><path d="m3 6.5 9 6.5 9-6.5"></path></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/ceobenny/" target="_blank" rel="noopener" onClick="{{ trackFounderLinkedin }}" aria-label="Benny on LinkedIn" title="LinkedIn" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="#FAF9F6" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5ZM3 9.75h4v10.75H3V9.75Zm6.5 0h3.83v1.47h.05c.53-1 1.84-2.06 3.78-2.06 4.04 0 4.79 2.66 4.79 6.12v5.22h-4v-4.63c0-1.1-.02-2.53-1.54-2.53-1.54 0-1.78 1.2-1.78 2.45v4.71h-4V9.75Z"></path></svg>
           </a>
           <a href="https://bennys-portfolio.vercel.app/" target="_blank" rel="noopener" onClick="{{ trackFounderPortfolio }}" aria-label="Benny's portfolio" title="Portfolio" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FAF9F6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"></circle><path d="M2.9 12h18.2M12 2.8c2.3 2.5 3.6 5.8 3.6 9.2s-1.3 6.7-3.6 9.2c-2.3-2.5-3.6-5.8-3.6-9.2s1.3-6.7 3.6-9.2Z"></path></svg>
@@ -968,7 +971,7 @@ class Component extends DCLogic {
     calcSize: '1', calcCalls: '20', calcValue: '850', faqOpen: -1,
     modal: null, // null | 'booking' | 'privacy' | 'terms' | 'exit'
     step: 0, bName: '', bPractice: '', bCountry: '', bVolume: '', bLocations: '', bEmail: '', bPhone: '',
-    founderPhotoOk: false, // flipped true only once the founder portrait has actually loaded
+    founderPhotoOk: false, // flipped true only once uploads/profile.jpg has actually loaded
     bWebsite: '', // honeypot — must stay empty; anything in it means a bot filled the form
     formError: '', shake: false,
     toothy: 'idle', // idle | connecting | live | ended | limited
@@ -1003,7 +1006,7 @@ class Component extends DCLogic {
   SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_MWPe84PkAw7Zo1T_MMvlFg_ppAOL';
 
   CALENDLY_URL = 'https://calendly.com/digidental/digi-dental-inquiry';
-  FOUNDER_PHOTO = 'uploads/founder-benny.jpg';
+  FOUNDER_PHOTO = 'uploads/profile.jpg';
 
   // Analytics (BUG-12). Events always go first-party to /api/event. Plausible and GA4 are
   // optional extras: set PLAUSIBLE_DOMAIN to the live domain to load Plausible automatically,
@@ -1026,7 +1029,7 @@ class Component extends DCLogic {
     this.initAnalytics();
     Object.values(this.FRAMES).forEach(src => { const im = new Image(); im.src = src; }); // preload sprite frames
     // Founder portrait: probed in JS so a missing file never renders a broken image, and never
-    // fires a request during the raw-HTML pass. Drop the photo at uploads/founder-benny.jpg.
+    // fires a request during the raw-HTML pass. Drop the photo at uploads/profile.jpg.
     const fp = new Image();
     fp.onload = () => this.setState({ founderPhotoOk: true });
     fp.src = this.FOUNDER_PHOTO;
@@ -1744,6 +1747,7 @@ class Component extends DCLogic {
       founderMonogramOn: !s.founderPhotoOk,
       trackFounderWhatsapp: () => this.track('cta_click', { location: 'founder_whatsapp' }),
       trackFounderEmail: () => this.track('cta_click', { location: 'founder_email' }),
+      trackFounderLinkedin: () => this.track('cta_click', { location: 'founder_linkedin' }),
       trackFounderPortfolio: () => this.track('cta_click', { location: 'founder_portfolio' }),
       trackVsl: () => this.track('video_play', { clip: 'vsl' }),
       trackDemoVideo: () => this.track('video_play', { clip: 'demo_recording' }),

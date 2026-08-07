@@ -117,4 +117,9 @@ User-agent: Kagibot
 Allow: /
 
 # ---------------------------------------------------------------------------
+User-agent: *
+Disallow: /admin.html
+Disallow: /api/stats
+Disallow: /api/admin-login
+
 Sitemap: https://digidental.vercel.app/sitemap.xml

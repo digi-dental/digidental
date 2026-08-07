@@ -22,16 +22,25 @@ is away.
 ## Pricing
 
 - **Setup: $2,000, one-time.** Includes voice AI configured to the practice, Google Calendar setup, call scripting for the practice's services and insurance FAQs, and testing, tuning and go-live.
-- **Ongoing care plans (optional):** $149/month for Google Calendar integration, or $299/month for practice-management (PMS) integration. Both include monitoring, security, updates and script refinements. Cancel anytime.
+- **Ongoing care plans (optional):** $149/month for Google Calendar integration, or $299/month for practice-management (PMS) integration. What the plan buys is the ongoing service — monitoring, updates and script tuning as services, insurance lists and hours change — not the integration itself. No minimum term, cancel anytime.
 - Without a care plan, Google Calendar setup is still included in the setup fee.
 - **Voice usage is billed at cost** on the practice's own voice-platform account — typically $0.10–$0.15 per minute of live conversation, roughly $60–$150/month for a practice handling 300 answered calls. Digi Dental takes no markup on usage.
-- A split-start option is available on request: begin with $1,000 upfront; the remaining $1,000 becomes due if a patient is booked within 14 days of go-live, completing the standard $2,000 setup fee.
+- A split-start option is available on request: begin with $1,000 upfront; the remaining $1,000 becomes due if the receptionist books a real patient into the practice's calendar within 14 days of go-live, completing the standard $2,000 setup fee. If it does not, the balance is not owed.
 
 ## Timeline and terms
 
 - Go-live in days, not months. Most practices are live within one week of the strategy call.
+- Most practices are live within 7 days of the onboarding call. The 7 days start once the practice has handed over its services list, insurance list and calendar access. No refund guarantee is offered or implied.
 - No long-term contract. The setup fee is one-time; care plans cancel anytime.
 - Call audio is processed by the underlying voice AI provider to power conversations. Form data is stored only to respond to the enquiry.
+
+## Data handling
+
+- Call audio is handled by enterprise voice-AI infrastructure and is not shared with Digi Dental unless the practice asks for a specific call to be reviewed.
+- The assistant is configured not to ask for or repeat protected health information beyond what is needed to book an appointment.
+- The website demo is capped at 60 seconds and involves no patient data.
+- Digi Dental will sign a BAA or data-processing agreement with the practice where required, before go-live.
+- No compliance certification is claimed on Digi Dental's behalf; how data flows is walked through on the strategy call.
 
 ## Try it
 

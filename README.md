@@ -5,10 +5,12 @@ Design + full front-end lives in `index.html` (open in a browser, or deploy the
 repo to Vercel — the root serves it automatically).
 Repo scaffolding for the production build (React + Vite + Tailwind + Vercel functions + Supabase):
 
-- `api/demo-session.ts` — one-demo-per-IP gate (called before every demo call)
-- `api/notify-lead.ts` — Supabase insert + owner email via Resend
+- `api/demo-session.ts` — one-demo-per-IP gate (called by `startDemo()` before every demo call)
+- `api/notify-lead.ts` — Supabase insert + owner email via Resend (honeypot + per-IP rate limit)
+- `api/event.ts` — first-party funnel analytics, one row per event in `site_events`
+- `api/video.ts` — stable URLs for the two marketing videos, so no expiring token lives in the page
 - `api/site-info.ts` — public JSON summary for AI agents (no deps, no secrets)
-- `supabase/migrations/001_leads_and_demo_sessions.sql` — tables + RLS
+- `supabase/migrations/` — `001` leads + demo sessions, `002` site events (+ the KPI queries)
 - `.env.example` — every required variable, placeholder values only
 - `vercel.json` — response headers for the SEO/AI files (content types, CORS, caching)
 
@@ -42,13 +44,70 @@ Real values are entered ONLY in your local `.env` (gitignored) and in the hostin
 dashboard (Vercel → Project → Settings → Environment Variables). Never in code.
 
 - `VITE_*` vars are public by design (anon key is protected by RLS; the Voice Infrastructure key is the PUBLIC web key).
-- `RESEND_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `IP_HASH_SALT`, `NOTIFY_EMAIL_TO` are server-side only.
+- `RESEND_API_KEY`, `RESEND_FROM`, `SUPABASE_SERVICE_ROLE_KEY`, `IP_HASH_SALT`, `NOTIFY_EMAIL_TO`,
+  `SITE_TOKEN`, `VIDEO_VSL_URL` and `VIDEO_DEMO_URL` are server-side only.
 
 ## Demo call hard limits
 The client stops the call at 60s, but the real limit lives in the Voice Infrastructure dashboard:
 set `maxDurationSeconds: 60` and a spend cap on the demo assistant.
 
+The visitor-level limit is enforced server-side, in two steps: `startDemo()` asks
+`/api/demo-session` whether this hashed IP may call, and `goLive()` posts `{ claim: true }`
+to spend it once the call is actually connected — so a denied microphone or a dropped
+connection costs the visitor nothing. Only an explicit `already_demoed` blocks a call;
+transport errors deliberately **fail open**, because a hot lead must never be turned away
+by our own hiccup. `localStorage` remains as the instant, no-round-trip layer above it.
+
+## Analytics
+Every funnel step fires through `track()` in `index.html`. Three sinks, one taxonomy:
+
+1. `/api/event` → the `site_events` table. Always on, no cookies, no personal data
+   (an anonymous per-tab id joins the steps of one visit; IPs are stored hashed).
+   **Apply `supabase/migrations/002_site_events.sql` first** — until that table exists,
+   events are accepted and silently dropped.
+2. Plausible — set `PLAUSIBLE_DOMAIN` in `index.html` to the live domain and the script
+   loads itself; every event mirrors automatically.
+3. GA4 — drop a `gtag` snippet in and every event mirrors to it. Nothing else to wire.
+
+Events: `view_hero`, `cta_click`, `demo_start`, `demo_complete`, `demo_error`, `demo_blocked`,
+`calc_interact`, `form_open`, `form_step_1..5`, `form_submit`, `form_error`, `calendly_click`,
+`exit_intent_shown`, `exit_intent_demo`, `video_play`.
+
+The four KPIs to watch from day one — demo start→completion (target ≥60%), demo
+complete→Calendly click (≥25%), form open→submit (≥40%, with per-step drop-off), and
+exit-intent conversion — have ready-to-run SQL in
+`supabase/migrations/002_site_events.sql`.
+
+## Videos
+Both clips are served through `/api/video?clip=vsl|demo`, so the page carries no expiring
+token. The signed URLs hardcoded as a fallback in `api/video.ts` **expire 2027-07-24**.
+Permanent fix: make the `digi_dental-VSL` bucket public and set `VIDEO_VSL_URL` /
+`VIDEO_DEMO_URL` to the public URLs. Interim fix: paste fresh signed URLs into those two
+env vars — no redeploy of the page needed either way.
+
 ## Before launch checklist
-Search the code for `PLACEHOLDER`: testimonials, Calendly embed, WhatsApp link,
-legal copy, verified Resend sender, compliance language. Statistics were sourced
-June 2026 — refresh annually.
+No `PLACEHOLDER` strings remain in rendered copy. What is still open, in priority order:
+
+1. **Legal review.** The Privacy and Terms modals in `index.html`, the HIPAA FAQ answer and
+   the contracts/data FAQ answer are final, honest copy that claims no certification — but
+   they have not been read by a lawyer. Both modals carry a `LEGAL REVIEW REQUIRED` comment
+   listing exactly what to check (subprocessors, jurisdiction sections, entity name and
+   governing law, which are deliberately not invented).
+2. **Commercial promises.** The split start is confirmed: $1,000 up front, the second $1,000
+   due only if a real patient is booked within 14 days of go-live. It appears in the pricing
+   section, the Terms modal, `llms.txt` and `api/site-info.ts` — change all four together.
+   The go-live line is deliberately a speed claim with **no refund remedy**, because that
+   promise was never confirmed; the comment above the badge in `index.html` has the exact
+   wording to turn it into a real guarantee if you decide to stand behind one.
+3. **Care-plan pricing.** $149/mo and $299/mo are carried over unverified from the previous
+   copy. Confirm they are current before the next push; if they changed, update `index.html`,
+   the JSON-LD offers, `llms.txt` and `api/site-info.ts`.
+4. **Resend sender.** Verify a domain in Resend and set `RESEND_FROM`; until then leads send
+   from `onboarding@resend.dev` and land in spam.
+5. **Supabase publishable key.** The browser-fallback key in `index.html` is a new-style
+   `sb_publishable_…` key, which really is that short. Confirm it with the curl in the comment
+   above it: 401 means replace it, 403 means it is fine and RLS is working.
+6. **Founder block.** Replace the monogram with a real photo and rewrite the two sentences in
+   your own words. No testimonials, client counts or usage numbers until they are real.
+7. **Statistics** were sourced June 2026 — refresh annually. Stat 4 is now labelled as our own
+   arithmetic rather than an uncited external figure.

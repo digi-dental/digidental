@@ -205,7 +205,7 @@
           "name": "How fast is go-live?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Live within 7 days of your onboarding call, or the setup is on us — the clock starts once we have your services list, insurance list, and calendar access."
+            "text": "Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access."
           }
         },
         {
@@ -655,11 +655,15 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2rem,5vw,3rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">Every call answered. Every opening filled.</h2>
     <p style="font-size:16px;color:#B9C4D4;margin:0;font-variant-numeric:tabular-nums">$2,000 one-time setup. Every call answered from day one.</p>
     <button onClick="{{ openBookingFinal }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,0.3)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
-    <!-- GUARANTEE — Benny: this is a commercial promise, not marketing garnish. The matching
-         clause is in the Terms modal and the "How fast is go-live?" FAQ. Change all three together. -->
+    <!-- GO-LIVE LINE — Benny: deliberately a speed claim, NOT a refund promise, because you
+         only confirmed the split start as a commercial commitment. To turn it into a real
+         guarantee, swap the badge text below for
+             "Live within 7 days of your call — or the setup is on us."
+         and restore the matching clause in the Terms modal and the "How fast is go-live?" FAQ
+         (both currently state the timeline without a remedy). All three change together. -->
     <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
       <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(15,139,128,0.14);border:1px solid rgba(15,139,128,0.45);border-radius:999px;padding:10px 20px;font-size:14.5px;font-weight:600;color:#FAF9F6;font-variant-numeric:tabular-nums">
-        <span aria-hidden="true" style="color:#3FBFA9">✓</span>Live within 7 days of your call — or the setup is on us.
+        <span aria-hidden="true" style="color:#3FBFA9">✓</span>Most practices are live within 7 days of the onboarding call.
       </div>
       <div style="font-size:12px;color:#5A6E86;max-width:420px;line-height:1.6;text-wrap:pretty">The clock starts once we have your services list, insurance list and calendar access.</div>
     </div>
@@ -852,15 +856,15 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
                 booked within 14 days of go-live (confirmed by Benny, 7 Aug 2026). The same
                 wording appears in the pricing section, llms.txt and api/site-info.ts — change
                 all four together.
-             2. Go-live guarantee: live within 7 days of onboarding or the setup fee is
-                refunded, with the clock starting when the practice hands over its inputs.
+             2. Go-live timeline: stated as a normal expectation, with no refund remedy, because
+                that promise was never confirmed. Add one only if you intend to honour it.
            Governing law and entity name are deliberately not invented here — add both with
            counsel before treating this as final. -->
       <div style="font-size:14px;line-height:1.75;color:#3D4F66;display:flex;flex-direction:column;gap:16px">
         <p style="margin:0;color:#8A93A1;font-size:12.5px">Last updated 6 August 2026. These terms cover the setup service sold on this page. Anything agreed in writing with your practice takes precedence over what's here.</p>
         <p style="margin:0"><strong>What the setup fee covers.</strong> $2,000, one-time: the voice assistant configured to your practice, Google Calendar setup so appointments are written directly, call scripting for your services and insurance list, and testing, tuning and go-live. One practice location unless we agree otherwise in writing.</p>
         <p style="margin:0"><strong>Split start.</strong> On request, setup begins with $1,000. If the receptionist books a real patient appointment into your calendar within 14 days of go-live, the remaining $1,000 falls due, completing the standard $2,000 setup fee. If it does not, the balance is not owed.</p>
-        <p style="margin:0"><strong>Go-live guarantee.</strong> Your receptionist is live within 7 days of the onboarding call, or your setup fee is refunded in full. The 7 days start once we have what we need from you: your services list, your insurance list, and calendar access. Delays caused by waiting on those, or by a third party we don't control (your phone carrier or practice-management vendor), pause the clock — we'll tell you in writing when that happens and why.</p>
+        <p style="margin:0"><strong>Go-live timeline.</strong> Your receptionist is normally live within 7 days of the onboarding call. The 7 days start once we have what we need from you: your services list, your insurance list, and calendar access. Delays caused by waiting on those, or by a third party we don't control (your phone carrier or practice-management vendor), pause the clock — we'll tell you in writing when that happens and why.</p>
         <p style="margin:0"><strong>Usage.</strong> Voice-AI usage is billed at cost on the practice's own platform account, typically $0.10–$0.15 per minute of live conversation. Digi Dental applies no markup and never bills you for usage.</p>
         <p style="margin:0"><strong>Care plans.</strong> Ongoing care plans ($149/month for Google Calendar integration, $299/month for practice-management integration) cover monitoring, updates, and ongoing script refinement. Optional, no minimum term, cancel anytime effective at the end of the current billing month. Without a plan, Google Calendar setup remains included in the setup fee and the receptionist keeps running — we simply stop actively tuning it.</p>
         <p style="margin:0"><strong>What we need from you.</strong> Accurate service and insurance information, calendar access, and a named person who can approve the script. The assistant answers from what you give us; if the underlying information is wrong, its answers will be too.</p>
@@ -1530,7 +1534,7 @@ class Component extends DCLogic {
       { q: 'How is this different from an answering service?', a: "An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list — every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier." },
       { q: 'Does it replace my front desk?', a: "No. It catches what they physically can't: after-hours calls, lunch rushes, the second line while they're checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself." },
       { q: 'I use Dentrix, Eaglesoft or Open Dental — will this work?', a: "Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes — that's the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn't, Denty still books into a calendar your team already lives in." },
-      { q: 'How fast is go-live?', a: 'Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Live within 7 days of your onboarding call, or the setup is on us — the clock starts once we have your services list, insurance list, and calendar access.' },
+      { q: 'How fast is go-live?', a: 'Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access.' },
       { q: 'Contracts, cancellation, and data?', a: "No long-term contract. The setup fee is one-time, and care plans cancel anytime — the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don't receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we'll have it in place before a single patient call is answered. Ask us to delete anything you've given us and it's deleted." }
     ];
     const vols = ['<200', '200–500', '500–1,000', '1,000+'];

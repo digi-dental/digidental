@@ -93,11 +93,12 @@ No `PLACEHOLDER` strings remain in rendered copy. What is still open, in priorit
    they have not been read by a lawyer. Both modals carry a `LEGAL REVIEW REQUIRED` comment
    listing exactly what to check (subprocessors, jurisdiction sections, entity name and
    governing law, which are deliberately not invented).
-2. **Two commercial promises to confirm.** The split start now says the second $1,000 falls
-   due when the receptionist books its first real patient, with *no* 14-day deadline; and the
-   final CTA promises live within 7 days of onboarding or the setup is refunded. Both appear
-   in the page copy, the Terms modal, the FAQ, `llms.txt` and `api/site-info.ts` — change all
-   five together or none.
+2. **Commercial promises.** The split start is confirmed: $1,000 up front, the second $1,000
+   due only if a real patient is booked within 14 days of go-live. It appears in the pricing
+   section, the Terms modal, `llms.txt` and `api/site-info.ts` — change all four together.
+   The go-live line is deliberately a speed claim with **no refund remedy**, because that
+   promise was never confirmed; the comment above the badge in `index.html` has the exact
+   wording to turn it into a real guarantee if you decide to stand behind one.
 3. **Care-plan pricing.** $149/mo and $299/mo are carried over unverified from the previous
    copy. Confirm they are current before the next push; if they changed, update `index.html`,
    the JSON-LD offers, `llms.txt` and `api/site-info.ts`.

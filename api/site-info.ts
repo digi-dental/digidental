@@ -52,8 +52,8 @@ const siteInfo = {
   },
 
   timeline: 'Days, not months. Most practices are live within one week of the strategy call.',
-  guarantee:
-    'Live within 7 days of the onboarding call or the setup fee is refunded. The 7 days start once the practice has provided its services list, insurance list and calendar access.',
+  timelineDetail:
+    'Most practices are live within 7 days of the onboarding call. The 7 days start once the practice has provided its services list, insurance list and calendar access. This is a normal expectation, not a refund-backed guarantee.',
   contractTerms: 'No long-term contract. The setup fee is one-time; care plans cancel anytime.',
 
   compliance:

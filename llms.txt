@@ -30,7 +30,7 @@ is away.
 ## Timeline and terms
 
 - Go-live in days, not months. Most practices are live within one week of the strategy call.
-- Guarantee: live within 7 days of the onboarding call or the setup fee is refunded. The 7 days start once the practice has handed over its services list, insurance list and calendar access.
+- Most practices are live within 7 days of the onboarding call. The 7 days start once the practice has handed over its services list, insurance list and calendar access. No refund guarantee is offered or implied.
 - No long-term contract. The setup fee is one-time; care plans cancel anytime.
 - Call audio is processed by the underlying voice AI provider to power conversations. Form data is stored only to respond to the enquiry.
 

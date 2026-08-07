@@ -3,7 +3,7 @@
 > A done-for-you AI receptionist for dental practices. It answers every inbound
 > call 24/7 in a human-sounding voice, answers service and insurance questions,
 > and writes appointments straight into the practice's calendar. Digi Dental
-> configures, tests and launches the whole system for the practice — most are
+> configures, tests and launches the whole system for the practice, and most are
 > live within a week of the strategy call.
 
 Digi Dental sells a setup service, not self-serve software. The buyer is a
@@ -13,7 +13,7 @@ is away.
 
 ## What it does
 
-- Answers every inbound call on the first ring, including nights, weekends and holidays — all 168 hours of the week.
+- Answers every inbound call on the first ring, including nights, weekends and holidays, across all 168 hours of the week.
 - Handles several calls at once, so no caller waits in a queue.
 - Answers recurring questions (services, insurance acceptance) from the practice's own list.
 - Books, reschedules and confirms appointments directly in the calendar, and reads the time back to the caller.
@@ -22,9 +22,9 @@ is away.
 ## Pricing
 
 - **Setup: $2,000, one-time.** Includes voice AI configured to the practice, Google Calendar setup, call scripting for the practice's services and insurance FAQs, and testing, tuning and go-live.
-- **Ongoing care plans (optional):** $149/month for Google Calendar integration, or $299/month for practice-management (PMS) integration. What the plan buys is the ongoing service — monitoring, updates and script tuning as services, insurance lists and hours change — not the integration itself. No minimum term, cancel anytime.
+- **Ongoing care plans (optional):** $149/month for Google Calendar integration, or $299/month for practice-management (PMS) integration. What the plan buys is the ongoing service (monitoring, updates and script tuning as services, insurance lists and hours change), not the integration itself. No minimum term, cancel anytime.
 - Without a care plan, Google Calendar setup is still included in the setup fee.
-- **Voice usage is billed at cost** on the practice's own voice-platform account — typically $0.10–$0.15 per minute of live conversation, roughly $60–$150/month for a practice handling 300 answered calls. Digi Dental takes no markup on usage.
+- **Voice usage is billed at cost** on the practice's own voice-platform account, typically $0.10–$0.15 per minute of live conversation, roughly $60–$150/month for a practice handling 300 answered calls. Digi Dental takes no markup on usage.
 - A split-start option is available on request: begin with $1,000 upfront; the remaining $1,000 becomes due if the receptionist books a real patient into the practice's calendar within 14 days of go-live, completing the standard $2,000 setup fee. If it does not, the balance is not owed.
 
 ## Timeline and terms
@@ -44,7 +44,7 @@ is away.
 
 ## Try it
 
-- A live voice demo runs on the homepage — visitors can talk to the AI receptionist directly in the browser. The demo is limited to 60 seconds, one per visitor.
+- A live voice demo runs on the homepage, so visitors can talk to the AI receptionist directly in the browser. The demo is limited to 60 seconds, one per visitor.
 
 ## Contact
 

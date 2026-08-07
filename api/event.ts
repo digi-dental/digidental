@@ -8,8 +8,8 @@ import { createClient } from '@supabase/supabase-js';
 import { createHash } from 'node:crypto';
 
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL || 'https://hctpvnqanwhxlmpmfmme.supabase.co',
-  (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)!
+  process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hctpvnqanwhxlmpmfmme.supabase.co',
+  (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)!
 );
 
 // Only events the page is supposed to send. Anything else is dropped, so a stray script or a

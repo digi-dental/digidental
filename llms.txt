@@ -25,7 +25,7 @@ is away.
 - **Ongoing care plans (optional):** $149/month for Google Calendar integration, or $299/month for practice-management (PMS) integration. What the plan buys is the ongoing service — monitoring, updates and script tuning as services, insurance lists and hours change — not the integration itself. No minimum term, cancel anytime.
 - Without a care plan, Google Calendar setup is still included in the setup fee.
 - **Voice usage is billed at cost** on the practice's own voice-platform account — typically $0.10–$0.15 per minute of live conversation, roughly $60–$150/month for a practice handling 300 answered calls. Digi Dental takes no markup on usage.
-- A split-start option is available on request: begin with $1,000 upfront; the remaining $1,000 becomes due only once the receptionist books a real patient into the practice's calendar, completing the standard $2,000 setup fee. If it never books a patient, the balance is never owed.
+- A split-start option is available on request: begin with $1,000 upfront; the remaining $1,000 becomes due if the receptionist books a real patient into the practice's calendar within 14 days of go-live, completing the standard $2,000 setup fee. If it does not, the balance is not owed.
 
 ## Timeline and terms
 

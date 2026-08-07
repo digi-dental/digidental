@@ -48,7 +48,7 @@ const siteInfo = {
       typicalMonthlyUsd: '60-150 for a practice handling ~300 answered calls',
     },
     splitStartOption:
-      'On request, setup may begin with $1,000 upfront. The remaining $1,000 becomes due only once the receptionist books a real patient into the practice\u2019s calendar, completing the standard $2,000 setup fee. If it never books a patient, the balance is never owed.',
+      'On request, setup may begin with $1,000 upfront. If the receptionist books a real patient into the practice\u2019s calendar within 14 days of go-live, the remaining $1,000 becomes due, completing the standard $2,000 setup fee. If it does not, the balance is not owed.',
   },
 
   timeline: 'Days, not months. Most practices are live within one week of the strategy call.',

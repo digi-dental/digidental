@@ -621,7 +621,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       <!-- Risk reversal: this is the load-bearing line of the pricing section, not a footnote. -->
       <div style="background:#0A1A2F;color:#FAF9F6;border-radius:16px;padding:clamp(22px,3.5vw,30px);display:flex;flex-direction:column;gap:10px;text-align:center">
         <div style="font-family:'Fraunces',serif;font-size:clamp(1.25rem,2.8vw,1.6rem);font-weight:600;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;text-wrap:balance">Start for $1,000. The rest is on us until it works.</div>
-        <p style="margin:0;font-size:15px;line-height:1.65;color:#B9C4D4;max-width:520px;margin-inline:auto;text-wrap:pretty;font-variant-numeric:tabular-nums">You only pay the remaining $1,000 once Denty actually books a real patient into your calendar. That's how sure we are.</p>
+        <p style="margin:0;font-size:15px;line-height:1.65;color:#B9C4D4;max-width:520px;margin-inline:auto;text-wrap:pretty;font-variant-numeric:tabular-nums">You pay the remaining $1,000 only once Denty books a real patient into your calendar, inside the first 14 days of go-live. If it doesn't, you don't. That's how sure we are.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:14px">
         <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" onClick="{{ trackCalendlyPricing }}" style="display:block;text-align:center;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:17px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Claim your practice audit slot</a>
@@ -848,10 +848,10 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       </div>
       <!-- LEGAL REVIEW REQUIRED (Benny): final, non-placeholder copy — but it now states two
            commercial promises you must be willing to honour exactly as written:
-             1. Split start: the second $1,000 falls due when the receptionist books its first
-                real patient, with NO deadline. This replaces the old "within 14 days of
-                go-live" clause; if you want the deadline back, change it here AND in the
-                pricing section, llms.txt and api/site-info.ts so all four agree.
+             1. Split start: $1,000 up front, the second $1,000 due only if a real patient is
+                booked within 14 days of go-live (confirmed by Benny, 7 Aug 2026). The same
+                wording appears in the pricing section, llms.txt and api/site-info.ts — change
+                all four together.
              2. Go-live guarantee: live within 7 days of onboarding or the setup fee is
                 refunded, with the clock starting when the practice hands over its inputs.
            Governing law and entity name are deliberately not invented here — add both with
@@ -859,7 +859,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       <div style="font-size:14px;line-height:1.75;color:#3D4F66;display:flex;flex-direction:column;gap:16px">
         <p style="margin:0;color:#8A93A1;font-size:12.5px">Last updated 6 August 2026. These terms cover the setup service sold on this page. Anything agreed in writing with your practice takes precedence over what's here.</p>
         <p style="margin:0"><strong>What the setup fee covers.</strong> $2,000, one-time: the voice assistant configured to your practice, Google Calendar setup so appointments are written directly, call scripting for your services and insurance list, and testing, tuning and go-live. One practice location unless we agree otherwise in writing.</p>
-        <p style="margin:0"><strong>Split start.</strong> On request, setup begins with $1,000. The remaining $1,000 falls due once the receptionist books its first real patient appointment into your calendar, completing the standard $2,000 fee. If it never books a patient, the balance is never owed.</p>
+        <p style="margin:0"><strong>Split start.</strong> On request, setup begins with $1,000. If the receptionist books a real patient appointment into your calendar within 14 days of go-live, the remaining $1,000 falls due, completing the standard $2,000 setup fee. If it does not, the balance is not owed.</p>
         <p style="margin:0"><strong>Go-live guarantee.</strong> Your receptionist is live within 7 days of the onboarding call, or your setup fee is refunded in full. The 7 days start once we have what we need from you: your services list, your insurance list, and calendar access. Delays caused by waiting on those, or by a third party we don't control (your phone carrier or practice-management vendor), pause the clock — we'll tell you in writing when that happens and why.</p>
         <p style="margin:0"><strong>Usage.</strong> Voice-AI usage is billed at cost on the practice's own platform account, typically $0.10–$0.15 per minute of live conversation. Digi Dental applies no markup and never bills you for usage.</p>
         <p style="margin:0"><strong>Care plans.</strong> Ongoing care plans ($149/month for Google Calendar integration, $299/month for practice-management integration) cover monitoring, updates, and ongoing script refinement. Optional, no minimum term, cancel anytime effective at the end of the current billing month. Without a plan, Google Calendar setup remains included in the setup fee and the receptionist keeps running — we simply stop actively tuning it.</p>

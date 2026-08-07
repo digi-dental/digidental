@@ -11,7 +11,10 @@ import { createClient } from '@supabase/supabase-js';
 import { createHash } from 'node:crypto';
 
 // SECURITY: service-role key is server-side only — set SUPABASE_SERVICE_ROLE_KEY in the hosting dashboard.
-const supabase = createClient(process.env.VITE_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hctpvnqanwhxlmpmfmme.supabase.co',
+  (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)!
+);
 
 export default async function handler(req: any, res: any) {
   try {

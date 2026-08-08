@@ -317,13 +317,13 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <div style="font-family:'Fraunces',serif;font-weight:600;font-size:21px;letter-spacing:-0.02em;line-height:1;white-space:nowrap;color:{{ navFg }};transition:color .35s ease">Digi<span style="color:#0F8B80"> Dental</span></div>
   </div>
   <div style="display:flex;align-items:center;gap:clamp(12px,2.2vw,24px)">
-    <a href="#demo" onClick="{{ navDemo }}" class="dd-navdemo" style="align-items:center;gap:9px;font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap;text-decoration:none;padding:7px 16px 7px 8px;border:1.5px solid rgba(15,139,128,0.45);border-radius:999px;background:rgba(15,139,128,0.08);transition:background-color .25s,border-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:rgba(15,139,128,0.16);border-color:#0F8B80;color:#0F8B80;text-decoration:none;transform:translateY(-1px)">
+    <a href="#demo" onClick="{{ navDemo }}" data-cta="nav_demo" class="dd-navdemo" style="align-items:center;gap:9px;font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap;text-decoration:none;padding:7px 16px 7px 8px;border:1.5px solid rgba(15,139,128,0.45);border-radius:999px;background:rgba(15,139,128,0.08);transition:background-color .25s,border-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:rgba(15,139,128,0.16);border-color:#0F8B80;color:#0F8B80;text-decoration:none;transform:translateY(-1px)">
       <span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#0F8B80;flex-shrink:0">
         <svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M8 4.13a1 1 0 0 1 0 1.74L1.5 9.4A1 1 0 0 1 0 8.53V1.47A1 1 0 0 1 1.5.6L8 4.13Z" fill="#FAF9F6"></path></svg>
       </span>Hear the demo</a>
     <a href="#pricing" class="dd-navlink" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">Pricing</a>
     <a href="#faq" class="dd-navlink" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">FAQ</a>
-    <button onClick="{{ openBookingNav }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+    <button onClick="{{ openBookingNav }}" data-cta="nav" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
   </div>
 </nav>
 
@@ -338,12 +338,12 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <h1 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2.5rem,6vw,4.25rem);line-height:1.05;letter-spacing:-0.025em;margin:0;text-wrap:balance">Your phone rings. A patient gets booked. You never lifted a finger.</h1>
     <p style="font-size:17px;line-height:1.65;color:#3D4F66;max-width:740px;margin:0;text-wrap:pretty">A 24/7 human-sounding AI receptionist that answers every call and writes appointments straight into your calendar, set up entirely for you.</p>
     <div class="dd-hero-cta" style="display:flex;flex-direction:column;align-items:center;gap:14px">
-      <button onClick="{{ openBookingHero }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(10,26,47,0.2)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+      <button onClick="{{ openBookingHero }}" data-cta="hero" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(10,26,47,0.2)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
       <div style="font-size:13px;color:#5A6E86;font-variant-numeric:tabular-nums;line-height:1.6;text-wrap:pretty">A free 20-minute call, no pressure. $2,000 one-time setup, and most practices are live within a week.</div>
       <div class="dd-hero-links" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px">
-        <a href="#demo" onClick="{{ scrollToToothy }}" style="font-size:15px;color:#0F8B80;background:none;border:none;cursor:pointer">Or talk to the AI yourself ↓</a>
+        <a href="#demo" onClick="{{ scrollToToothy }}" data-cta="hero_demo" style="font-size:15px;color:#0F8B80;background:none;border:none;cursor:pointer">Or talk to the AI yourself ↓</a>
         <span aria-hidden="true" style="color:#D8D2C4">·</span>
-        <a href="https://wa.me/351912859130" target="_blank" rel="noopener" onClick="{{ trackWhatsappHero }}" style="font-size:15px;color:#0F8B80">Prefer to talk? WhatsApp us</a>
+        <a href="https://wa.me/351912859130" target="_blank" rel="noopener" onClick="{{ trackWhatsappHero }}" data-cta="hero_whatsapp" style="font-size:15px;color:#0F8B80">Prefer to talk? WhatsApp us</a>
       </div>
     </div>
   </div>
@@ -388,7 +388,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   </div>
   </div>
   <div class="dd-wrap" style="margin-top:80px;display:flex;flex-direction:column;align-items:center;gap:16px">
-    <video controls="controls" preload="metadata" playsInline="{{ true }}" src="/api/video?clip=vsl" onPlay="{{ trackVsl }}" style="width:min(1180px,100%);aspect-ratio:16/9;border-radius:16px;border:1px solid #E8E4DA;background:#0A1A2F;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:block;object-fit:cover"></video>
+    <video data-clip="vsl" controls="controls" preload="metadata" playsInline="{{ true }}" src="/api/video?clip=vsl" onPlay="{{ trackVsl }}" style="width:min(1180px,100%);aspect-ratio:16/9;border-radius:16px;border:1px solid #E8E4DA;background:#0A1A2F;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:block;object-fit:cover"></video>
     <div style="font-size:13px;color:#5A6E86">2 minutes: watch the exact call that books a patient at 9 PM.</div>
   </div>
 </header>
@@ -505,7 +505,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:24px;margin-top:16px">
       <div style="font-size:15px;color:#5A6E86">Set up entirely by us. Live in days.</div>
-      <button onClick="{{ openBookingSection }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+      <button onClick="{{ openBookingSection }}" data-cta="before_after" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
     </div>
   </div>
 </section>
@@ -565,7 +565,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     </details>
     <!-- Routed into the booking modal rather than straight out to Calendly: the modal
          qualifies the lead and captures it even if they never pick a slot. -->
-    <button onClick="{{ openBookingCalc }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">See exactly where you're leaking revenue</button>
+    <button onClick="{{ openBookingCalc }}" data-cta="calculator" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">See exactly where you're leaking revenue</button>
     </div>
     </div>
   </div>
@@ -606,7 +606,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       </div>
     </sc-if>
     <sc-if value="{{ tEnded }}" hint-placeholder-val="{{ false }}">
-      <button onClick="{{ openBookingPostDemo }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:14px 30px;font-size:15px;font-weight:600;cursor:pointer;animation:dd-fadeup .5s cubic-bezier(.22,1,.36,1) both" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+      <button onClick="{{ openBookingPostDemo }}" data-cta="post_demo" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:14px 30px;font-size:15px;font-weight:600;cursor:pointer;animation:dd-fadeup .5s cubic-bezier(.22,1,.36,1) both" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
     </sc-if>
     <div style="font-size:12px;color:#5A6E86;max-width:380px;line-height:1.6">Demo limited to 60 seconds. Audio is processed by our voice AI provider. <a href="#privacy" onClick="{{ openPrivacy }}" style="color:#8A9BB5">Privacy</a></div>
   </div>
@@ -615,7 +615,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
        assistant is configured before it answers anything. -->
   <div style="width:100%;max-width:1140px;margin:96px auto 0;border-top:1px solid #22344E;padding-top:72px;display:flex;flex-wrap:wrap;gap:clamp(32px,5vw,64px);align-items:center;justify-content:center">
     <div style="flex:0 1 300px;display:flex;flex-direction:column;align-items:center;gap:14px">
-      <video controls="controls" preload="metadata" playsInline="{{ true }}" src="/api/video?clip=demo" onPlay="{{ trackDemoVideo }}" style="width:min(300px,80vw);aspect-ratio:9/16;border-radius:16px;border:1px solid #22344E;background:#08131F;box-shadow:0 18px 44px rgba(0,0,0,0.35);display:block;object-fit:cover"></video>
+      <video data-clip="demo_recording" controls="controls" preload="metadata" playsInline="{{ true }}" src="/api/video?clip=demo" onPlay="{{ trackDemoVideo }}" style="width:min(300px,80vw);aspect-ratio:9/16;border-radius:16px;border:1px solid #22344E;background:#08131F;box-shadow:0 18px 44px rgba(0,0,0,0.35);display:block;object-fit:cover"></video>
       <div style="font-size:13px;color:#8A9BB5;text-align:center;line-height:1.6;max-width:300px;text-wrap:pretty">A recorded call, start to finish: answered, questions handled, appointment booked.</div>
     </div>
     <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:18px;text-align:left">
@@ -669,7 +669,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <p style="margin:0;font-size:15px;line-height:1.65;color:#B9C4D4;max-width:520px;margin-inline:auto;text-wrap:pretty;font-variant-numeric:tabular-nums">You pay the remaining $1,000 only once Denty books a real patient into your calendar, inside the first 14 days of go-live. If it doesn't, you don't. That's how sure we are.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:14px">
-        <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" onClick="{{ trackCalendlyPricing }}" style="display:block;text-align:center;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:17px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Claim your practice audit slot</a>
+        <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" onClick="{{ trackCalendlyPricing }}" data-cta="pricing" style="display:block;text-align:center;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:17px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Claim your practice audit slot</a>
         <div style="font-size:12.5px;color:#8A93A1;line-height:1.6;text-align:center;font-variant-numeric:tabular-nums">Free 20-minute call. Ask about the split start on it. No paperwork, just say the word.</div>
       </div>
       <div ref="{{ glareRef }}" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;opacity:0.15;border-radius:24px"></div>
@@ -699,7 +699,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   <div data-reveal="" style="width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;padding-bottom:90px">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2rem,5vw,3rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">Every call answered. Every opening filled.</h2>
     <p style="font-size:16px;color:#B9C4D4;margin:0;font-variant-numeric:tabular-nums">$2,000 one-time setup. Every call answered from day one.</p>
-    <button onClick="{{ openBookingFinal }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,0.3)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+    <button onClick="{{ openBookingFinal }}" data-cta="final_cta" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,0.3)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
     <!-- GO-LIVE LINE — Benny: deliberately a speed claim, NOT a refund promise, because you
          only confirmed the split start as a commercial commitment. To turn it into a real
          guarantee, swap the badge text below for
@@ -773,7 +773,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <a href="#terms" onClick="{{ openTerms }}" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Terms</a>
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-        <button onClick="{{ scrollToToothy }}" aria-label="Talk to the AI receptionist" title="Talk to the AI receptionist" style="width:60px;height:60px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
+        <button onClick="{{ scrollToToothy }}" data-cta="hero_demo" aria-label="Talk to the AI receptionist" title="Talk to the AI receptionist" style="width:60px;height:60px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
           <img src="uploads/denty_neutral.png" alt="" width="60" height="60" style="display:block;width:60px;height:60px;object-fit:contain;image-rendering:pixelated">
         </button>
         <div style="font-size:12px;color:#5A6E86">Talk to the receptionist</div>
@@ -790,8 +790,8 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 <sc-if value="{{ showSticky }}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;bottom:0;left:0;right:0;z-index:40;padding:12px 16px;background:rgba(10,26,47,0.92);backdrop-filter:blur(10px)">
     <div style="display:flex;gap:10px;align-items:stretch">
-      <button onClick="{{ stickyDemo }}" style="flex:0 0 auto;background:rgba(250,249,246,0.08);color:#FAF9F6;border:1px solid rgba(250,249,246,0.32);border-radius:10px;padding:16px 14px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">Talk to the AI</button>
-      <button onClick="{{ openBookingSticky }}" style="flex:1;min-width:0;background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 10px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">Book a Strategy Call</button>
+      <button onClick="{{ stickyDemo }}" data-cta="sticky_demo" style="flex:0 0 auto;background:rgba(250,249,246,0.08);color:#FAF9F6;border:1px solid rgba(250,249,246,0.32);border-radius:10px;padding:16px 14px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">Talk to the AI</button>
+      <button onClick="{{ openBookingSticky }}" data-cta="sticky_mobile" style="flex:1;min-width:0;background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 10px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">Book a Strategy Call</button>
     </div>
   </div>
 </sc-if>
@@ -894,7 +894,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <p style="margin:0"><strong>What we collect.</strong> What you type into the form on this page: your name, practice name, email, phone, country, rough monthly call volume, and number of locations. Nothing more, and nothing you haven't typed.</p>
         <p style="margin:0"><strong>Demo calls.</strong> The in-browser demo is a live call: your microphone audio is streamed to the third-party voice-AI platform that powers the conversation, processed there under that platform's own security and data-processing terms, and used to generate the assistant's replies. Demo calls are capped at 60 seconds. Please don't share patient, health, or payment information during the demo. The assistant is not configured to receive it, and neither are we.</p>
         <p style="margin:0"><strong>Demo limits and your IP address.</strong> The free demo is one per visitor. To enforce that without keeping a record of who you are, we store a one-way salted hash of your IP address, never the address itself, and the hash cannot be reversed back into an IP.</p>
-        <p style="margin:0"><strong>Usage measurement.</strong> We record anonymous events about how this page is used: for example that a demo was started, that a section was viewed, or which button was clicked, together with a coarse timestamp. These events carry no name, email, cookie, or advertising identifier, and are used only to understand which parts of the page work.</p>
+        <p style="margin:0"><strong>Usage measurement.</strong> We record anonymous events about how this page is used: for example that a demo was started, that a section was viewed, or which button was clicked, together with a coarse timestamp. To count returning visits without knowing who you are, your browser stores a random first-party identifier. It is a random string, it holds no name or email, it is never shared with anyone and it is never used for advertising. Clearing your browser storage removes it. These events carry no advertising identifier and no third-party tracker, and are used only to understand which parts of the page work.</p>
         <p style="margin:0"><strong>Who else touches it.</strong> We use a small number of established service providers to run this: a voice-AI platform (live call audio), a hosted database (your form details and usage events), an email delivery service (so your enquiry reaches our inbox), a hosting provider (serving this page), and a scheduling tool (booking your strategy call). Each processes data only to provide its part of the service. We do not sell your information, we do not share it for advertising, and we run no advertising trackers on this page.</p>
         <p style="margin:0"><strong>How long we keep it.</strong> Enquiry details are kept while we're in touch and for as long as we may need them to answer you. Ask us to delete them and we delete them.</p>
         <p style="margin:0"><strong>Your choices.</strong> Email us to see what we hold, correct it, or have it deleted. One message is enough, and there is no form to fill in.</p>
@@ -1151,13 +1151,39 @@ class Component extends DCLogic {
   // no personal data — an anonymous per-tab id so steps of the same visit can be joined).
   // Plausible and GA4 mirror the same events automatically if either is present.
   initAnalytics() {
+    // Identity is three separate things, and conflating them is what made the old numbers wrong:
+    //   visitor_id  persistent, anonymous, localStorage. Counts PEOPLE and survives tabs.
+    //   session_id  one visit, sessionStorage, with a 30-minute idle rollover so a visit
+    //               interrupted by lunch counts as two sessions instead of one six-hour outlier.
+    //   ip_hash     server-side only, for abuse control. Never identity: IPs rotate on mobile
+    //               networks and are shared across an office.
+    // Both ids are random, carry no personal data, and are never sent anywhere but this site.
+    const rid = () => (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2) + Date.now().toString(36);
     try {
+      this._vid = localStorage.getItem('dd_vid');
+      if (!this._vid) { this._vid = rid(); localStorage.setItem('dd_vid', this._vid); }
+    } catch (e) { this._vid = null; } // storage blocked: fall back to session-only identity
+    try {
+      const IDLE_MS = 30 * 60 * 1000;
+      const last = parseInt(sessionStorage.getItem('dd_sid_at') || '0', 10);
       this._sid = sessionStorage.getItem('dd_sid');
-      if (!this._sid) {
-        this._sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
-        sessionStorage.setItem('dd_sid', this._sid);
-      }
-    } catch (e) { this._sid = 'nostore'; }
+      if (!this._sid || !last || (Date.now() - last) > IDLE_MS) this._sid = rid();
+      sessionStorage.setItem('dd_sid', this._sid);
+      sessionStorage.setItem('dd_sid_at', String(Date.now()));
+      this._touchSession = () => { try { sessionStorage.setItem('dd_sid_at', String(Date.now())); } catch (e) {} };
+    } catch (e) { this._sid = 'nostore'; this._touchSession = () => {}; }
+
+    // Campaign tags are parsed once here rather than stored raw and unpicked in SQL later.
+    try {
+      const p = new URLSearchParams(location.search);
+      this._utm = {
+        source: p.get('utm_source') || null,
+        medium: p.get('utm_medium') || null,
+        campaign: p.get('utm_campaign') || null
+      };
+    } catch (e) { this._utm = {}; }
 
     if (this.PLAUSIBLE_DOMAIN && !window.plausible) {
       const sc = document.createElement('script');
@@ -1197,24 +1223,47 @@ class Component extends DCLogic {
 
     // Dwell time per section: which parts of the page hold attention. Accumulated while a
     // section is at least half on screen, and sent as one event at the end of the visit.
-    this._dwell = {}; this._dwellFrom = {};
+    //
+    // section_view fires the first time each section is actually seen. That used to be inferred
+    // at query time from section_time, which only arrives at the very end of a visit, so the
+    // "reached the demo" funnel step silently missed every session that did not close cleanly.
+    // A reach event has to be its own event.
+    this._dwell = {}; this._dwellFrom = {}; this._seenSection = {};
     if ('IntersectionObserver' in window) {
       this._sio = new IntersectionObserver(es => es.forEach(en => {
         const name = en.target.getAttribute('data-section');
         if (!name) return;
-        if (en.isIntersecting) { this._dwellFrom[name] = Date.now(); }
+        if (en.isIntersecting) {
+          this._dwellFrom[name] = Date.now();
+          if (!this._seenSection[name]) { this._seenSection[name] = true; this.track('section_view', { section: name }); }
+        }
         else if (this._dwellFrom[name]) {
           this._dwell[name] = (this._dwell[name] || 0) + (Date.now() - this._dwellFrom[name]);
           delete this._dwellFrom[name];
         }
       }), { threshold: 0.5 });
       document.querySelectorAll('[data-section]').forEach(el => this._sio.observe(el));
+
+      // CTA impressions: the denominator click-through rate never had. Without it you can only
+      // see which button gets clicked most in absolute terms, which mostly reflects which one
+      // sits highest on the page. Fires once per placement per visit.
+      this._seenCta = {};
+      this._cio = new IntersectionObserver(es => es.forEach(en => {
+        const where = en.target.getAttribute('data-cta');
+        if (!en.isIntersecting || !where || this._seenCta[where]) return;
+        this._seenCta[where] = true;
+        this._cio.unobserve(en.target);
+        this.track('cta_impression', { location: where });
+      }), { threshold: 0.6 });
+      document.querySelectorAll('[data-cta]').forEach(el => this._cio.observe(el));
     }
 
     // Video watch time: real seconds watched, plus quarter milestones per clip.
+    // The clip name is read from the element rather than inferred from DOM order — index-based
+    // naming meant reordering the page silently relabelled historical data.
     this._watch = {};
     document.querySelectorAll('video').forEach((v, i) => {
-      const clip = i === 0 ? 'vsl' : 'demo_recording';
+      const clip = v.getAttribute('data-clip') || ('video_' + (i + 1));
       const w = this._watch[clip] = { seconds: 0, last: 0, marks: {} };
       v.addEventListener('timeupdate', () => {
         const d = v.currentTime - w.last;
@@ -1231,20 +1280,56 @@ class Component extends DCLogic {
     });
 
     // One summary per visit, on the way out.
-    this._onLeave = () => {
-      if (this._left) return;
-      this._left = true;
-      Object.keys(this._dwellFrom).forEach(n => { this._dwell[n] = (this._dwell[n] || 0) + (Date.now() - this._dwellFrom[n]); });
-      const secs = o => Object.keys(o).reduce((a, k) => (a[k] = Math.round(o[k] / 1000), a), {});
-      this.track('section_time', secs(this._dwell));
-      Object.keys(this._watch).forEach(clip => {
-        const w = this._watch[clip];
-        if (w.seconds > 0.5) this.track('video_watch', { clip, seconds: Math.round(w.seconds) });
+    //
+    // This used to be a one-shot guarded by a flag, fired on the first `visibilitychange →
+    // hidden`. On a phone, switching apps for a second ended the measured visit permanently, so
+    // time on page and scroll depth were systematically undercounted for the mobile majority.
+    //
+    // Now: hiding the page flushes what we have so far, and coming back resumes measuring.
+    // Repeat flushes send only the time accrued since the last one, so a visitor who switches
+    // apps five times contributes five partial summaries that add up to the real total rather
+    // than one truncated one. `_sent` tracks what has already been reported per section.
+    this._sent = {}; this._sentSeconds = 0; this._sentWatch = {};
+    this._flush = final => {
+      const now = Date.now();
+      // Close any open dwell windows without discarding them: the section is still on screen.
+      Object.keys(this._dwellFrom).forEach(n => {
+        this._dwell[n] = (this._dwell[n] || 0) + (now - this._dwellFrom[n]);
+        this._dwellFrom[n] = now;
       });
-      this.track('session_end', { seconds: Math.round((Date.now() - this._t0) / 1000), max_depth: this._maxDepth });
+      const delta = {};
+      Object.keys(this._dwell).forEach(n => {
+        const whole = Math.round(this._dwell[n] / 1000);
+        const already = this._sent[n] || 0;
+        if (whole > already) { delta[n] = whole - already; this._sent[n] = whole; }
+      });
+      if (Object.keys(delta).length) this.track('section_time', delta);
+
+      Object.keys(this._watch).forEach(clip => {
+        const whole = Math.round(this._watch[clip].seconds);
+        const already = this._sentWatch[clip] || 0;
+        if (whole > already + 0.5) {
+          this.track('video_watch', { clip, seconds: whole - already });
+          this._sentWatch[clip] = whole;
+        }
+      });
+
+      const total = Math.round((now - this._t0) / 1000);
+      if (total > this._sentSeconds) {
+        this.track('session_end', {
+          seconds: total - this._sentSeconds,
+          max_depth: this._maxDepth,
+          final: !!final
+        });
+        this._sentSeconds = total;
+      }
     };
+    this._onLeave = () => this._flush(true);
     window.addEventListener('pagehide', this._onLeave);
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') this._onLeave(); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') this._flush(false);
+      else { this._t0 = Date.now() - this._sentSeconds * 1000; this._touchSession(); } // resume measuring
+    });
   }
 
   track(name, props) {
@@ -1252,7 +1337,12 @@ class Component extends DCLogic {
       const p = props || {};
       if (window.plausible) window.plausible(name, { props: p });
       if (window.gtag) window.gtag('event', name, p);
-      const body = JSON.stringify({ event: name, props: p, sid: this._sid, path: location.pathname, ref: document.referrer || '', ts: Date.now() });
+      if (this._touchSession) this._touchSession(); // any activity keeps the session alive
+      const body = JSON.stringify({
+        event: name, props: p,
+        vid: this._vid, sid: this._sid, utm: this._utm || {},
+        path: location.pathname, ref: document.referrer || '', ts: Date.now()
+      });
       // Beacon survives the page being closed mid-event (exit intent, outbound Calendly click).
       if (navigator.sendBeacon) navigator.sendBeacon('/api/event', new Blob([body], { type: 'application/json' }));
       else fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
@@ -1279,7 +1369,10 @@ class Component extends DCLogic {
       name: s.bName, practice_name: s.bPractice, email: s.bEmail, phone: s.bPhone,
       country: s.bCountry, monthly_call_volume: s.bVolume, locations: s.bLocations,
       website: s.bWebsite, // honeypot: server drops anything with this filled
-      source
+      source,
+      // Attribution rides along so a lead can be tied back to the visit and campaign that
+      // produced it. The direct-to-Supabase fallback ignores the fields it has no columns for.
+      vid: this._vid, sid: this._sid, utm: this._utm || {}, ref: document.referrer || ''
     };
   }
 
@@ -1569,15 +1662,40 @@ class Component extends DCLogic {
 
   insertDirect(payload) {
     // Fallback when no serverless runtime exists: write the lead straight to Supabase from the
-    // browser. The honeypot field is server-side only — `leads` has no column for it.
-    const { website, ...row } = payload;
-    if (website) return; // bot: drop it here too
+    // browser, under the insert-only RLS policy.
+    //
+    // The row is built column by column rather than by spreading the payload. PostgREST rejects
+    // the whole insert if it sees a key with no matching column, and the payload deliberately
+    // carries fields the table does not have: the honeypot, the nested utm object, the raw
+    // referrer. (This previously destructured `website` out and then sent the original payload
+    // anyway, so every fallback insert was being rejected.)
+    if (payload.website) return; // bot: drop it here too
+    const u = payload.utm || {};
+    let referrerHost = null;
+    if (payload.ref) { try { referrerHost = new URL(payload.ref).hostname.replace(/^www\./, ''); } catch (e) { referrerHost = null; } }
+    const core = {
+      name: payload.name, practice_name: payload.practice_name, email: payload.email,
+      phone: payload.phone, country: payload.country,
+      monthly_call_volume: payload.monthly_call_volume, locations: payload.locations,
+      source: payload.source
+    };
+    const attributed = Object.assign({}, core, {
+      visitor_id: payload.vid || null, session_id: payload.sid || null,
+      utm_source: u.source || null, utm_medium: u.medium || null, utm_campaign: u.campaign || null,
+      referrer_host: referrerHost
+    });
+    const post = row => fetch(this.SUPABASE_URL + '/rest/v1/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: this.SUPABASE_PUBLISHABLE_KEY, Authorization: 'Bearer ' + this.SUPABASE_PUBLISHABLE_KEY, Prefer: 'return=minimal' },
+      body: JSON.stringify(row)
+    });
     try {
-      fetch(this.SUPABASE_URL + '/rest/v1/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', apikey: this.SUPABASE_PUBLISHABLE_KEY, Authorization: 'Bearer ' + this.SUPABASE_PUBLISHABLE_KEY, Prefer: 'return=minimal' },
-        body: JSON.stringify(payload)
-      }).then(r => this.setState({ sendState: r.ok ? 'saved' : 'queued' }))
+      // If the attribution columns are not there yet (page deployed ahead of the migration),
+      // retry with the columns the table has always had. Losing the campaign tag is a small
+      // cost; losing the lead is not.
+      post(attributed)
+        .then(r => r.ok ? r : post(core))
+        .then(r => this.setState({ sendState: r.ok ? 'saved' : 'queued' }))
         .catch(() => this.setState({ sendState: 'queued' }));
     } catch (e) { this.setState({ sendState: 'queued' }); }
   }

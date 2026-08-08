@@ -1,3 +1,11 @@
+-- ============================================================================
+-- SUPERSEDED — DO NOT RUN.
+-- This migration was never applied to production (schema_migrations was empty and the
+-- site_events table did not exist). It is kept only as history. The finished schema,
+-- including the columns this file and 003 would have added plus visitor_id and category,
+-- is created by 005_analytics_core.sql. Running this now would conflict with 005.
+-- ============================================================================
+
 -- Digi Dental — geography and device on site events (for the admin dashboard)
 -- Country, region and city come from Vercel's edge headers, so there is no IP lookup and no
 -- third-party tracker involved. The raw IP is still never stored; only its salted hash is.

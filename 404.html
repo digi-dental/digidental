@@ -62,9 +62,24 @@
   </footer>
   <script>
     // Log the miss so broken links show up in the admin dashboard rather than silently rotting.
+    //
+    // It reuses the same visitor and session ids the main page issues, so a dead link appears
+    // inside that visitor's journey instead of floating free. It only ever READS the ids: a
+    // visitor whose first ever hit is a 404 should not be minted an identity by an error page.
     try {
-      var body = JSON.stringify({ event: 'page_not_found', props: { path: location.pathname }, path: location.pathname, ref: document.referrer || '', ts: Date.now() });
+      var vid = null, sid = null;
+      try { vid = localStorage.getItem('dd_vid'); } catch (e) {}
+      try { sid = sessionStorage.getItem('dd_sid'); } catch (e) {}
+      var p = new URLSearchParams(location.search);
+      var body = JSON.stringify({
+        event: 'page_not_found',
+        props: { path: location.pathname },
+        vid: vid, sid: sid,
+        utm: { source: p.get('utm_source'), medium: p.get('utm_medium'), campaign: p.get('utm_campaign') },
+        path: location.pathname, ref: document.referrer || '', ts: Date.now()
+      });
       if (navigator.sendBeacon) navigator.sendBeacon('/api/event', new Blob([body], { type: 'application/json' }));
+      else fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {});
     } catch (e) {}
   </script>
 </body>

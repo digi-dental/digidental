@@ -65,8 +65,9 @@ Every funnel step fires through `track()` in `index.html`. Three sinks, one taxo
    **Apply `supabase/APPLY_TO_SUPABASE.sql` first** (migrations `005`, `006` and `007` in one
    paste) — until `site_events` exists, events are accepted and dropped. If the dashboard
    reports functions missing from the schema cache, only the tail of that 39 KB file failed to
-   paste: run `supabase/APPLY_007_ONLY.sql` instead, which is 9 KB and prints the four
-   functions it created so you can see it worked. (`002` and `003` are
+   paste: run the matching single-migration file instead — `supabase/APPLY_007_ONLY.sql` or
+   `supabase/APPLY_008_ONLY.sql`. Each is ~10 KB and prints the functions it created, so a
+   truncated paste is visible rather than silent. (`002` and `003` are
    superseded by `005`; they are kept only as history and must not be run.)
 2. Plausible — set `PLAUSIBLE_DOMAIN` in `index.html` to the live domain and the script
    loads itself; every event mirrors automatically.
@@ -109,6 +110,24 @@ controls added later. That matters: before it existed, fewer than half the Whats
 links on the page had a handler, so "how many people actually emailed me" had no answer.
 `contact_click` carries `channel` (`whatsapp` / `email` / `phone`), and Calendly is folded in
 alongside it by `rpc_contact` so all four routes to you are compared on one footing.
+
+### The dashboard's own views
+`/admin.html` is one page with real views rather than a long scroll: the sidebar swaps content
+instead of jumping a few hundred pixels. The Overview leads with one large chart that switches
+between visitors, clicks, visits, demos, forms, contacts and leads — every series arrives in a
+single `rpc_series` call, so switching is instant and all of them cover the same days.
+
+**Click log** (`rpc_click_log`) is the record behind the click-through rates: one row per click
+with the timestamp, what was clicked, which section, the channel, country/region/city, device,
+source and the anonymous visitor id. Nothing new is collected; it is the events already stored,
+shown individually rather than only in aggregate.
+
+**Audit** (`rpc_monthly`, `rpc_monthly_breakdown`) works in calendar months rather than a
+rolling window, so one month can be compared with the last, and splits those conversions by
+source, country, device or campaign.
+
+**Export** covers `.md` (a full written report), `.csv` (every dataset), `.json` (raw), and
+`.png` of the current chart, rendered from its own SVG onto a canvas.
 
 ### Aggregation
 All of it happens in Postgres, in the functions created by `006`. `/api/stats` just calls

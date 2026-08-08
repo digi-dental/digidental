@@ -271,8 +271,9 @@ input,select,button,textarea{font-family:inherit}
   .dd-hero-links{justify-content:flex-start}
   .dd-hero-demo{width:100%;justify-self:end}
 }
-.dd-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:110px clamp(48px,7vw,120px);align-items:start}
-@media (min-width:1180px){.dd-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(32px,3vw,48px)}}
+/* The four cost statistics stay in the original 2x2 block. Four across read as a thin
+   ribbon of percentages on a wide screen; capping the grid keeps the pairs balanced. */
+.dd-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:110px clamp(48px,7vw,120px);align-items:start;max-width:1060px;margin:0 auto;width:100%}
 .dd-split{display:flex;flex-direction:column;gap:40px;width:100%;align-items:center}
 @media (min-width:980px){
   .dd-split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,0.85fr);align-items:center;gap:clamp(40px,5vw,72px)}

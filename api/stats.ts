@@ -95,6 +95,26 @@ export default async function handler(req: any, res: any) {
       const { data, error } = await rpc('rpc_conversion_paths', { days });
       return res.status(200).json({ range_days: days, paths: data || [], error });
     }
+    // Heavy or rarely-opened views are lazy: the dashboard's first paint should not pay for a
+    // 5,000-row click log or a 12-month audit nobody has asked to see yet.
+    if (view === 'clicklog') {
+      const { data, error } = await rpc('rpc_click_log', { days, lim: intParam(q.limit, 500, 1, 5000) });
+      return res.status(200).json({ range_days: days, log: data || [], error });
+    }
+    if (view === 'audit') {
+      const months = intParam(q.months, 12, 1, 36);
+      const dim = ['source', 'country', 'device', 'campaign'].includes(String(q.dim)) ? String(q.dim) : 'source';
+      const [monthly, breakdown] = await Promise.all([
+        rpc('rpc_monthly', { months }),
+        rpc('rpc_monthly_breakdown', { months, dim })
+      ]);
+      return res.status(200).json({
+        months, dim,
+        monthly: monthly.data || [],
+        breakdown: breakdown.data || [],
+        error: monthly.error || breakdown.error
+      });
+    }
     if (view === 'pipeline') {
       const { data, error } = await rpc('rpc_pipeline', { days, lim: 300 });
       return res.status(200).json({ range_days: days, cards: data || [], error });
@@ -111,13 +131,13 @@ export default async function handler(req: any, res: any) {
 
     // ---- The dashboard itself: one round trip, all panels in parallel ----
     const [
-      overview, funnel, daily, cta, sections, video, scroll,
+      overview, funnel, series, cta, sections, video, scroll,
       sources, countries, devices, referrers, errors, paths, leads,
       contact, clickTotals, clicks, pipeline
     ] = await Promise.all([
       rpc('rpc_overview', { days }),
       rpc('rpc_funnel', { days }),
-      rpc('rpc_daily', { days }),
+      rpc('rpc_series', { days }),
       rpc('rpc_cta_matrix', { days }),
       rpc('rpc_sections', { days }),
       rpc('rpc_video', { days }),
@@ -140,7 +160,7 @@ export default async function handler(req: any, res: any) {
     // Truncating this list to three used to hide the fourth failure, which made it look like
     // one migration was partly applied when in fact a whole file had not run. Report the
     // distinct causes and say how many panels each affected.
-    const failures = [overview, funnel, daily, cta, sections, video, scroll, sources, countries, devices, referrers, errors, paths, leads, contact, clickTotals, clicks, pipeline]
+    const failures = [overview, funnel, series, cta, sections, video, scroll, sources, countries, devices, referrers, errors, paths, leads, contact, clickTotals, clicks, pipeline]
       .map(r => r.error).filter(Boolean) as string[];
     const distinctFailures = Array.from(new Set(failures));
 
@@ -151,7 +171,7 @@ export default async function handler(req: any, res: any) {
       degraded_count: failures.length || undefined,
       overview: overview.data || {},
       funnel: funnel.data || [],
-      daily: daily.data || [],
+      series: series.data || [],
       cta: cta.data || [],
       sections: sections.data || [],
       video: video.data || [],

@@ -5,9 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <title>Digi Dental — Control room</title>
-<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<!-- Denty, the same icon set the public site uses, so the dashboard tab is recognisably ours. -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- GSAP for the entrance choreography. Deferred and entirely optional: if it fails to load,
+     initMotion() is never called and the dashboard renders in its final state. -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
 <style>
 /*
   shadcn design system, built natively.
@@ -220,10 +227,12 @@ svg{flex:0 0 auto}
 }
 .sb-head{padding:18px 16px;display:flex;align-items:center;gap:10px}
 .sb-mark{
-  width:32px;height:32px;border-radius:9px;background:var(--sidebar-primary);
+  width:34px;height:34px;border-radius:10px;background:var(--sidebar-primary);
   color:var(--sidebar-primary-foreground);display:grid;place-items:center;
-  font-family:var(--font-heading);font-weight:700;font-size:15px;flex:0 0 auto
+  font-family:var(--font-heading);font-weight:700;font-size:15px;flex:0 0 auto;overflow:hidden
 }
+/* Denty is pixel art: nearest-neighbour keeps the pixels crisp instead of smudging them. */
+.sb-mark img{image-rendering:pixelated;display:block;object-fit:contain}
 .sb-name{font-family:var(--font-heading);font-weight:600;font-size:14.5px;line-height:1.2}
 .sb-sub{font-size:11.5px;color:var(--muted-foreground)}
 .sb-group{padding:6px 10px}
@@ -404,7 +413,7 @@ input[type=password]{
 <div class="shell" id="app" hidden>
   <aside class="sidebar" id="sidebar">
     <div class="sb-head">
-      <div class="sb-mark">D</div>
+      <div class="sb-mark"><img src="/uploads/denty_happy.png" alt="Denty" width="26" height="26" onerror="this.replaceWith(document.createTextNode('D'))"></div>
       <div>
         <div class="sb-name">Digi Dental</div>
         <div class="sb-sub">Control room</div>
@@ -845,6 +854,9 @@ input[type=password]{
           '</td><td>' + esc(r.utm_campaign || r.referrer_host || 'direct') +
           '</td><td>' + (r.visitor_id ? '<button class="linkish" data-vid="' + esc(r.visitor_id) + '">journey</button>' : '') + '</td></tr>';
       });
+
+    // Everything is in the DOM now, so the entrance can be choreographed over the real content.
+    initMotion();
   }
 
   function drawKanban(cards) {
@@ -931,6 +943,73 @@ input[type=password]{
         }).join('');
       })
       .catch(function () { $('timeline').innerHTML = '<li class="empty">Could not load this journey.</li>'; });
+  }
+
+  // ---------- motion (GSAP) ----------
+  //
+  // This is a dashboard: it gets scanned and operated, not watched, so motion earns its place
+  // only where it helps you read the data. Three things, and nothing else:
+  //   1. a short staggered entrance so the eye lands on the stat row first
+  //   2. counting the headline figures up, which makes a changed number obvious on refresh
+  //   3. growing bars and drawing donut arcs from zero, so length and angle read as quantity
+  //
+  // Everything is wrapped in gsap.matchMedia() with a reduced-motion branch that simply sets
+  // the final state, so the whole layer reverts cleanly for anyone who asks for less motion.
+  // GSAP is loaded with `defer` and is entirely optional — if it never arrives, nothing here
+  // runs and the dashboard is already in its finished state.
+  var mm = null;
+  function initMotion(scope) {
+    if (!window.gsap) return;
+    if (mm) mm.revert();               // clear the previous render's tweens before re-animating
+    mm = window.gsap.matchMedia();
+
+    mm.add({ ok: '(prefers-reduced-motion: no-preference)', reduce: '(prefers-reduced-motion: reduce)' }, function (ctx) {
+      var g = window.gsap;
+      if (ctx.conditions.reduce) {
+        // Create nothing. The markup is already in its final state, and matchMedia reverts the
+        // other branch's tweens on its own if the preference changes.
+        //
+        // Do NOT clearProps here: the bars carry their length as an inline width set when the
+        // HTML was built, so clearing properties wipes that width and every bar renders empty.
+        return;
+      }
+
+      var tl = g.timeline({ defaults: { ease: 'power2.out' } });
+
+      // Stat row, then the panels below it.
+      tl.from('.stat', { y: 10, opacity: 0, duration: 0.4, stagger: { each: 0.045, from: 'start' } })
+        .from('.content > section:not(#s-overview) > .grid > .card, .content > section > .card, .kan .col',
+              { y: 12, opacity: 0, duration: 0.4, stagger: 0.04 }, '-=0.25');
+
+      // Count the headline numbers up. Only pure numerics: "2m 15s" is left alone.
+      g.utils.toArray('.stat .v').forEach(function (el) {
+        var raw = (el.textContent || '').replace(/,/g, '');
+        if (!/^\d+$/.test(raw)) return;
+        var target = parseInt(raw, 10);
+        if (target <= 0) return;
+        var o = { n: 0 };
+        g.to(o, {
+          n: target, duration: Math.min(1.1, 0.35 + target / 900), ease: 'power1.out',
+          onUpdate: function () { el.textContent = Math.round(o.n).toLocaleString(); },
+          onComplete: function () { el.textContent = target.toLocaleString(); }
+        });
+      });
+
+      // Bars grow from zero, so the bar length itself carries the quantity.
+      g.utils.toArray('.fill, .fbar span').forEach(function (el) {
+        var w = el.style.width;
+        g.fromTo(el, { width: 0 }, { width: w, duration: 0.6, ease: 'power2.out', delay: 0.12 });
+      });
+
+      // Donut arcs sweep in rather than appearing whole.
+      g.utils.toArray('.donut-wrap svg circle').forEach(function (c, i) {
+        var dash = c.getAttribute('stroke-dasharray');
+        if (!dash) return;
+        var len = parseFloat(dash.split(' ')[0]) || 0;
+        g.fromTo(c, { strokeDasharray: '0 9999' },
+          { strokeDasharray: dash, duration: 0.7, ease: 'power2.inOut', delay: 0.15 + i * 0.07 });
+      });
+    });
   }
 
   window.addEventListener('resize', function () {

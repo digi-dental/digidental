@@ -63,7 +63,10 @@ Every funnel step fires through `track()` in `index.html`. Three sinks, one taxo
 
 1. `/api/event` → the `site_events` table. Always on, no third-party tracker.
    **Apply `supabase/APPLY_TO_SUPABASE.sql` first** (migrations `005`, `006` and `007` in one
-   paste) — until `site_events` exists, events are accepted and dropped. (`002` and `003` are
+   paste) — until `site_events` exists, events are accepted and dropped. If the dashboard
+   reports functions missing from the schema cache, only the tail of that 39 KB file failed to
+   paste: run `supabase/APPLY_007_ONLY.sql` instead, which is 9 KB and prints the four
+   functions it created so you can see it worked. (`002` and `003` are
    superseded by `005`; they are kept only as history and must not be run.)
 2. Plausible — set `PLAUSIBLE_DOMAIN` in `index.html` to the live domain and the script
    loads itself; every event mirrors automatically.

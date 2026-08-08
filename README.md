@@ -62,8 +62,8 @@ by our own hiccup. `localStorage` remains as the instant, no-round-trip layer ab
 Every funnel step fires through `track()` in `index.html`. Three sinks, one taxonomy:
 
 1. `/api/event` → the `site_events` table. Always on, no third-party tracker.
-   **Apply `supabase/migrations/005_analytics_core.sql` and `006_analytics_functions.sql`
-   first** — until that table exists, events are accepted and dropped. (`002` and `003` are
+   **Apply `supabase/APPLY_TO_SUPABASE.sql` first** (migrations `005`, `006` and `007` in one
+   paste) — until `site_events` exists, events are accepted and dropped. (`002` and `003` are
    superseded by `005`; they are kept only as history and must not be run.)
 2. Plausible — set `PLAUSIBLE_DOMAIN` in `index.html` to the live domain and the script
    loads itself; every event mirrors automatically.
@@ -87,16 +87,25 @@ Events carry a `category` so a whole class can be filtered without matching on n
 allowlist in `api/event.ts` is derived from the same map, so the two cannot drift.
 
 - **BEHAVIOR** — `page_view`, `view_hero`, `section_view`, `scroll_depth`, `section_time`,
-  `video_play`, `video_progress`, `video_watch`, `calc_interact`, `session_end`
+  `video_play`, `video_progress`, `video_watch`, `calc_interact`, `session_end`,
+  `element_click`
 - **INTENT** — `cta_impression`, `cta_click`, `form_open`, `form_step_1..5`, `demo_start`,
   `exit_intent_shown`, `exit_intent_demo`
-- **CONVERSION** — `demo_complete`, `form_submit`, `calendly_click`, `lead_captured`
+- **CONVERSION** — `demo_complete`, `form_submit`, `calendly_click`, `lead_captured`,
+  `contact_click`
 - **TECHNICAL** — `demo_error`, `demo_blocked`, `form_error`, `page_not_found`
 
 `cta_impression` is what makes click-through a real rate rather than a reflection of page
 position: mark any new button with `data-cta="<placement>"` and the impression fires when it
 scrolls into view. The placement string must match the `location` the click handler reports,
 or the two will not line up. Videos are named with `data-clip`, never by DOM order.
+
+`element_click` and `contact_click` come from a single delegated listener on the document, so
+**every** link and button is counted without anyone having to instrument it — including
+controls added later. That matters: before it existed, fewer than half the WhatsApp and email
+links on the page had a handler, so "how many people actually emailed me" had no answer.
+`contact_click` carries `channel` (`whatsapp` / `email` / `phone`), and Calendly is folded in
+alongside it by `rpc_contact` so all four routes to you are compared on one footing.
 
 ### Aggregation
 All of it happens in Postgres, in the functions created by `006`. `/api/stats` just calls

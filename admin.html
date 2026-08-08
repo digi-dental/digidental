@@ -1,225 +1,233 @@
 <!doctype html>
-<html lang="en" data-palette="#00A092,#C2410C,#7C3AED,#BE185D">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<title>Digi Dental — Traffic</title>
+<title>Digi Dental — Control room</title>
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /*
-  Categorical palette validated with the dataviz validator (five checks, both modes):
-    light  #00A092 #C2410C #7C3AED #BE185D   surface #FCFCFB
-    dark   #0D9488 #EA580C #7C3AED #DB2777   surface #1A1A19
-  Dark is a selected set of steps, not an automatic lightening of the light set — the dark
-  lightness band (L 0.48–0.67) is narrower and the light values fall outside it.
-  Status colors are reserved and never reused as a series hue.
+  Digi Dental palette, straight off the site: navy #0A1A2F, teal #0F8B80, cream #FAF9F6,
+  Fraunces for figures and headings, Inter for everything else.
+
+  Chart hues validated with the dataviz validator (five checks, both modes):
+    light on cream #FAF9F6   #00958A #C2410C #7C3AED #BE185D #1C6DB0
+    dark  on navy  #0A1A2F   #12A192 #E8620E #8B5CF6 #DB2777 #3B82D9
+  Dark is a chosen set of steps, not a lightened copy: the dark lightness band is narrower
+  and the light values sit outside it. Status colours are reserved and never used as a series.
 */
 :root{
-  --surface:#FCFCFB;
+  --bg:#FAF9F6;
   --panel:#FFFFFF;
-  --ink:#12201C;
-  --ink-2:#48605A;
-  --ink-3:#7B928B;
-  --rule:#E3E9E6;
-  --rule-2:#EFF3F1;
-  --grid:#EDF1EF;
+  --ink:#0A1A2F;
+  --ink-2:#4A5C72;
+  --ink-3:#8494A6;
+  --rule:#E8E4DA;
+  --rule-2:#F1EEE6;
+  --brand:#0F8B80;
+  --brand-soft:#E7F2F0;
 
-  --c1:#00A092; --c2:#C2410C; --c3:#7C3AED; --c4:#BE185D;
-  --seq-1:#CCEDE9; --seq-2:#7FCFC6; --seq-3:#2FAFA2; --seq-4:#00786D;
+  --s1:#00958A; --s2:#C2410C; --s3:#7C3AED; --s4:#BE185D; --s5:#1C6DB0;
+  --good:#1F7A4D; --good-bg:#E8F3ED;
+  --warn:#8A5A06; --warn-bg:#FBF2DF;
+  --crit:#B3300C; --crit-bg:#FBEAE4;
 
-  --good:#1F7A4D; --good-bg:#E6F3EC;
-  --warn:#8A5A06; --warn-bg:#FBF1DE;
-  --crit:#B3300C; --crit-bg:#FBE9E3;
-
-  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
-  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --r:8px;
-  --shadow:0 1px 2px rgba(18,32,28,.05), 0 8px 24px rgba(18,32,28,.05);
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r:12px;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --surface:#1A1A19; --panel:#212422; --ink:#ECF1EF; --ink-2:#A8BAB4; --ink-3:#7C918B;
-    --rule:#313835; --rule-2:#272C2A; --grid:#2B312F;
-    --c1:#0D9488; --c2:#EA580C; --c3:#7C3AED; --c4:#DB2777;
-    --seq-1:#123C38; --seq-2:#1A6B62; --seq-3:#0D9488; --seq-4:#5EEAD4;
-    --good:#4ADE80; --good-bg:#12291D; --warn:#E0B155; --warn-bg:#2C2312; --crit:#F87F5D; --crit-bg:#301811;
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    --bg:#0A1A2F; --panel:#0E2338; --ink:#FAF9F6; --ink-2:#A8BACB; --ink-3:#6F8298;
+    --rule:#22354C; --rule-2:#16293D;
+    --brand:#3FBFA9; --brand-soft:#10312F;
+    --s1:#12A192; --s2:#E8620E; --s3:#8B5CF6; --s4:#DB2777; --s5:#3B82D9;
+    --good:#4ADE80; --good-bg:#0F2A1D; --warn:#E0B155; --warn-bg:#2B2211; --crit:#F87F5D; --crit-bg:#2F1712;
   }
 }
 :root[data-theme="dark"]{
-  --surface:#1A1A19; --panel:#212422; --ink:#ECF1EF; --ink-2:#A8BAB4; --ink-3:#7C918B;
-  --rule:#313835; --rule-2:#272C2A; --grid:#2B312F;
-  --c1:#0D9488; --c2:#EA580C; --c3:#7C3AED; --c4:#DB2777;
-  --seq-1:#123C38; --seq-2:#1A6B62; --seq-3:#0D9488; --seq-4:#5EEAD4;
-  --good:#4ADE80; --good-bg:#12291D; --warn:#E0B155; --warn-bg:#2C2312; --crit:#F87F5D; --crit-bg:#301811;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  --bg:#0A1A2F; --panel:#0E2338; --ink:#FAF9F6; --ink-2:#A8BACB; --ink-3:#6F8298;
+  --rule:#22354C; --rule-2:#16293D;
+  --brand:#3FBFA9; --brand-soft:#10312F;
+  --s1:#12A192; --s2:#E8620E; --s3:#8B5CF6; --s4:#DB2777; --s5:#3B82D9;
+  --good:#4ADE80; --good-bg:#0F2A1D; --warn:#E0B155; --warn-bg:#2B2211; --crit:#F87F5D; --crit-bg:#2F1712;
 }
 
 *{box-sizing:border-box}
-[hidden]{display:none !important} /* class rules below set display; the attribute must still win */
+[hidden]{display:none !important}
 html,body{margin:0;padding:0}
-body{background:var(--surface);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
-h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.015em}
 button{font:inherit;cursor:pointer}
-a{color:var(--c1)}
-:focus-visible{outline:2px solid var(--c1);outline-offset:2px;border-radius:4px}
+a{color:var(--brand);text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
+.num{font-family:var(--serif);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 
 /* ---------- login ---------- */
 .login{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
-.login-card{width:100%;max-width:380px;background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:32px;box-shadow:var(--shadow)}
-.login-card h1{font-size:20px;margin-bottom:6px}
-.login-card p{color:var(--ink-2);font-size:14px;margin:0 0 22px}
-.field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
-label{font-size:12px;font-weight:600;color:var(--ink-2);letter-spacing:.02em}
-input[type=password],input[type=search],select{
-  font:inherit;padding:10px 12px;border:1px solid var(--rule);border-radius:var(--r);
-  background:var(--surface);color:var(--ink);width:100%
-}
-.btn{background:var(--c1);color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-weight:600}
-.btn:hover{filter:brightness(.94)}
+.login-card{width:100%;max-width:370px;background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:36px}
+.login-card h1{font-family:var(--serif);font-size:24px;margin-bottom:8px}
+.login-card p{color:var(--ink-2);font-size:14px;margin:0 0 24px}
+label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:7px}
+input[type=password]{font:inherit;padding:12px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--bg);color:var(--ink);width:100%}
+.btn{background:var(--brand);color:#fff;border:none;border-radius:10px;padding:12px 18px;font-weight:600}
+.btn:hover{filter:brightness(.93)}
 .btn-ghost{background:transparent;color:var(--ink-2);border:1px solid var(--rule)}
 .btn-ghost:hover{background:var(--rule-2);color:var(--ink)}
-.msg{font-size:13px;padding:10px 12px;border-radius:var(--r);margin-bottom:14px}
-.msg.err{background:var(--crit-bg);color:var(--crit)}
+.msg{font-size:13px;padding:11px 13px;border-radius:10px;margin-bottom:16px;background:var(--crit-bg);color:var(--crit)}
 
 /* ---------- shell ---------- */
-.app{max-width:1320px;margin:0 auto;padding:22px 22px 80px}
-.topbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--rule);margin-bottom:24px}
-.topbar h1{font-size:19px}
-.topbar .sub{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-top:3px}
+.app{max-width:1280px;margin:0 auto;padding:30px 26px 90px}
+.top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:34px}
+.brand{display:flex;align-items:center;gap:11px}
+.brand .mark{width:30px;height:30px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:15px;font-weight:600}
+.brand h1{font-family:var(--serif);font-size:20px}
+.brand .sub{font-size:12px;color:var(--ink-3);margin-top:1px}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.seg{display:inline-flex;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
-.seg button{background:var(--panel);border:none;padding:7px 13px;font-size:13px;color:var(--ink-2);border-right:1px solid var(--rule)}
-.seg button:last-child{border-right:none}
-.seg button[aria-pressed="true"]{background:var(--c1);color:#fff;font-weight:600}
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:3px}
+.seg button{background:none;border:none;padding:6px 13px;font-size:13px;color:var(--ink-2);border-radius:7px}
+.seg button[aria-pressed="true"]{background:var(--brand);color:#fff;font-weight:600}
 
-.banner{padding:12px 15px;border-radius:var(--r);margin-bottom:20px;font-size:13.5px;display:flex;gap:9px;align-items:flex-start}
-.banner.warn{background:var(--warn-bg);color:var(--warn)}
+.banner{padding:13px 16px;border-radius:10px;margin-bottom:22px;font-size:13.5px;background:var(--warn-bg);color:var(--warn)}
 .banner.crit{background:var(--crit-bg);color:var(--crit)}
-.banner b{font-weight:700}
 
-/* ---------- panels ---------- */
-.grid{display:grid;gap:16px;margin-bottom:16px}
-/* min() on the minmax floor: a bare minmax(420px,1fr) refuses to shrink below 420px, so on a
-   narrower phone the track stays 420px wide and pushes the page sideways. */
-.g2{grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr))}
-.g3{grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))}
-.panel{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow);min-width:0}
-.panel > header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;margin-bottom:4px}
-.panel h2{font-size:14.5px}
-/* The question references are long; letting them wrap keeps narrow screens from scrolling
-   sideways. They stay on one line whenever the header has room. */
-.panel .q{font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
-.panel .hint{font-size:12.5px;color:var(--ink-3);margin:2px 0 16px}
+/* ---------- sections ---------- */
+.sec{margin-bottom:34px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--serif);font-size:17px}
+.sec-head .note{font-size:12.5px;color:var(--ink-3)}
 
-/* ---------- KPI tiles ---------- */
-/* Four across on a wide screen keeps the eight tiles as two even rows, rather than seven in a
-   thin ribbon with one orphan underneath. */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;margin-bottom:16px}
-@media (min-width:900px){ .kpis{grid-template-columns:repeat(4,1fr)} }
-.kpi{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
-.kpi .k{font-size:11.5px;color:var(--ink-3);font-weight:600;letter-spacing:.02em}
-.kpi .v{font-size:27px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:5px;line-height:1.1}
-.kpi .d{font-size:11.5px;color:var(--ink-3);margin-top:3px;font-variant-numeric:tabular-nums}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:var(--r);padding:20px 22px;min-width:0}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(400px,100%),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr))}
+
+/* ---------- hero figures ---------- */
+.hero{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;margin-bottom:34px}
+@media (min-width:720px){ .hero{grid-template-columns:repeat(4,1fr)} }
+.hero .cell{background:var(--panel);padding:20px 22px}
+.hero .k{font-size:12px;color:var(--ink-3);font-weight:500}
+.hero .v{font-family:var(--serif);font-size:34px;line-height:1.05;margin-top:8px;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.hero .d{font-size:12px;color:var(--ink-3);margin-top:5px}
+
+.card h3{font-size:14px;margin-bottom:3px}
+.card .sub{font-size:12.5px;color:var(--ink-3);margin-bottom:16px}
+
+/* ---------- donut ---------- */
+.donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.donut{flex:0 0 auto}
+.keys{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1}
+.key{display:flex;align-items:center;gap:9px;font-size:13px;min-width:0}
+.key .sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.key .nm{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.key .vl{font-family:var(--serif);font-variant-numeric:tabular-nums;font-size:13px;color:var(--ink)}
+.key .pc{color:var(--ink-3);font-size:12px;width:44px;text-align:right;font-variant-numeric:tabular-nums}
 
 /* ---------- bars ---------- */
-.rows{display:flex;flex-direction:column;gap:9px}
-.row{display:grid;grid-template-columns:minmax(96px,132px) 1fr auto;gap:11px;align-items:center;font-size:13px}
+.rows{display:flex;flex-direction:column;gap:10px}
+.row{display:grid;grid-template-columns:minmax(90px,140px) 1fr auto;gap:12px;align-items:center;font-size:13px}
 .row .lab{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.track{background:var(--grid);border-radius:4px;height:19px;position:relative;overflow:hidden;display:block}
-/* display:block matters: these are spans, and percentage width/height do not apply to an
-   inline box, so without it the fill collapses and only the grey track is visible. */
-.fill{display:block;height:100%;border-radius:0 4px 4px 0;min-width:2px;transition:width .35s ease}
-.row .val{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
-.row .val small{color:var(--ink-3)}
+.track{display:block;background:var(--rule-2);border-radius:5px;height:10px;overflow:hidden}
+.fill{display:block;height:100%;border-radius:0 5px 5px 0;min-width:2px}
+.row .val{font-family:var(--serif);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.row .val small{color:var(--ink-3);font-family:var(--sans);font-size:11.5px}
 
-/* funnel keeps a second, lighter bar showing what was lost at each step */
-.fun{display:flex;flex-direction:column;gap:2px}
-.fun .step{display:grid;grid-template-columns:minmax(120px,168px) 1fr auto;gap:11px;align-items:center;padding:6px 0;font-size:13px}
-.fun .drop{font-family:var(--mono);font-size:11px;color:var(--crit);padding-left:calc(168px + 11px)}
-.fun .drop.none{color:var(--ink-3)} /* "no drop" is good news; it should not read as an alert */
+/* ---------- funnel ---------- */
+.fun{display:flex;flex-direction:column;gap:11px}
+.fstep{display:grid;grid-template-columns:minmax(110px,160px) 1fr auto;gap:12px;align-items:center;font-size:13px}
+.fstep .lab{color:var(--ink-2)}
+.fbar{display:block;background:var(--rule-2);border-radius:5px;height:12px;overflow:hidden}
+.fbar span{display:block;height:100%;background:var(--brand);border-radius:0 5px 5px 0}
+.fdrop{font-size:11.5px;color:var(--crit);grid-column:2/4}
+
+/* ---------- kanban ---------- */
+.kan{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px;align-items:start}
+.col{background:var(--rule-2);border-radius:var(--r);padding:12px;min-width:0}
+.col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px;padding:0 3px}
+.col-head .t{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.col-head .c{font-family:var(--serif);font-size:13px;color:var(--ink);background:var(--panel);border-radius:20px;padding:1px 9px;font-variant-numeric:tabular-nums}
+.col .stripe{height:3px;border-radius:3px;margin-bottom:11px}
+.cards{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto}
+.kcard{background:var(--panel);border:1px solid var(--rule);border-radius:9px;padding:10px 11px;cursor:pointer;text-align:left;width:100%;font:inherit;color:inherit}
+.kcard:hover{border-color:var(--brand)}
+.kcard .n{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kcard .m{font-size:11.5px;color:var(--ink-3);margin-top:3px;display:flex;gap:7px;flex-wrap:wrap}
+.kcard .lead{display:inline-block;font-size:10.5px;font-weight:600;color:var(--good);background:var(--good-bg);border-radius:20px;padding:1px 7px;margin-top:6px}
+.col .more{font-size:11.5px;color:var(--ink-3);text-align:center;padding-top:8px}
 
 /* ---------- tables ---------- */
-.tw{overflow-x:auto;margin:0 -4px}
-table{border-collapse:collapse;width:100%;font-size:13px;min-width:520px}
-th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--rule-2);white-space:nowrap}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);font-weight:600;position:sticky;top:0;background:var(--panel)}
-td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:480px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--rule-2);white-space:nowrap}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);font-weight:600}
+td.n,th.n{text-align:right;font-family:var(--serif);font-variant-numeric:tabular-nums}
 tbody tr:hover{background:var(--rule-2)}
 tr:last-child td{border-bottom:none}
-.chip{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:600}
-.chip.good{background:var(--good-bg);color:var(--good)}
-.chip.warn{background:var(--warn-bg);color:var(--warn)}
-.chip.crit{background:var(--crit-bg);color:var(--crit)}
-.chip.mute{background:var(--rule-2);color:var(--ink-3)}
-.linkish{color:var(--c1);cursor:pointer;text-decoration:underline;text-underline-offset:2px;background:none;border:none;padding:0;font:inherit}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.pill.good{background:var(--good-bg);color:var(--good)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.crit{background:var(--crit-bg);color:var(--crit)}
+.pill.mute{background:var(--rule-2);color:var(--ink-3)}
+.linkish{color:var(--brand);cursor:pointer;background:none;border:none;padding:0;font:inherit;text-decoration:underline;text-underline-offset:2px}
+.empty{color:var(--ink-3);font-size:13px;padding:22px 0;text-align:center}
 
-.empty{color:var(--ink-3);font-size:13px;padding:16px 0;text-align:center}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-bottom:12px}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.dot{width:9px;height:9px;border-radius:2px;display:inline-block}
-
-/* ---------- daily chart ---------- */
-.chartwrap{position:relative}
-svg.line{display:block;width:100%;height:190px;overflow:visible}
-.tip{
-  position:absolute;pointer-events:none;background:var(--ink);color:var(--surface);
-  padding:7px 10px;border-radius:6px;font-size:12px;font-family:var(--mono);
-  transform:translate(-50%,-115%);white-space:nowrap;z-index:5;opacity:0;transition:opacity .12s
-}
+/* ---------- line chart ---------- */
+.chart{position:relative}
+svg.line{display:block;width:100%;height:170px;overflow:visible}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);padding:7px 10px;border-radius:7px;font-size:12px;transform:translate(-50%,-120%);white-space:nowrap;opacity:0;transition:opacity .12s}
 .tip.on{opacity:1}
 
-/* ---------- journey drawer ---------- */
-.drawer{position:fixed;inset:0;background:rgba(10,20,17,.45);display:flex;justify-content:flex-end;z-index:40}
-.drawer-inner{background:var(--panel);width:min(620px,100%);height:100%;overflow-y:auto;padding:22px;border-left:1px solid var(--rule)}
-.drawer header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
-.tl{list-style:none;margin:0;padding:0;border-left:2px solid var(--rule);margin-left:7px}
-.tl li{position:relative;padding:0 0 16px 20px}
-.tl li::before{content:"";position:absolute;left:-6px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--panel)}
-.tl li.BEHAVIOR::before{background:var(--c1)}
-.tl li.INTENT::before{background:var(--c3)}
-.tl li.CONVERSION::before{background:var(--c4)}
-.tl li.TECHNICAL::before{background:var(--c2)}
+/* ---------- drawer ---------- */
+.drawer{position:fixed;inset:0;background:rgba(10,26,47,.5);display:flex;justify-content:flex-end;z-index:40}
+.dinner{background:var(--panel);width:min(560px,100%);height:100%;overflow-y:auto;padding:24px}
+.dinner header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.tl{list-style:none;margin:0;padding:0;border-left:2px solid var(--rule);margin-left:6px}
+.tl li{position:relative;padding:0 0 15px 19px}
+.tl li::before{content:"";position:absolute;left:-6px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--panel);background:var(--s1)}
+.tl li.INTENT::before{background:var(--s3)}
+.tl li.CONVERSION::before{background:var(--s4)}
+.tl li.TECHNICAL::before{background:var(--s2)}
 .tl .ev{font-weight:600;font-size:13.5px}
-.tl .meta{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:2px}
-.tl .pr{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);margin-top:4px;word-break:break-word;white-space:pre-wrap}
+.tl .meta{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.tl .pr{font-size:11.5px;color:var(--ink-2);margin-top:3px;word-break:break-word}
 
 @media (max-width:640px){
-  .app{padding:16px 14px 60px}
-  .row,.fun .step{grid-template-columns:minmax(78px,96px) 1fr auto}
-  .fun .drop{padding-left:107px}
+  .app{padding:20px 15px 60px}
+  .row,.fstep{grid-template-columns:minmax(74px,92px) 1fr auto}
 }
 </style>
 </head>
 <body>
 
-<!-- ============ LOGIN ============ -->
 <div class="login" id="login">
   <form class="login-card" id="loginForm">
-    <h1>Digi Dental traffic</h1>
-    <p>Private dashboard. It shows lead contact details, so it stays behind a password.</p>
-    <div class="msg err" id="loginErr" hidden></div>
-    <div class="field">
-      <label for="pw">Password</label>
-      <input type="password" id="pw" autocomplete="current-password" required>
-    </div>
-    <button class="btn" type="submit" style="width:100%" id="loginBtn">Sign in</button>
+    <h1>Digi Dental</h1>
+    <p>Control room. Shows lead contact details, so it stays behind a password.</p>
+    <div class="msg" id="loginErr" hidden></div>
+    <label for="pw">Password</label>
+    <input type="password" id="pw" autocomplete="current-password" required>
+    <button class="btn" type="submit" style="width:100%;margin-top:16px" id="loginBtn">Sign in</button>
   </form>
 </div>
 
-<!-- ============ DASHBOARD ============ -->
 <div class="app" id="app" hidden>
-  <div class="topbar">
-    <div>
-      <h1>Traffic &amp; conversion</h1>
-      <div class="sub" id="stamp">loading…</div>
+  <div class="top">
+    <div class="brand">
+      <div class="mark">D</div>
+      <div>
+        <h1>Control room</h1>
+        <div class="sub" id="stamp">loading…</div>
+      </div>
     </div>
     <div class="controls">
       <div class="seg" id="range" role="group" aria-label="Date range">
-        <button data-days="7">7 days</button>
-        <button data-days="30" aria-pressed="true">30 days</button>
-        <button data-days="90">90 days</button>
+        <button data-days="7">7d</button>
+        <button data-days="30" aria-pressed="true">30d</button>
+        <button data-days="90">90d</button>
       </div>
       <button class="btn btn-ghost" id="refresh">Refresh</button>
       <button class="btn btn-ghost" id="logout">Sign out</button>
@@ -227,125 +235,132 @@ svg.line{display:block;width:100%;height:190px;overflow:visible}
   </div>
 
   <div class="banner crit" id="degraded" hidden></div>
-  <div class="banner warn" id="nodata" hidden>
-    <span>No events recorded yet in this window. If the site is live, check that the analytics migrations have been applied and that <b>/api/event</b> is reaching the database.</span>
-  </div>
+  <div class="banner" id="nodata" hidden>No events recorded yet in this window. If the site is live, check that the analytics migrations have been applied.</div>
 
-  <!-- KPIs: Q1, Q2, Q11, Q14, Q17, Q24 -->
-  <div class="kpis" id="kpis"></div>
+  <!-- headline figures -->
+  <div class="hero" id="hero"></div>
 
-  <div class="grid g2">
-    <section class="panel">
-      <header><h2>Conversion funnel</h2><span class="q">Q13 · Q14 · Q15 · Q16 · Q17</span></header>
-      <p class="hint">Unique visitors reaching each step, not event counts. Red shows the share lost from the step above.</p>
-      <div class="fun" id="funnel"></div>
-    </section>
-
-    <section class="panel">
-      <header><h2>Visitors per day</h2><span class="q">Q1 · Q2</span></header>
-      <p class="hint">Distinct people and sessions per day, with leads marked.</p>
-      <div class="legend">
-        <span><i class="dot" style="background:var(--c1)"></i>Visitors</span>
-        <span><i class="dot" style="background:var(--c3)"></i>Sessions</span>
-        <span><i class="dot" style="background:var(--c4)"></i>Leads</span>
+  <!-- the four questions -->
+  <div class="sec">
+    <div class="sec-head"><h2>Clicks and attention</h2><span class="note">Every link and button on the page, counted</span></div>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Where the clicks go</h3>
+        <div class="sub">Most-clicked controls, by total clicks</div>
+        <div class="rows" id="clicks"></div>
       </div>
-      <div class="chartwrap" id="dailyWrap">
-        <svg class="line" id="daily" role="img" aria-label="Visitors and sessions per day"></svg>
-        <div class="tip" id="dailyTip"></div>
+      <div class="card">
+        <h3>Click-through by placement</h3>
+        <div class="sub">Impressions count people who actually scrolled the button into view</div>
+        <div class="tw"><table id="ctaTable"></table></div>
       </div>
-    </section>
+    </div>
   </div>
 
-  <section class="panel" style="margin-bottom:16px">
-    <header><h2>Call-to-action performance</h2><span class="q">Q19 · Q20 · Q21</span></header>
-    <p class="hint">Impressions count visitors who actually scrolled the button into view, so click-through is a real rate rather than a reflection of page position. The last column follows clickers forward to see who went on to submit.</p>
-    <div class="tw"><table id="ctaTable"></table></div>
-  </section>
-
-  <div class="grid g2">
-    <section class="panel">
-      <header><h2>Section attention</h2><span class="q">Q7 · Q8 · Q9</span></header>
-      <p class="hint">Reach is the share of visitors who saw the section. Exit rate is the share of visits that ended there.</p>
-      <div class="tw"><table id="secTable"></table></div>
-    </section>
-
-    <section class="panel">
-      <header><h2>Scroll depth</h2><span class="q">Q7</span></header>
-      <p class="hint">Share of visitors reaching each point down the page.</p>
-      <div class="rows" id="scroll"></div>
-      <header style="margin-top:26px"><h2>Video</h2><span class="q">Q10</span></header>
-      <p class="hint">Completion is the share of starts that reached 95%.</p>
-      <div class="tw"><table id="videoTable"></table></div>
-    </section>
+  <div class="sec">
+    <div class="sec-head"><h2>How people reach you</h2><span class="note">Form, WhatsApp, email, Calendly</span></div>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Contact channel mix</h3>
+        <div class="sub">Share of everyone who arrived</div>
+        <div class="donut-wrap"><div class="donut" id="contactDonut"></div><div class="keys" id="contactKeys"></div></div>
+      </div>
+      <div class="card">
+        <h3>Did they fill the form first?</h3>
+        <div class="sub">Whether each contact came after a form submission or instead of one</div>
+        <div class="tw"><table id="contactTable"></table></div>
+      </div>
+    </div>
   </div>
 
-  <section class="panel" style="margin-bottom:16px">
-    <header><h2>Where visitors come from, and which sources convert</h2><span class="q">Q5 · Q6 · Q22</span></header>
-    <p class="hint">First-touch attribution: each visitor is credited to the campaign or referrer of their first visit in this window.</p>
-    <div class="tw"><table id="srcTable"></table></div>
-  </section>
-
-  <div class="grid g3">
-    <section class="panel">
-      <header><h2>Countries</h2><span class="q">Q3</span></header>
-      <div class="rows" id="countries"></div>
-    </section>
-    <section class="panel">
-      <header><h2>Devices</h2><span class="q">Q4</span></header>
-      <div class="rows" id="devices"></div>
-    </section>
-    <section class="panel">
-      <header><h2>Referrers</h2><span class="q">Q5</span></header>
-      <div class="rows" id="referrers"></div>
-    </section>
+  <div class="sec">
+    <div class="sec-head"><h2>Conversion funnel</h2><span class="note">Unique visitors, not event counts</span></div>
+    <div class="grid g2">
+      <div class="card"><div class="fun" id="funnel"></div></div>
+      <div class="card">
+        <h3>Visitors per day</h3>
+        <div class="sub">Distinct people, with leads marked</div>
+        <div class="chart" id="dailyWrap">
+          <svg class="line" id="daily" role="img" aria-label="Visitors per day"></svg>
+          <div class="tip" id="dailyTip"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="grid g2">
-    <section class="panel">
-      <header><h2>What converting visits have in common</h2><span class="q">Q12 · Q18</span></header>
-      <p class="hint">How much more often each step appears in journeys that converted than in journeys that did not. A high lift means that step is characteristic of people who go on to convert; it does not prove it caused the conversion.</p>
-      <div class="rows" id="paths"></div>
-    </section>
-
-    <section class="panel">
-      <header><h2>Errors and dead ends</h2><span class="q">Q23</span></header>
-      <p class="hint">Blocked demos, failed calls, form errors and missing pages.</p>
-      <div class="tw"><table id="errTable"></table></div>
-    </section>
+  <div class="sec">
+    <div class="sec-head"><h2>Pipeline</h2><span class="note">Every visitor, in the furthest stage they reached. Click a card for their journey.</span></div>
+    <div class="kan" id="kanban"></div>
   </div>
 
-  <section class="panel" style="margin-bottom:16px">
-    <header>
-      <h2>Visitors</h2>
-      <span class="q">Q1 · Q2 · Q18 — click a row for the full journey</span>
-    </header>
-    <p class="hint">Most recently active first. Identifiers are random and anonymous.</p>
-    <div class="tw"><table id="visTable"></table></div>
-  </section>
+  <div class="sec">
+    <div class="sec-head"><h2>Video</h2><span class="note">How much of each clip actually gets watched</span></div>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Watch-through</h3>
+        <div class="sub">Share of starts reaching each quarter</div>
+        <div class="rows" id="videoBars"></div>
+      </div>
+      <div class="card">
+        <h3>Time watched</h3>
+        <div class="sub">Real seconds, ignoring seeks</div>
+        <div class="tw"><table id="videoTable"></table></div>
+      </div>
+    </div>
+  </div>
 
-  <section class="panel">
-    <header><h2>Leads</h2><span class="q">Q17 · Q22 · Q24</span></header>
-    <p class="hint">Bot submissions are excluded. Attribution shows which campaign produced each lead.</p>
-    <div class="tw"><table id="leadTable"></table></div>
-  </section>
+  <div class="sec">
+    <div class="sec-head"><h2>Audience</h2></div>
+    <div class="grid g3">
+      <div class="card">
+        <h3>Devices</h3><div class="sub">&nbsp;</div>
+        <div class="donut-wrap"><div class="donut" id="devDonut"></div><div class="keys" id="devKeys"></div></div>
+      </div>
+      <div class="card">
+        <h3>Traffic sources</h3><div class="sub">&nbsp;</div>
+        <div class="donut-wrap"><div class="donut" id="srcDonut"></div><div class="keys" id="srcKeys"></div></div>
+      </div>
+      <div class="card">
+        <h3>Countries</h3><div class="sub">&nbsp;</div>
+        <div class="rows" id="countries"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2>Attention and reach</h2></div>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Sections</h3>
+        <div class="sub">Reach, median time, and where visits end</div>
+        <div class="tw"><table id="secTable"></table></div>
+      </div>
+      <div class="card">
+        <h3>Scroll depth</h3>
+        <div class="sub">Share of visitors reaching each point</div>
+        <div class="rows" id="scroll"></div>
+        <h3 style="margin-top:24px">Errors and dead ends</h3>
+        <div class="sub">Blocked demos, failed calls, missing pages</div>
+        <div class="tw"><table id="errTable"></table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2>Leads</h2><span class="note">Bots excluded, with the campaign that produced each one</span></div>
+    <div class="card"><div class="tw"><table id="leadTable"></table></div></div>
+  </div>
 </div>
 
-<!-- ============ JOURNEY DRAWER ============ -->
 <div class="drawer" id="drawer" hidden>
-  <div class="drawer-inner">
+  <div class="dinner">
     <header>
       <div>
-        <h2 style="font-size:16px">Visitor journey</h2>
-        <div class="sub" style="font-family:var(--mono);font-size:11.5px;color:var(--ink-3)" id="drawerId"></div>
+        <h2 style="font-family:var(--serif);font-size:18px">Visitor journey</h2>
+        <div style="font-size:11.5px;color:var(--ink-3)" id="drawerId"></div>
       </div>
       <button class="btn btn-ghost" id="drawerClose">Close</button>
     </header>
-    <div class="legend">
-      <span><i class="dot" style="background:var(--c1)"></i>Behavior</span>
-      <span><i class="dot" style="background:var(--c3)"></i>Intent</span>
-      <span><i class="dot" style="background:var(--c4)"></i>Conversion</span>
-      <span><i class="dot" style="background:var(--c2)"></i>Technical</span>
-    </div>
     <ol class="tl" id="timeline"></ol>
   </div>
 </div>
@@ -355,8 +370,8 @@ svg.line{display:block;width:100%;height:190px;overflow:visible}
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var state = { days: 30, data: null };
+  var SERIES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)'];
 
-  // ---------- helpers ----------
   function num(n) { return (n === null || n === undefined || isNaN(n)) ? '0' : Number(n).toLocaleString(); }
   function pct(n) { return (n === null || n === undefined || n === '') ? '—' : Number(n).toFixed(1) + '%'; }
   function esc(s) {
@@ -367,38 +382,59 @@ svg.line{display:block;width:100%;height:190px;overflow:visible}
   function dur(s) {
     s = Math.round(Number(s) || 0);
     if (s < 60) return s + 's';
-    var m = Math.floor(s / 60);
-    return m + 'm ' + (s % 60) + 's';
+    return Math.floor(s / 60) + 'm ' + (s % 60) + 's';
   }
   function when(iso) {
     try { return new Date(iso).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
     catch (e) { return iso || ''; }
   }
-  // Categorical hues in fixed order, never cycled: a 9th series folds into the rest.
-  var CAT = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 
-  // Horizontal bar list. Bars share one scale so lengths are comparable.
+  // Donut. Segments are drawn as stroked arcs with a 2px surface gap between them, and the
+  // legend carries the identity so nothing depends on colour alone.
+  function donut(elId, keysId, rows) {
+    var el = $(elId), keys = $(keysId);
+    var total = rows.reduce(function (a, r) { return a + (Number(r.value) || 0); }, 0);
+    if (!total) { el.innerHTML = ''; keys.innerHTML = '<div class="empty">Nothing yet.</div>'; return; }
+    var R = 54, C = 2 * Math.PI * R, off = 0;
+    var segs = rows.slice(0, 5).map(function (r, i) {
+      var frac = (Number(r.value) || 0) / total;
+      var len = Math.max(0, frac * C - 2); // 2px gap so adjacent segments stay distinct
+      var s = '<circle cx="64" cy="64" r="' + R + '" fill="none" stroke="' + SERIES[i % 5] +
+        '" stroke-width="17" stroke-dasharray="' + len + ' ' + (C - len) +
+        '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 64 64)"/>';
+      off += frac * C;
+      return s;
+    }).join('');
+    el.innerHTML = '<svg width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Share breakdown">' + segs +
+      '<text x="64" y="60" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="23" fill="currentColor">' + num(total) + '</text>' +
+      '<text x="64" y="77" text-anchor="middle" font-size="10" fill="var(--ink-3)">total</text></svg>';
+    keys.innerHTML = rows.slice(0, 5).map(function (r, i) {
+      return '<div class="key"><span class="sw" style="background:' + SERIES[i % 5] + '"></span>' +
+        '<span class="nm" title="' + esc(r.label) + '">' + esc(r.label) + '</span>' +
+        '<span class="vl">' + num(r.value) + '</span>' +
+        '<span class="pc">' + (Number(r.value) / total * 100).toFixed(0) + '%</span></div>';
+    }).join('');
+  }
+
+  // `right` and `sub` are both escaped as plain text. Passing markup through here would be
+  // escaped and shown literally, so a secondary value gets its own field rather than a tag.
   function bars(el, rows, color) {
-    if (!rows || !rows.length) { el.innerHTML = '<div class="empty">Nothing recorded yet.</div>'; return; }
+    if (!rows || !rows.length) { el.innerHTML = '<div class="empty">Nothing yet.</div>'; return; }
     var max = Math.max.apply(null, rows.map(function (r) { return Number(r.value) || 0; })) || 1;
     el.innerHTML = rows.map(function (r) {
-      var w = Math.max(1, (Number(r.value) || 0) / max * 100);
       return '<div class="row"><span class="lab" title="' + esc(r.label) + '">' + esc(r.label) + '</span>' +
-        '<span class="track"><span class="fill" style="width:' + w + '%;background:' + (r.color || color || CAT[0]) + '"></span></span>' +
-        '<span class="val">' + esc(r.right !== undefined ? r.right : num(r.value)) + '</span></div>';
+        '<span class="track"><span class="fill" style="width:' + Math.max(1, (Number(r.value) || 0) / max * 100) + '%;background:' + (r.color || color || SERIES[0]) + '"></span></span>' +
+        '<span class="val">' + esc(r.right !== undefined ? r.right : num(r.value)) +
+        (r.sub ? ' <small>' + esc(r.sub) + '</small>' : '') + '</span></div>';
     }).join('');
   }
 
   function table(el, cols, rows, rowFn) {
-    if (!rows || !rows.length) { el.innerHTML = '<tbody><tr><td class="empty">Nothing recorded yet.</td></tr></tbody>'; return; }
-    el.innerHTML =
-      '<thead><tr>' + cols.map(function (c) {
-        return '<th' + (c.n ? ' class="n"' : '') + '>' + esc(c.t) + '</th>';
-      }).join('') + '</tr></thead><tbody>' +
-      rows.map(rowFn).join('') + '</tbody>';
+    if (!rows || !rows.length) { el.innerHTML = '<tbody><tr><td class="empty">Nothing yet.</td></tr></tbody>'; return; }
+    el.innerHTML = '<thead><tr>' + cols.map(function (c) { return '<th' + (c.n ? ' class="n"' : '') + '>' + esc(c.t) + '</th>'; }).join('') +
+      '</tr></thead><tbody>' + rows.map(rowFn).join('') + '</tbody>';
   }
 
-  // ---------- auth ----------
   function showLogin(msg) {
     $('app').hidden = true; $('login').hidden = false; $('drawer').hidden = true;
     if (msg) { $('loginErr').textContent = msg; $('loginErr').hidden = false; }
@@ -406,272 +442,227 @@ svg.line{display:block;width:100%;height:190px;overflow:visible}
 
   $('loginForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    var btn = $('loginBtn'); btn.disabled = true; btn.textContent = 'Signing in…';
-    $('loginErr').hidden = true;
-    fetch('/api/admin-login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: $('pw').value })
-    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+    var b = $('loginBtn'); b.disabled = true; b.textContent = 'Signing in…'; $('loginErr').hidden = true;
+    fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: $('pw').value }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         if (!res.ok) throw new Error((res.j && res.j.error) || 'Could not sign in.');
-        $('pw').value = '';
-        $('login').hidden = true; $('app').hidden = false;
-        load();
+        $('pw').value = ''; $('login').hidden = true; $('app').hidden = false; load();
       })
       .catch(function (err) { $('loginErr').textContent = err.message; $('loginErr').hidden = false; })
-      .then(function () { btn.disabled = false; btn.textContent = 'Sign in'; });
+      .then(function () { b.disabled = false; b.textContent = 'Sign in'; });
   });
 
   $('logout').addEventListener('click', function () {
-    fetch('/api/admin-login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ logout: true })
-    }).then(function () { showLogin(''); });
+    fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ logout: true }) })
+      .then(function () { showLogin(''); });
   });
-
   $('refresh').addEventListener('click', load);
   $('range').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-days]'); if (!b) return;
     state.days = Number(b.dataset.days);
-    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) {
-      x.setAttribute('aria-pressed', String(x === b));
-    });
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
     load();
   });
 
-  // ---------- load ----------
   function load() {
     $('stamp').textContent = 'loading…';
     fetch('/api/stats?days=' + state.days, { credentials: 'same-origin' })
       .then(function (r) {
         if (r.status === 401) { showLogin('Your session expired. Sign in again.'); return null; }
-        return r.json().then(function (j) {
-          if (!r.ok) throw new Error(j.error || ('Request failed (' + r.status + ')'));
-          return j;
-        });
+        return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || ('Request failed (' + r.status + ')')); return j; });
       })
       .then(function (d) { if (d) { state.data = d; render(d); } })
       .catch(function (err) {
         $('stamp').textContent = 'error';
-        var b = $('degraded'); b.hidden = false;
-        b.innerHTML = '<span><b>Could not load the report.</b> ' + esc(err.message) + '</span>';
+        $('degraded').hidden = false;
+        $('degraded').textContent = 'Could not load the report. ' + err.message;
       });
   }
 
-  // ---------- render ----------
   function render(d) {
-    var o = d.overview || {};
+    var o = d.overview || {}, ct = d.click_totals || {};
     $('stamp').textContent = 'Last ' + d.range_days + ' days · updated ' + when(d.generated_at);
 
-    var deg = $('degraded');
     if (d.degraded && d.degraded.length) {
-      deg.hidden = false;
-      deg.innerHTML = '<span><b>Some panels could not be built.</b> ' + esc(d.degraded.join(' · ')) +
-        '. This usually means the analytics migrations have not been applied yet.</span>';
-    } else { deg.hidden = true; }
-
+      $('degraded').hidden = false;
+      $('degraded').textContent = 'Some panels could not be built: ' + d.degraded.join(' · ') +
+        '. This usually means the analytics migrations have not been applied yet.';
+    } else { $('degraded').hidden = true; }
     $('nodata').hidden = !(Number(o.visitors || 0) === 0 && Number(o.page_views || 0) === 0);
 
-    // ---- KPI tiles ----
-    var demoRate = o.demo_starts ? (o.demo_completes / o.demo_starts * 100) : null;
-    var formRate = o.form_opens ? (o.form_submits / o.form_opens * 100) : null;
-    var leadRate = o.visitors ? (o.leads / o.visitors * 100) : null;
-    var kpis = [
-      { k: 'Visitors', v: num(o.visitors), d: num(o.returning_visitors) + ' returning' },
-      { k: 'Sessions', v: num(o.sessions), d: num(o.page_views) + ' page views' },
-      { k: 'Typical visit', v: dur(o.median_seconds), d: 'median ' + Math.round(o.median_scroll || 0) + '% scrolled' },
-      { k: 'Demo calls', v: num(o.demo_completes), d: num(o.demo_starts) + ' started · ' + (demoRate === null ? '—' : demoRate.toFixed(0) + '% finished') },
-      { k: 'Form submits', v: num(o.form_submits), d: num(o.form_opens) + ' opened · ' + (formRate === null ? '—' : formRate.toFixed(0) + '% completed') },
-      { k: 'Leads', v: num(o.leads), d: leadRate === null ? '—' : leadRate.toFixed(1) + '% of visitors' },
-      { k: 'Calendly clicks', v: num(o.calendly_clicks), d: 'booking intent' },
-      { k: 'Errors', v: num(o.errors), d: num(o.not_found) + ' dead links · ' + num(o.bot_leads) + ' bots' }
-    ];
-    $('kpis').innerHTML = kpis.map(function (t) {
-      return '<div class="kpi"><div class="k">' + esc(t.k) + '</div><div class="v">' + esc(t.v) + '</div><div class="d">' + esc(t.d) + '</div></div>';
+    // Contact totals feed the headline conversion figures.
+    var byCh = {};
+    (d.contact || []).forEach(function (c) { byCh[c.channel] = c; });
+    var reach = function (ch) { return byCh[ch] ? Number(byCh[ch].visitors) : 0; };
+    var emailed = reach('email'), whats = reach('whatsapp'), phoned = reach('phone'), cal = reach('calendly');
+
+    $('hero').innerHTML = [
+      { k: 'Visitors', v: num(o.visitors), d: num(o.returning_visitors) + ' returning · ' + num(o.sessions) + ' visits' },
+      { k: 'Total clicks', v: num(ct.total_clicks), d: (ct.clicks_per_visitor || 0) + ' per visitor' },
+      { k: 'Typical visit', v: dur(o.median_seconds), d: Math.round(o.median_scroll || 0) + '% scrolled' },
+      { k: 'Form submits', v: num(o.form_submits), d: num(o.form_opens) + ' opened · ' + (o.form_opens ? (o.form_submits / o.form_opens * 100).toFixed(0) + '% finished' : '—') },
+      { k: 'WhatsApp', v: num(whats), d: o.visitors ? (whats / o.visitors * 100).toFixed(1) + '% of visitors' : '—' },
+      { k: 'Emailed you', v: num(emailed), d: o.visitors ? (emailed / o.visitors * 100).toFixed(1) + '% of visitors' : '—' },
+      { k: 'Calendly', v: num(cal), d: 'booking intent' },
+      { k: 'Leads', v: num(o.leads), d: o.visitors ? (o.leads / o.visitors * 100).toFixed(1) + '% of visitors' : '—' }
+    ].map(function (t) {
+      return '<div class="cell"><div class="k">' + esc(t.k) + '</div><div class="v">' + esc(t.v) + '</div><div class="d">' + esc(t.d) + '</div></div>';
     }).join('');
 
-    // ---- funnel ----
-    var f = d.funnel || [];
-    var top = f.length ? Number(f[0].visitors) || 0 : 0;
-    $('funnel').innerHTML = f.length ? f.map(function (s) {
-      var w = top ? Math.max(1, (Number(s.visitors) || 0) / top * 100) : 1;
-      var lost = Number(s.drop_pct) > 0;
-      var drop = (s.drop_pct === null || s.drop_pct === undefined || Number(s.step) === 1) ? '' :
-        '<div class="drop' + (lost ? '' : ' none') + '">' + (lost ? '↓ ' + pct(s.drop_pct) + ' lost here' : 'no drop') + '</div>';
-      return '<div class="step"><span class="lab">' + esc(s.label) + '</span>' +
-        '<span class="track"><span class="fill" style="width:' + w + '%;background:var(--c1)"></span></span>' +
-        '<span class="val">' + num(s.visitors) + ' <small>' + pct(s.pct_of_landed) + '</small></span></div>' + drop;
-    }).join('') : '<div class="empty">Nothing recorded yet.</div>';
+    // clicks
+    bars($('clicks'), (d.clicks || []).slice(0, 9).map(function (c) {
+      return { label: c.label, value: c.clicks, right: num(c.clicks), sub: num(c.visitors) + ' people' };
+    }), 'var(--s1)');
 
-    drawDaily(d.daily || []);
-
-    // ---- CTA matrix ----
     table($('ctaTable'),
-      [{ t: 'Placement' }, { t: 'Seen', n: 1 }, { t: 'Clicks', n: 1 }, { t: 'CTR', n: 1 }, { t: 'Then submitted', n: 1 }, { t: 'Of clickers', n: 1 }],
+      [{ t: 'Placement' }, { t: 'Seen', n: 1 }, { t: 'Clicks', n: 1 }, { t: 'CTR', n: 1 }, { t: 'Submitted', n: 1 }],
       d.cta || [],
       function (r) {
-        var c = r.ctr === null || r.ctr === undefined ? 'mute' : (r.ctr >= 8 ? 'good' : (r.ctr >= 3 ? 'warn' : 'crit'));
+        var c = (r.ctr === null || r.ctr === undefined) ? 'mute' : (r.ctr >= 8 ? 'good' : r.ctr >= 3 ? 'warn' : 'crit');
         return '<tr><td>' + esc(r.placement) + '</td><td class="n">' + num(r.impressions) + '</td><td class="n">' + num(r.clicks) +
-          '</td><td class="n"><span class="chip ' + c + '">' + pct(r.ctr) + '</span></td><td class="n">' + num(r.submitted) +
-          '</td><td class="n">' + pct(r.submit_rate) + '</td></tr>';
+          '</td><td class="n"><span class="pill ' + c + '">' + pct(r.ctr) + '</span></td><td class="n">' + num(r.submitted) + '</td></tr>';
       });
 
-    // ---- sections ----
+    // contact
+    donut('contactDonut', 'contactKeys', (d.contact || []).map(function (c) { return { label: c.channel, value: Number(c.visitors) }; }));
+    table($('contactTable'),
+      [{ t: 'Channel' }, { t: 'People', n: 1 }, { t: '% of visitors', n: 1 }, { t: 'After the form', n: 1 }, { t: 'Instead of it', n: 1 }],
+      d.contact || [],
+      function (r) {
+        return '<tr><td>' + esc(r.channel) + '</td><td class="n">' + num(r.visitors) + '</td><td class="n">' + pct(r.pct_of_visitors) +
+          '</td><td class="n">' + num(r.after_form) + '</td><td class="n">' + num(r.without_form) + '</td></tr>';
+      });
+
+    // funnel
+    var f = d.funnel || [], top = f.length ? Number(f[0].visitors) || 0 : 0;
+    $('funnel').innerHTML = f.length ? f.map(function (s) {
+      var lost = Number(s.drop_pct) > 0 && Number(s.step) !== 1;
+      return '<div class="fstep"><span class="lab">' + esc(s.label) + '</span>' +
+        '<span class="fbar"><span style="width:' + (top ? Math.max(1, (Number(s.visitors) || 0) / top * 100) : 1) + '%"></span></span>' +
+        '<span class="val">' + num(s.visitors) + ' <small>' + pct(s.pct_of_landed) + '</small></span>' +
+        (lost ? '<span class="fdrop">↓ ' + pct(s.drop_pct) + ' lost here</span>' : '') + '</div>';
+    }).join('') : '<div class="empty">Nothing yet.</div>';
+
+    drawDaily(d.daily || []);
+    drawKanban(d.pipeline || []);
+
+    // video
+    var vb = [];
+    (d.video || []).forEach(function (v) {
+      [['25%', v.p25], ['50%', v.p50], ['75%', v.p75], ['Finished', v.p95]].forEach(function (m, i) {
+        vb.push({ label: v.clip + ' · ' + m[0], value: Number(m[1]) || 0, right: num(m[1]), color: SERIES[i % 5] });
+      });
+    });
+    bars($('videoBars'), vb);
+    table($('videoTable'),
+      [{ t: 'Clip' }, { t: 'Starts', n: 1 }, { t: 'Finished', n: 1 }, { t: 'Median watch', n: 1 }, { t: 'Total', n: 1 }],
+      d.video || [],
+      function (r) {
+        var cp = Number(r.completion_pct) || 0;
+        return '<tr><td>' + esc(r.clip) + '</td><td class="n">' + num(r.starts) +
+          '</td><td class="n"><span class="pill ' + (cp >= 40 ? 'good' : cp >= 15 ? 'warn' : 'mute') + '">' + pct(r.completion_pct) +
+          '</span></td><td class="n">' + dur(r.median_seconds) + '</td><td class="n">' + num(r.total_minutes) + 'm</td></tr>';
+      });
+
+    // audience
+    donut('devDonut', 'devKeys', (d.devices || []).map(function (r) { return { label: r.label || 'unknown', value: Number(r.visitors) }; }));
+    donut('srcDonut', 'srcKeys', (d.referrers || []).map(function (r) { return { label: r.label || 'direct', value: Number(r.visitors) }; }));
+    bars($('countries'), (d.countries || []).slice(0, 7).map(function (r) {
+      return { label: r.label || 'unknown', value: Number(r.visitors), right: num(r.visitors) };
+    }), 'var(--s5)');
+
+    // sections + scroll + errors
     table($('secTable'),
-      [{ t: 'Section' }, { t: 'Reach', n: 1 }, { t: '% of visitors', n: 1 }, { t: 'Median time', n: 1 }, { t: 'Exit rate', n: 1 }],
+      [{ t: 'Section' }, { t: 'Reach', n: 1 }, { t: '%', n: 1 }, { t: 'Median', n: 1 }, { t: 'Exit', n: 1 }],
       d.sections || [],
       function (r) {
         var ex = Number(r.exit_pct) || 0;
         return '<tr><td>' + esc(r.section) + '</td><td class="n">' + num(r.reach) + '</td><td class="n">' + pct(r.reach_pct) +
-          '</td><td class="n">' + dur(r.median_seconds) + '</td><td class="n"><span class="chip ' +
+          '</td><td class="n">' + dur(r.median_seconds) + '</td><td class="n"><span class="pill ' +
           (ex >= 40 ? 'crit' : ex >= 20 ? 'warn' : 'mute') + '">' + pct(r.exit_pct) + '</span></td></tr>';
       });
-
-    // ---- scroll ----
     bars($('scroll'), (d.scroll || []).map(function (r) {
-      return { label: r.depth + '% down', value: r.visitors, right: num(r.visitors) + ' · ' + pct(r.pct) };
-    }), 'var(--c1)');
-
-    // ---- video ----
-    table($('videoTable'),
-      [{ t: 'Clip' }, { t: 'Starts', n: 1 }, { t: '25%', n: 1 }, { t: '50%', n: 1 }, { t: '75%', n: 1 }, { t: '95%', n: 1 }, { t: 'Finished', n: 1 }, { t: 'Median', n: 1 }],
-      d.video || [],
-      function (r) {
-        var cp = Number(r.completion_pct) || 0;
-        return '<tr><td>' + esc(r.clip) + '</td><td class="n">' + num(r.starts) + '</td><td class="n">' + num(r.p25) +
-          '</td><td class="n">' + num(r.p50) + '</td><td class="n">' + num(r.p75) + '</td><td class="n">' + num(r.p95) +
-          '</td><td class="n"><span class="chip ' + (cp >= 40 ? 'good' : cp >= 15 ? 'warn' : 'mute') + '">' + pct(r.completion_pct) +
-          '</span></td><td class="n">' + dur(r.median_seconds) + '</td></tr>';
-      });
-
-    // ---- sources ----
-    table($('srcTable'),
-      [{ t: 'Source' }, { t: 'Medium' }, { t: 'Campaign' }, { t: 'Referrer' }, { t: 'Visitors', n: 1 }, { t: 'Demos', n: 1 }, { t: 'Submits', n: 1 }, { t: 'Leads', n: 1 }, { t: 'Lead rate', n: 1 }],
-      d.sources || [],
-      function (r) {
-        return '<tr><td>' + esc(r.source) + '</td><td>' + esc(r.medium) + '</td><td>' + esc(r.campaign) +
-          '</td><td>' + esc(r.referrer_host) + '</td><td class="n">' + num(r.visitors) + '</td><td class="n">' + num(r.demo_starts) +
-          '</td><td class="n">' + num(r.submits) + '</td><td class="n">' + num(r.leads) +
-          '</td><td class="n">' + pct(r.lead_pct) + '</td></tr>';
-      });
-
-    // ---- breakdowns ----
-    var mk = function (rows) {
-      return (rows || []).slice(0, 8).map(function (r) {
-        return { label: r.label || 'unknown', value: r.visitors, right: num(r.visitors) };
-      });
-    };
-    bars($('countries'), mk(d.countries), 'var(--c1)');
-    bars($('devices'), mk(d.devices), 'var(--c3)');
-    bars($('referrers'), mk(d.referrers), 'var(--c4)');
-
-    // ---- conversion paths ----
-    var paths = (d.paths || []).filter(function (p) { return Number(p.lift) > 0; }).slice(0, 10);
-    bars($('paths'), paths.map(function (p) {
-      return {
-        label: p.event, value: Math.abs(Number(p.lift) || 0),
-        right: '+' + pct(p.lift),
-        color: p.category === 'CONVERSION' ? 'var(--c4)' : p.category === 'INTENT' ? 'var(--c3)' : p.category === 'TECHNICAL' ? 'var(--c2)' : 'var(--c1)'
-      };
-    }));
-
-    // ---- errors ----
+      return { label: r.depth + '% down', value: Number(r.visitors), right: num(r.visitors), sub: pct(r.pct) };
+    }), 'var(--s3)');
     table($('errTable'),
-      [{ t: 'Problem' }, { t: 'Detail' }, { t: 'Hits', n: 1 }, { t: 'Visitors', n: 1 }],
+      [{ t: 'Problem' }, { t: 'Detail' }, { t: 'Hits', n: 1 }],
       d.errors || [],
       function (r) {
-        return '<tr><td><span class="chip crit">' + esc(r.event) + '</span></td><td>' + esc(r.detail) +
-          '</td><td class="n">' + num(r.hits) + '</td><td class="n">' + num(r.visitors) + '</td></tr>';
+        return '<tr><td><span class="pill crit">' + esc(r.event) + '</span></td><td>' + esc(r.detail) + '</td><td class="n">' + num(r.hits) + '</td></tr>';
       });
 
-    // ---- leads ----
     table($('leadTable'),
-      [{ t: 'When' }, { t: 'Name' }, { t: 'Practice' }, { t: 'Email' }, { t: 'Phone' }, { t: 'Calls/mo' }, { t: 'Source' }, { t: 'Campaign' }, { t: 'Journey' }],
+      [{ t: 'When' }, { t: 'Name' }, { t: 'Practice' }, { t: 'Email' }, { t: 'Phone' }, { t: 'Calls/mo' }, { t: 'Campaign' }, { t: '' }],
       d.leads || [],
       function (r) {
         return '<tr><td>' + esc(when(r.created_at)) + '</td><td>' + esc(r.name || '—') + '</td><td>' + esc(r.practice_name || '—') +
           '</td><td>' + (r.email ? '<a href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a>' : '—') +
           '</td><td>' + esc(r.phone || '—') + '</td><td>' + esc(r.monthly_call_volume || '—') +
-          '</td><td>' + esc(r.source) + '</td><td>' + esc(r.utm_campaign || r.referrer_host || 'direct') +
-          '</td><td>' + (r.visitor_id ? '<button class="linkish" data-vid="' + esc(r.visitor_id) + '">view</button>' : '—') + '</td></tr>';
+          '</td><td>' + esc(r.utm_campaign || r.referrer_host || 'direct') +
+          '</td><td>' + (r.visitor_id ? '<button class="linkish" data-vid="' + esc(r.visitor_id) + '">journey</button>' : '') + '</td></tr>';
       });
-
-    loadVisitors();
   }
 
-  // ---------- daily line chart ----------
+  // Pipeline board. Columns are the funnel stages, in order, and a visitor sits in exactly
+  // one of them — the furthest they reached — so the columns sum to the visitor count.
+  function drawKanban(cards) {
+    var STAGES = [
+      { n: 'Browsing', o: 1, c: 'var(--s5)' },
+      { n: 'Engaged', o: 2, c: 'var(--s3)' },
+      { n: 'Opened the form', o: 3, c: 'var(--s1)' },
+      { n: 'Submitted the form', o: 4, c: 'var(--s2)' },
+      { n: 'Reached out', o: 5, c: 'var(--s4)' }
+    ];
+    $('kanban').innerHTML = STAGES.map(function (st) {
+      var mine = (cards || []).filter(function (c) { return Number(c.stage_order) === st.o; });
+      var shown = mine.slice(0, 25);
+      return '<div class="col"><div class="col-head"><span class="t">' + esc(st.n) + '</span><span class="c">' + mine.length + '</span></div>' +
+        '<div class="stripe" style="background:' + st.c + '"></div><div class="cards">' +
+        (shown.length ? shown.map(function (c) {
+          var title = c.lead_name || (String(c.visitor_id).slice(0, 8) + '…');
+          return '<button class="kcard" data-vid="' + esc(c.visitor_id) + '">' +
+            '<div class="n">' + esc(title) + '</div>' +
+            '<div class="m"><span>' + esc(c.country || '—') + '</span><span>' + esc(c.device || '—') + '</span><span>' + esc(c.source || 'direct') + '</span></div>' +
+            (c.is_lead ? '<span class="lead">lead</span>' : '') + '</button>';
+        }).join('') : '<div class="empty" style="padding:12px 0">Empty</div>') +
+        '</div>' + (mine.length > shown.length ? '<div class="more">+' + (mine.length - shown.length) + ' more</div>' : '') + '</div>';
+    }).join('');
+  }
+
   function drawDaily(rows) {
     var svg = $('daily'), tip = $('dailyTip');
     if (!rows.length) { svg.innerHTML = ''; return; }
-    var W = svg.clientWidth || 560, H = 190, P = { t: 10, r: 10, b: 22, l: 30 };
+    var W = svg.clientWidth || 520, H = 170, P = { t: 10, r: 8, b: 20, l: 26 };
     var iw = Math.max(10, W - P.l - P.r), ih = H - P.t - P.b;
-    var max = Math.max(1, Math.max.apply(null, rows.map(function (r) {
-      return Math.max(Number(r.visitors) || 0, Number(r.sessions) || 0);
-    })));
+    var max = Math.max(1, Math.max.apply(null, rows.map(function (r) { return Number(r.visitors) || 0; })));
     var x = function (i) { return P.l + (rows.length === 1 ? iw / 2 : i / (rows.length - 1) * iw); };
     var y = function (v) { return P.t + ih - (Number(v) || 0) / max * ih; };
-    var path = function (key) {
-      return rows.map(function (r, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(r[key]).toFixed(1); }).join(' ');
-    };
 
-    var ticks = [0, Math.round(max / 2), max].filter(function (v, i, a) { return a.indexOf(v) === i; });
-    var out = ticks.map(function (v) {
-      return '<line x1="' + P.l + '" y1="' + y(v) + '" x2="' + (W - P.r) + '" y2="' + y(v) +
-        '" stroke="var(--grid)" stroke-width="1"/>' +
-        '<text x="' + (P.l - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="10" fill="var(--ink-3)" font-family="var(--mono)">' + v + '</text>';
+    var out = [0, max].map(function (v) {
+      return '<line x1="' + P.l + '" y1="' + y(v) + '" x2="' + (W - P.r) + '" y2="' + y(v) + '" stroke="var(--rule-2)" stroke-width="1"/>' +
+        '<text x="' + (P.l - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="10" fill="var(--ink-3)">' + v + '</text>';
     }).join('');
-
-    out += '<path d="' + path('sessions') + '" fill="none" stroke="var(--c3)" stroke-width="2" stroke-linejoin="round"/>';
-    out += '<path d="' + path('visitors') + '" fill="none" stroke="var(--c1)" stroke-width="2" stroke-linejoin="round"/>';
-    // Leads are rare and discrete, so they get markers rather than a line of their own.
+    var line = rows.map(function (r, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(r.visitors).toFixed(1); }).join(' ');
+    out += '<path d="' + line + ' L' + x(rows.length - 1).toFixed(1) + ' ' + (P.t + ih) + ' L' + x(0).toFixed(1) + ' ' + (P.t + ih) + ' Z" fill="var(--brand)" opacity="0.08"/>';
+    out += '<path d="' + line + '" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linejoin="round"/>';
     out += rows.map(function (r, i) {
-      return Number(r.leads) > 0
-        ? '<circle cx="' + x(i) + '" cy="' + y(r.visitors) + '" r="5" fill="var(--c4)" stroke="var(--panel)" stroke-width="2"/>' : '';
+      return Number(r.leads) > 0 ? '<circle cx="' + x(i) + '" cy="' + y(r.visitors) + '" r="4.5" fill="var(--s4)" stroke="var(--panel)" stroke-width="2"/>' : '';
     }).join('');
-    // First and last date labels only — a label per day collides on 90-day ranges.
-    out += '<text x="' + P.l + '" y="' + (H - 6) + '" font-size="10" fill="var(--ink-3)" font-family="var(--mono)">' + rows[0].day + '</text>';
-    if (rows.length > 1) {
-      out += '<text x="' + (W - P.r) + '" y="' + (H - 6) + '" text-anchor="end" font-size="10" fill="var(--ink-3)" font-family="var(--mono)">' + rows[rows.length - 1].day + '</text>';
-    }
-    out += '<rect id="dailyHit" x="' + P.l + '" y="' + P.t + '" width="' + iw + '" height="' + ih + '" fill="transparent"/>';
+    out += '<text x="' + P.l + '" y="' + (H - 5) + '" font-size="10" fill="var(--ink-3)">' + rows[0].day + '</text>';
+    if (rows.length > 1) out += '<text x="' + (W - P.r) + '" y="' + (H - 5) + '" text-anchor="end" font-size="10" fill="var(--ink-3)">' + rows[rows.length - 1].day + '</text>';
+    out += '<rect id="hit" x="' + P.l + '" y="' + P.t + '" width="' + iw + '" height="' + ih + '" fill="transparent"/>';
     svg.innerHTML = out;
 
-    // Hover crosshair: hit area spans the plot, nearest point wins.
-    var hit = svg.querySelector('#dailyHit');
-    hit.addEventListener('mousemove', function (e) {
+    svg.querySelector('#hit').addEventListener('mousemove', function (e) {
       var box = svg.getBoundingClientRect();
-      var i = Math.round((e.clientX - box.left - P.l) / (iw || 1) * (rows.length - 1));
-      i = Math.max(0, Math.min(rows.length - 1, i));
+      var i = Math.max(0, Math.min(rows.length - 1, Math.round((e.clientX - box.left - P.l) / (iw || 1) * (rows.length - 1))));
       var r = rows[i];
-      tip.innerHTML = r.day + ' · ' + num(r.visitors) + ' visitors · ' + num(r.sessions) + ' sessions' +
-        (Number(r.leads) ? ' · ' + num(r.leads) + ' leads' : '');
-      tip.style.left = x(i) + 'px';
-      tip.style.top = y(Math.max(r.visitors, r.sessions)) + 'px';
+      tip.textContent = r.day + ' · ' + num(r.visitors) + ' visitors' + (Number(r.leads) ? ' · ' + num(r.leads) + ' leads' : '');
+      tip.style.left = x(i) + 'px'; tip.style.top = y(r.visitors) + 'px';
       tip.classList.add('on');
     });
-    hit.addEventListener('mouseleave', function () { tip.classList.remove('on'); });
-  }
-
-  // ---------- visitors + journey ----------
-  function loadVisitors() {
-    fetch('/api/stats?view=visitors&days=' + state.days + '&limit=100', { credentials: 'same-origin' })
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        table($('visTable'),
-          [{ t: 'Visitor' }, { t: 'First seen' }, { t: 'Last seen' }, { t: 'Visits', n: 1 }, { t: 'Events', n: 1 }, { t: 'Country' }, { t: 'Device' }, { t: 'Source' }, { t: 'Outcome' }],
-          d.visitors || [],
-          function (r) {
-            var chip = r.is_lead ? '<span class="chip good">lead</span>'
-              : r.converted ? '<span class="chip warn">converted</span>'
-              : '<span class="chip mute">browsed</span>';
-            return '<tr><td><button class="linkish" data-vid="' + esc(r.visitor_id) + '">' + esc(String(r.visitor_id).slice(0, 8)) + '…</button></td>' +
-              '<td>' + esc(when(r.first_seen)) + '</td><td>' + esc(when(r.last_seen)) + '</td>' +
-              '<td class="n">' + num(r.sessions) + '</td><td class="n">' + num(r.events) + '</td>' +
-              '<td>' + esc(r.country || '—') + '</td><td>' + esc(r.device || '—') + '</td>' +
-              '<td>' + esc(r.source || 'direct') + '</td><td>' + chip + '</td></tr>';
-          });
-      })
-      .catch(function () { /* the panel simply stays empty */ });
+    svg.querySelector('#hit').addEventListener('mouseleave', function () { tip.classList.remove('on'); });
   }
 
   document.addEventListener('click', function (e) {
@@ -690,21 +681,15 @@ svg.line{display:block;width:100%;height:190px;overflow:visible}
       .then(function (d) {
         var ev = d.events || [];
         if (!ev.length) { $('timeline').innerHTML = '<li class="empty">No events for this visitor.</li>'; return; }
-        var lastSession = null;
+        var last = null;
         $('timeline').innerHTML = ev.map(function (x) {
-          var newSession = x.session_id !== lastSession;
-          lastSession = x.session_id;
-          var props = '';
-          try {
-            var p = x.props || {};
-            var keys = Object.keys(p);
-            if (keys.length) props = '<div class="pr">' + esc(keys.map(function (k) { return k + ': ' + p[k]; }).join('  ·  ')) + '</div>';
-          } catch (err) {}
+          var fresh = x.session_id !== last; last = x.session_id;
+          var p = x.props || {}, keys = Object.keys(p);
           return '<li class="' + esc(x.category || 'BEHAVIOR') + '">' +
-            (newSession ? '<div class="meta" style="color:var(--c1);font-weight:600">— new visit —</div>' : '') +
+            (fresh ? '<div class="meta" style="color:var(--brand);font-weight:600">— new visit —</div>' : '') +
             '<div class="ev">' + esc(x.event) + '</div>' +
-            '<div class="meta">' + esc(when(x.created_at)) + (x.path ? ' · ' + esc(x.path) : '') + '</div>' +
-            props + '</li>';
+            '<div class="meta">' + esc(when(x.created_at)) + '</div>' +
+            (keys.length ? '<div class="pr">' + esc(keys.map(function (k) { return k + ': ' + p[k]; }).join('  ·  ')) + '</div>' : '') + '</li>';
         }).join('');
       })
       .catch(function () { $('timeline').innerHTML = '<li class="empty">Could not load this journey.</li>'; });
@@ -715,12 +700,10 @@ svg.line{display:block;width:100%;height:190px;overflow:visible}
     window.__rz = setTimeout(function () { if (state.data) drawDaily(state.data.daily || []); }, 200);
   });
 
-  // A valid cookie means we can skip the login screen entirely.
   fetch('/api/stats?days=30', { credentials: 'same-origin' }).then(function (r) {
     if (r.ok) { $('login').hidden = true; $('app').hidden = false; load(); }
-    else if (r.status === 503) {
-      r.json().then(function (j) { showLogin(j.error || 'Dashboard is not configured.'); });
-    } else { showLogin(''); }
+    else if (r.status === 503) { r.json().then(function (j) { showLogin(j.error || 'Dashboard is not configured.'); }); }
+    else showLogin('');
   }).catch(function () { showLogin(''); });
 })();
 </script>

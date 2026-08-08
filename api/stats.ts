@@ -95,6 +95,14 @@ export default async function handler(req: any, res: any) {
       const { data, error } = await rpc('rpc_conversion_paths', { days });
       return res.status(200).json({ range_days: days, paths: data || [], error });
     }
+    if (view === 'pipeline') {
+      const { data, error } = await rpc('rpc_pipeline', { days, lim: 300 });
+      return res.status(200).json({ range_days: days, cards: data || [], error });
+    }
+    if (view === 'clicks') {
+      const { data, error } = await rpc('rpc_clicks', { days, lim: intParam(q.limit, 40, 1, 200) });
+      return res.status(200).json({ range_days: days, clicks: data || [], error });
+    }
     if (view === 'breakdown') {
       const dim = ['country', 'device', 'city', 'referrer', 'region'].includes(String(q.dim)) ? String(q.dim) : 'country';
       const { data, error } = await rpc('rpc_breakdown', { days, dim });
@@ -104,7 +112,8 @@ export default async function handler(req: any, res: any) {
     // ---- The dashboard itself: one round trip, all panels in parallel ----
     const [
       overview, funnel, daily, cta, sections, video, scroll,
-      sources, countries, devices, referrers, errors, paths, leads
+      sources, countries, devices, referrers, errors, paths, leads,
+      contact, clickTotals, clicks, pipeline
     ] = await Promise.all([
       rpc('rpc_overview', { days }),
       rpc('rpc_funnel', { days }),
@@ -119,12 +128,16 @@ export default async function handler(req: any, res: any) {
       rpc('rpc_breakdown', { days, dim: 'referrer' }),
       rpc('rpc_errors', { days }),
       rpc('rpc_conversion_paths', { days }),
-      rpc('rpc_leads', { days, lim: 100 })
+      rpc('rpc_leads', { days, lim: 100 }),
+      rpc('rpc_contact', { days }),
+      rpc('rpc_click_totals', { days }),
+      rpc('rpc_clicks', { days, lim: 40 }),
+      rpc('rpc_pipeline', { days, lim: 300 })
     ]);
 
     // If the very first call failed the schema is probably not there yet, which is worth
     // saying plainly rather than rendering a dashboard full of zeroes.
-    const failures = [overview, funnel, daily, cta, sections, video, scroll, sources, countries, devices, referrers, errors, paths, leads]
+    const failures = [overview, funnel, daily, cta, sections, video, scroll, sources, countries, devices, referrers, errors, paths, leads, contact, clickTotals, clicks, pipeline]
       .map(r => r.error).filter(Boolean);
 
     return res.status(200).json({
@@ -144,7 +157,11 @@ export default async function handler(req: any, res: any) {
       referrers: referrers.data || [],
       errors: errors.data || [],
       paths: paths.data || [],
-      leads: leads.data || []
+      leads: leads.data || [],
+      contact: contact.data || [],
+      click_totals: clickTotals.data || {},
+      clicks: clicks.data || [],
+      pipeline: pipeline.data || []
     });
   } catch (e: any) {
     console.error('[stats] handler threw:', e && e.message);

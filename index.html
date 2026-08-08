@@ -1279,6 +1279,40 @@ class Component extends DCLogic {
       v.addEventListener('seeked', () => { w.last = v.currentTime; });
     });
 
+    // Total click coverage, via one delegated listener on the document.
+    //
+    // The per-button handlers only fire on the controls someone remembered to wire up: of the
+    // contact links on this page, fewer than half had a handler, so "how many people emailed
+    // me" was unanswerable. Delegation catches everything, including anything added later, and
+    // it keeps working when a control is re-rendered.
+    //
+    // Two events, deliberately:
+    //   element_click  every link and button, for raw interaction counts
+    //   contact_click  WhatsApp, email and phone only, because those are outcomes, not clicks
+    // The existing cta_click handlers still fire and are unaffected: they measure placement
+    // performance, which is a different question from reach.
+    this._onAnyClick = e => {
+      const el = e.target && e.target.closest ? e.target.closest('a,button,[role="button"]') : null;
+      if (!el) return;
+
+      const href = el.getAttribute('href') || '';
+      const section = (el.closest('[data-section]') || {}).getAttribute
+        ? el.closest('[data-section]').getAttribute('data-section') : null;
+
+      // A stable, readable label that survives copy changes better than raw text alone.
+      const label = (el.getAttribute('data-cta') || el.getAttribute('aria-label') ||
+        el.getAttribute('title') || (el.textContent || '').trim().slice(0, 60) || el.tagName).toString();
+
+      let channel = null;
+      if (/^mailto:/i.test(href)) channel = 'email';
+      else if (/^tel:/i.test(href)) channel = 'phone';
+      else if (/(^https?:)?\/\/(wa\.me|api\.whatsapp\.com)/i.test(href)) channel = 'whatsapp';
+
+      this.track('element_click', { label, section: section || 'unknown', kind: channel || (href ? 'link' : 'button') });
+      if (channel) this.track('contact_click', { channel, label, section: section || 'unknown' });
+    };
+    document.addEventListener('click', this._onAnyClick, true); // capture: runs even if a handler stops propagation
+
     // One summary per visit, on the way out.
     //
     // This used to be a one-shot guarded by a flag, fired on the first `visibilitychange →

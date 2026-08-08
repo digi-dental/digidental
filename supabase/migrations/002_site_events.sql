@@ -1,3 +1,11 @@
+-- ============================================================================
+-- SUPERSEDED — DO NOT RUN.
+-- This migration was never applied to production (schema_migrations was empty and the
+-- site_events table did not exist). It is kept only as history. The finished schema,
+-- including the columns this file and 003 would have added plus visitor_id and category,
+-- is created by 005_analytics_core.sql. Running this now would conflict with 005.
+-- ============================================================================
+
 -- Digi Dental — first-party funnel analytics (BUG-12)
 -- Written only by /api/event using the service role. No anon policies: the browser can never
 -- read or write this table directly.

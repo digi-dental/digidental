@@ -61,39 +61,71 @@ by our own hiccup. `localStorage` remains as the instant, no-round-trip layer ab
 ## Analytics
 Every funnel step fires through `track()` in `index.html`. Three sinks, one taxonomy:
 
-1. `/api/event` → the `site_events` table. Always on, no cookies, no personal data
-   (an anonymous per-tab id joins the steps of one visit; IPs are stored hashed).
-   **Apply `supabase/migrations/002_site_events.sql` first** — until that table exists,
-   events are accepted and silently dropped.
+1. `/api/event` → the `site_events` table. Always on, no third-party tracker.
+   **Apply `supabase/migrations/005_analytics_core.sql` and `006_analytics_functions.sql`
+   first** — until that table exists, events are accepted and dropped. (`002` and `003` are
+   superseded by `005`; they are kept only as history and must not be run.)
 2. Plausible — set `PLAUSIBLE_DOMAIN` in `index.html` to the live domain and the script
    loads itself; every event mirrors automatically.
 3. GA4 — drop a `gtag` snippet in and every event mirrors to it. Nothing else to wire.
 
-Events: `view_hero`, `cta_click`, `demo_start`, `demo_complete`, `demo_error`, `demo_blocked`,
-`calc_interact`, `form_open`, `form_step_1..5`, `form_submit`, `form_error`, `calendly_click`,
-`exit_intent_shown`, `exit_intent_demo`, `video_play`.
+### Identity
+Three separate ideas, deliberately not conflated:
 
-The four KPIs to watch from day one — demo start→completion (target ≥60%), demo
-complete→Calendly click (≥25%), form open→submit (≥40%, with per-step drop-off), and
-exit-intent conversion — have ready-to-run SQL in
-`supabase/migrations/002_site_events.sql`.
+| | Stored in | Lives for | Used for |
+|---|---|---|---|
+| `visitor_id` | `localStorage` | until storage is cleared | counting people, returning visits, journeys |
+| `session_id` | `sessionStorage` | one visit, 30-min idle rollover | grouping the steps of a visit |
+| `ip_hash` | server only | per request | abuse control **only**, never identity |
+
+Both ids are random and carry no personal data. `ip_hash` used to double as the visitor
+count, which was wrong in both directions: IPs rotate on mobile networks and are shared
+across an office. The privacy copy in `index.html` discloses the stored identifier.
+
+### Taxonomy
+Events carry a `category` so a whole class can be filtered without matching on names. The
+allowlist in `api/event.ts` is derived from the same map, so the two cannot drift.
+
+- **BEHAVIOR** — `page_view`, `view_hero`, `section_view`, `scroll_depth`, `section_time`,
+  `video_play`, `video_progress`, `video_watch`, `calc_interact`, `session_end`
+- **INTENT** — `cta_impression`, `cta_click`, `form_open`, `form_step_1..5`, `demo_start`,
+  `exit_intent_shown`, `exit_intent_demo`
+- **CONVERSION** — `demo_complete`, `form_submit`, `calendly_click`, `lead_captured`
+- **TECHNICAL** — `demo_error`, `demo_blocked`, `form_error`, `page_not_found`
+
+`cta_impression` is what makes click-through a real rate rather than a reflection of page
+position: mark any new button with `data-cta="<placement>"` and the impression fires when it
+scrolls into view. The placement string must match the `location` the click handler reports,
+or the two will not line up. Videos are named with `data-clip`, never by DOM order.
+
+### Aggregation
+All of it happens in Postgres, in the functions created by `006`. `/api/stats` just calls
+them and returns the result, so the payload stays small no matter how many events exist.
+Adding a panel means adding a function, not looping in JavaScript.
 
 ## Admin dashboard
-`/admin.html` is a private traffic dashboard: visitors and sessions, the full funnel,
-click-through per button placement, dwell time per section, video watch seconds, scroll
-depth, countries, devices, referrers, the latest leads, and which broken links people hit.
+`/admin.html` is a private traffic dashboard built to answer 24 specific business questions;
+each panel is labelled with the ones it covers. Visitors and returning visitors, the funnel
+in unique visitors, CTA impressions/clicks/CTR and downstream submits, section reach and exit
+rate, video completion, scroll reach, traffic source through to leads, countries, devices,
+referrers, errors and dead links, conversion path analysis, a visitor list with a full
+journey drill-down, and the lead table with attribution.
 
 - **Set `ADMIN_PASSWORD`** in Vercel → Settings → Environment Variables. Until it is set,
   `/api/stats` and `/api/admin-login` return 503 and the dashboard shows nothing. It never
   falls open.
-- Signing in sets an HttpOnly, Secure, SameSite=Strict cookie holding an expiry plus an
-  HMAC of that expiry, valid 7 days. No session table, nothing a page script can read.
-  Login attempts are throttled per IP.
+- **Set `ADMIN_SESSION_SECRET`** to a long random value. It signs the session cookie and is
+  deliberately separate from the password, because a signing key should be random and a
+  password you type is not. Falls back to the password if unset.
+- Bump `ADMIN_SESSION_VERSION` to sign every session out at once. `ADMIN_SESSION_HOURS`
+  controls how long a login lasts (default 168 = 7 days).
+- Login attempts are counted in Postgres, so the limit survives cold starts. The old
+  in-memory limit reset on every new lambda instance.
 - `/api/stats` aggregates server-side with the service-role key, so the browser never holds
   a database credential and raw event rows never leave the server.
-- The page is `noindex` and disallowed in `robots.txt`, but that is tidiness, not security.
-  The password is the security.
-- Needs migrations `002` and `003` applied, otherwise there is nothing to read.
+- The page is `noindex`, `no-store`, disallowed in `robots.txt` and refuses to be framed —
+  but that is tidiness. The password is the security.
+- Needs migrations `005` and `006` applied, otherwise there is nothing to read.
 
 ## Videos
 Both clips are served through `/api/video?clip=vsl|demo`, so the page carries no expiring

@@ -6,11 +6,17 @@
 # ---------------------------------------------------------------------------
 # Default: everything is crawlable
 # ---------------------------------------------------------------------------
+# One group per user-agent. There used to be a second "User-agent: *" block further down with
+# the admin rules in it. Google merges same-agent groups so it worked there, but stricter
+# parsers read only the first group and would have missed the admin disallows entirely.
 User-agent: *
 Allow: /
 Allow: /api/site-info
 Disallow: /api/
 Disallow: /.thumbnail
+Disallow: /admin.html
+Disallow: /api/stats
+Disallow: /api/admin-login
 
 # ---------------------------------------------------------------------------
 # Search engines
@@ -117,9 +123,4 @@ User-agent: Kagibot
 Allow: /
 
 # ---------------------------------------------------------------------------
-User-agent: *
-Disallow: /admin.html
-Disallow: /api/stats
-Disallow: /api/admin-login
-
 Sitemap: https://digidental.vercel.app/sitemap.xml

@@ -42,12 +42,14 @@ export default async function handler(req: any, res: any) {
 
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { return res.status(200).json({ ok: false }); } }
-    const { name, practice_name, email, phone, country, monthly_call_volume, locations, source, website } = body || {};
+    const { name, practice_name, email, phone, country, monthly_call_volume, locations, source,
+            website, vid, sid, utm, ref } = body || {};
     if (!['form', 'demo_call', 'exit_intent'].includes(source)) return res.status(200).json({ ok: false });
 
     // Honeypot: humans never see this field, so anything in it is a bot. Recorded, never emailed.
     if (website) {
-      await supabase.from('leads').insert({ name: str(name), practice_name: str(practice_name), email: str(email), source, is_bot: true });
+      const { error } = await supabase.from('leads').insert({ name: str(name), practice_name: str(practice_name), email: str(email), source, is_bot: true });
+      if (error) console.error('[notify-lead] bot insert failed:', error.message);
       return res.status(200).json({ ok: true }); // look identical to success so bots don't learn
     }
 
@@ -58,10 +60,37 @@ export default async function handler(req: any, res: any) {
     const expected = process.env.SITE_TOKEN;
     if (expected && req.headers['x-dd-site'] !== expected) return res.status(200).json({ ok: false });
 
-    await supabase.from('leads').insert({
+    // Attribution travels with the lead so the dashboard can answer "which campaign produced
+    // this booking". Nullable and best-effort by design: a visitor who blocks storage still
+    // becomes a lead, just an unattributed one. Losing attribution is acceptable; losing a
+    // lead is not.
+    const u = (utm && typeof utm === 'object') ? utm : {};
+    let referrerHost: string | null = null;
+    if (ref) { try { referrerHost = new URL(String(ref)).hostname.replace(/^www\./, '').slice(0, 120); } catch { referrerHost = null; } }
+
+    // The insert error is now read rather than discarded. Ignoring it is exactly how every
+    // lead was silently lost while this endpoint kept reporting success and sending email.
+    const { error: insertError } = await supabase.from('leads').insert({
       name: str(name), practice_name: str(practice_name), email: str(email, 320), phone: str(phone, 40),
-      country: str(country, 80), monthly_call_volume: str(monthly_call_volume, 40), locations: str(locations, 20), source
+      country: str(country, 80), monthly_call_volume: str(monthly_call_volume, 40), locations: str(locations, 20), source,
+      visitor_id: str(vid, 64), session_id: str(sid, 64),
+      utm_source: str(u.source, 80), utm_medium: str(u.medium, 80), utm_campaign: str(u.campaign, 120),
+      referrer_host: referrerHost
     });
+    if (insertError) console.error('[notify-lead] lead insert FAILED:', insertError.message, '| source:', source);
+
+    // Mark the conversion on the analytics timeline too, so a lead appears in the visitor's
+    // journey and in conversion path analysis. Never allowed to block the email.
+    if (vid || sid) {
+      const { error: evError } = await supabase.from('site_events').insert({
+        event: 'lead_captured', category: 'CONVERSION',
+        props: { source, qualified: ['200–500', '500–1,000', '1,000+'].includes(monthly_call_volume) },
+        visitor_id: str(vid, 64), session_id: str(sid, 64),
+        utm_source: str(u.source, 80), utm_medium: str(u.medium, 80), utm_campaign: str(u.campaign, 120),
+        referrer_host: referrerHost, path: '/'
+      });
+      if (evError) console.error('[notify-lead] lead_captured event failed:', evError.message);
+    }
 
     // An exit-intent event with no contact details is a signal, not a lead — it belongs in the
     // table, but it must not put an empty email in the owner's inbox on every desktop visit.

@@ -31,6 +31,10 @@ const CATEGORY: Record<string, string> = {
   scroll_depth: 'BEHAVIOR', section_time: 'BEHAVIOR', video_play: 'BEHAVIOR',
   video_progress: 'BEHAVIOR', video_watch: 'BEHAVIOR', calc_interact: 'BEHAVIOR',
   session_end: 'BEHAVIOR',
+  // Every link and button click on the page, captured by one delegated listener so a control
+  // added later is measured without anyone remembering to instrument it. This is what makes
+  // "how many clicks happened" answerable rather than "how many clicks we thought to count".
+  element_click: 'BEHAVIOR',
   // INTENT
   cta_impression: 'INTENT', cta_click: 'INTENT', form_open: 'INTENT',
   form_step_1: 'INTENT', form_step_2: 'INTENT', form_step_3: 'INTENT',
@@ -39,6 +43,10 @@ const CATEGORY: Record<string, string> = {
   // CONVERSION
   demo_complete: 'CONVERSION', form_submit: 'CONVERSION', calendly_click: 'CONVERSION',
   lead_captured: 'CONVERSION',
+  // Reaching for a real contact channel — WhatsApp, email or phone. Counted separately from
+  // element_click because these are outcomes, not interactions, and they are the answer to
+  // "how many people actually messaged or emailed me".
+  contact_click: 'CONVERSION',
   // TECHNICAL
   demo_error: 'TECHNICAL', demo_blocked: 'TECHNICAL', form_error: 'TECHNICAL',
   page_not_found: 'TECHNICAL'

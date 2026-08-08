@@ -1673,21 +1673,29 @@ class Component extends DCLogic {
     const u = payload.utm || {};
     let referrerHost = null;
     if (payload.ref) { try { referrerHost = new URL(payload.ref).hostname.replace(/^www\./, ''); } catch (e) { referrerHost = null; } }
-    const row = {
+    const core = {
       name: payload.name, practice_name: payload.practice_name, email: payload.email,
       phone: payload.phone, country: payload.country,
       monthly_call_volume: payload.monthly_call_volume, locations: payload.locations,
-      source: payload.source,
+      source: payload.source
+    };
+    const attributed = Object.assign({}, core, {
       visitor_id: payload.vid || null, session_id: payload.sid || null,
       utm_source: u.source || null, utm_medium: u.medium || null, utm_campaign: u.campaign || null,
       referrer_host: referrerHost
-    };
+    });
+    const post = row => fetch(this.SUPABASE_URL + '/rest/v1/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: this.SUPABASE_PUBLISHABLE_KEY, Authorization: 'Bearer ' + this.SUPABASE_PUBLISHABLE_KEY, Prefer: 'return=minimal' },
+      body: JSON.stringify(row)
+    });
     try {
-      fetch(this.SUPABASE_URL + '/rest/v1/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', apikey: this.SUPABASE_PUBLISHABLE_KEY, Authorization: 'Bearer ' + this.SUPABASE_PUBLISHABLE_KEY, Prefer: 'return=minimal' },
-        body: JSON.stringify(row)
-      }).then(r => this.setState({ sendState: r.ok ? 'saved' : 'queued' }))
+      // If the attribution columns are not there yet (page deployed ahead of the migration),
+      // retry with the columns the table has always had. Losing the campaign tag is a small
+      // cost; losing the lead is not.
+      post(attributed)
+        .then(r => r.ok ? r : post(core))
+        .then(r => this.setState({ sendState: r.ok ? 'saved' : 'queued' }))
         .catch(() => this.setState({ sendState: 'queued' }));
     } catch (e) { this.setState({ sendState: 'queued' }); }
   }

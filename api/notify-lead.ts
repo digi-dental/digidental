@@ -68,16 +68,31 @@ export default async function handler(req: any, res: any) {
     let referrerHost: string | null = null;
     if (ref) { try { referrerHost = new URL(String(ref)).hostname.replace(/^www\./, '').slice(0, 120); } catch { referrerHost = null; } }
 
-    // The insert error is now read rather than discarded. Ignoring it is exactly how every
-    // lead was silently lost while this endpoint kept reporting success and sending email.
-    const { error: insertError } = await supabase.from('leads').insert({
+    // The columns every version of this table has had. Attribution is added on top.
+    const core = {
       name: str(name), practice_name: str(practice_name), email: str(email, 320), phone: str(phone, 40),
-      country: str(country, 80), monthly_call_volume: str(monthly_call_volume, 40), locations: str(locations, 20), source,
+      country: str(country, 80), monthly_call_volume: str(monthly_call_volume, 40),
+      locations: str(locations, 20), source
+    };
+
+    // The insert error is now read rather than discarded. Ignoring it is exactly how every lead
+    // was silently lost while this endpoint kept reporting success and sending email.
+    //
+    // If the attribution columns do not exist yet, the code has deployed ahead of migration 005.
+    // Rather than lose the lead over it, fall back to the core columns and log the gap. A lead
+    // without attribution is a minor loss; a lead that never lands is the bug we just fixed.
+    const { error: insertError } = await supabase.from('leads').insert({
+      ...core,
       visitor_id: str(vid, 64), session_id: str(sid, 64),
       utm_source: str(u.source, 80), utm_medium: str(u.medium, 80), utm_campaign: str(u.campaign, 120),
       referrer_host: referrerHost
     });
-    if (insertError) console.error('[notify-lead] lead insert FAILED:', insertError.message, '| source:', source);
+    if (insertError) {
+      console.error('[notify-lead] attributed insert failed, retrying without attribution:', insertError.message);
+      const { error: retryError } = await supabase.from('leads').insert(core);
+      if (retryError) console.error('[notify-lead] lead insert FAILED, lead not saved:', retryError.message, '| source:', source);
+      else console.warn('[notify-lead] lead saved WITHOUT attribution — apply migration 005_analytics_core.sql');
+    }
 
     // Mark the conversion on the analytics timeline too, so a lead appears in the visitor's
     // journey and in conversion path analysis. Never allowed to block the email.

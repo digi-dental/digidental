@@ -7,348 +7,568 @@
 <title>Digi Dental — Control room</title>
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /*
-  Digi Dental palette, straight off the site: navy #0A1A2F, teal #0F8B80, cream #FAF9F6,
-  Fraunces for figures and headings, Inter for everything else.
+  shadcn design system, built natively.
 
-  Chart hues validated with the dataviz validator (five checks, both modes):
-    light on cream #FAF9F6   #00958A #C2410C #7C3AED #BE185D #1C6DB0
-    dark  on navy  #0A1A2F   #12A192 #E8620E #8B5CF6 #DB2777 #3B82D9
-  Dark is a chosen set of steps, not a lightened copy: the dark lightness band is narrower
-  and the light values sit outside it. Status colours are reserved and never used as a series.
+  The preset (b6DHUT4HCa) resolves to: style=vega, baseColor=zinc, theme=teal, font=inter,
+  fontHeading=manrope, iconLibrary=lucide, radius=default, chartColor=teal. This file
+  reproduces that system — same token names, same radius scale, same component vocabulary,
+  Manrope/Inter, lucide icons — with Digi Dental's own colours substituted for the generic
+  zinc/teal, which is what was asked for.
+
+  Brand values in OKLCH: navy #0A1A2F -> 0.216 0.047 256, teal #0F8B80 -> 0.574 0.098 185,
+  cream #FAF9F6 -> 0.982 0.004 91.
+
+  On --chart-*: the pasted ramp was five steps of one teal hue. That is a SEQUENTIAL ramp, and
+  it is the right tool for magnitude but the wrong one for identity — five teals cannot tell
+  "mobile" from "desktop" in a donut. So --chart-1..5 here are categorical (validated for
+  contrast and colour-blind separation against both grounds), and the teal ramp is kept
+  separately as --seq-1..5 for the magnitude bars, where it belongs.
 */
 :root{
-  --bg:#FAF9F6;
-  --panel:#FFFFFF;
-  --ink:#0A1A2F;
-  --ink-2:#4A5C72;
-  --ink-3:#8494A6;
-  --rule:#E8E4DA;
-  --rule-2:#F1EEE6;
-  --brand:#0F8B80;
-  --brand-soft:#E7F2F0;
+  --background: oklch(0.982 0.004 91.4);
+  --foreground: oklch(0.216 0.047 256.0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.216 0.047 256.0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.216 0.047 256.0);
+  --primary: oklch(0.574 0.098 184.9);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.949 0.011 89.7);
+  --secondary-foreground: oklch(0.216 0.047 256.0);
+  --muted: oklch(0.949 0.011 89.7);
+  --muted-foreground: oklch(0.520 0.036 252.0);
+  --accent: oklch(0.949 0.011 89.7);
+  --accent-foreground: oklch(0.216 0.047 256.0);
+  --destructive: oklch(0.509 0.173 34.6);
+  --success: oklch(0.515 0.110 156.8);
+  --warning: oklch(0.508 0.106 72.6);
+  --border: oklch(0.919 0.014 88.7);
+  --input: oklch(0.919 0.014 88.7);
+  --ring: oklch(0.574 0.098 184.9);
 
-  --s1:#00958A; --s2:#C2410C; --s3:#7C3AED; --s4:#BE185D; --s5:#1C6DB0;
-  --good:#1F7A4D; --good-bg:#E8F3ED;
-  --warn:#8A5A06; --warn-bg:#FBF2DF;
-  --crit:#B3300C; --crit-bg:#FBEAE4;
+  --chart-1: oklch(0.603 0.106 185.7);
+  --chart-2: oklch(0.553 0.174 38.4);
+  --chart-3: oklch(0.541 0.247 293.0);
+  --chart-4: oklch(0.525 0.199 4.0);
+  --chart-5: oklch(0.522 0.129 248.8);
 
-  --serif:'Fraunces',Georgia,serif;
-  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --r:12px;
+  --seq-1: oklch(0.905 0.038 185.0);
+  --seq-2: oklch(0.800 0.070 185.0);
+  --seq-3: oklch(0.690 0.092 185.0);
+  --seq-4: oklch(0.574 0.098 184.9);
+  --seq-5: oklch(0.470 0.082 186.0);
+
+  --radius: 0.625rem;
+
+  --sidebar: oklch(0.966 0.008 90.0);
+  --sidebar-foreground: oklch(0.216 0.047 256.0);
+  --sidebar-primary: oklch(0.574 0.098 184.9);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.930 0.013 89.0);
+  --sidebar-accent-foreground: oklch(0.216 0.047 256.0);
+  --sidebar-border: oklch(0.906 0.014 88.7);
+  --sidebar-ring: oklch(0.574 0.098 184.9);
+
+  --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-heading:'Manrope','Inter',system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0A1A2F; --panel:#0E2338; --ink:#FAF9F6; --ink-2:#A8BACB; --ink-3:#6F8298;
-    --rule:#22354C; --rule-2:#16293D;
-    --brand:#3FBFA9; --brand-soft:#10312F;
-    --s1:#12A192; --s2:#E8620E; --s3:#8B5CF6; --s4:#DB2777; --s5:#3B82D9;
-    --good:#4ADE80; --good-bg:#0F2A1D; --warn:#E0B155; --warn-bg:#2B2211; --crit:#F87F5D; --crit-bg:#2F1712;
+    --background: oklch(0.216 0.047 256.0);
+    --foreground: oklch(0.982 0.004 91.4);
+    --card: oklch(0.251 0.048 250.3);
+    --card-foreground: oklch(0.982 0.004 91.4);
+    --popover: oklch(0.251 0.048 250.3);
+    --popover-foreground: oklch(0.982 0.004 91.4);
+    --primary: oklch(0.730 0.115 179.1);
+    --primary-foreground: oklch(0.216 0.047 256.0);
+    --secondary: oklch(0.298 0.045 251.0);
+    --secondary-foreground: oklch(0.982 0.004 91.4);
+    --muted: oklch(0.275 0.045 250.9);
+    --muted-foreground: oklch(0.660 0.038 252.0);
+    --accent: oklch(0.298 0.045 251.0);
+    --accent-foreground: oklch(0.982 0.004 91.4);
+    --destructive: oklch(0.727 0.156 36.6);
+    --success: oklch(0.800 0.182 151.7);
+    --warning: oklch(0.785 0.122 82.1);
+    --border: oklch(0.324 0.048 253.8);
+    --input: oklch(0.324 0.048 253.8);
+    --ring: oklch(0.730 0.115 179.1);
+
+    --chart-1: oklch(0.638 0.111 183.1);
+    --chart-2: oklch(0.656 0.184 44.7);
+    --chart-3: oklch(0.606 0.219 292.7);
+    --chart-4: oklch(0.592 0.218 0.6);
+    --chart-5: oklch(0.604 0.151 255.1);
+
+    --seq-1: oklch(0.330 0.048 185.0);
+    --seq-2: oklch(0.440 0.070 185.0);
+    --seq-3: oklch(0.550 0.092 184.0);
+    --seq-4: oklch(0.660 0.108 182.0);
+    --seq-5: oklch(0.780 0.110 179.0);
+
+    --sidebar: oklch(0.240 0.048 253.0);
+    --sidebar-foreground: oklch(0.982 0.004 91.4);
+    --sidebar-primary: oklch(0.730 0.115 179.1);
+    --sidebar-primary-foreground: oklch(0.216 0.047 256.0);
+    --sidebar-accent: oklch(0.298 0.045 251.0);
+    --sidebar-accent-foreground: oklch(0.982 0.004 91.4);
+    --sidebar-border: oklch(0.324 0.048 253.8);
+    --sidebar-ring: oklch(0.730 0.115 179.1);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0A1A2F; --panel:#0E2338; --ink:#FAF9F6; --ink-2:#A8BACB; --ink-3:#6F8298;
-  --rule:#22354C; --rule-2:#16293D;
-  --brand:#3FBFA9; --brand-soft:#10312F;
-  --s1:#12A192; --s2:#E8620E; --s3:#8B5CF6; --s4:#DB2777; --s5:#3B82D9;
-  --good:#4ADE80; --good-bg:#0F2A1D; --warn:#E0B155; --warn-bg:#2B2211; --crit:#F87F5D; --crit-bg:#2F1712;
+  --background: oklch(0.216 0.047 256.0);
+  --foreground: oklch(0.982 0.004 91.4);
+  --card: oklch(0.251 0.048 250.3);
+  --card-foreground: oklch(0.982 0.004 91.4);
+  --popover: oklch(0.251 0.048 250.3);
+  --popover-foreground: oklch(0.982 0.004 91.4);
+  --primary: oklch(0.730 0.115 179.1);
+  --primary-foreground: oklch(0.216 0.047 256.0);
+  --secondary: oklch(0.298 0.045 251.0);
+  --secondary-foreground: oklch(0.982 0.004 91.4);
+  --muted: oklch(0.275 0.045 250.9);
+  --muted-foreground: oklch(0.660 0.038 252.0);
+  --accent: oklch(0.298 0.045 251.0);
+  --accent-foreground: oklch(0.982 0.004 91.4);
+  --destructive: oklch(0.727 0.156 36.6);
+  --success: oklch(0.800 0.182 151.7);
+  --warning: oklch(0.785 0.122 82.1);
+  --border: oklch(0.324 0.048 253.8);
+  --input: oklch(0.324 0.048 253.8);
+  --ring: oklch(0.730 0.115 179.1);
+  --chart-1: oklch(0.638 0.111 183.1);
+  --chart-2: oklch(0.656 0.184 44.7);
+  --chart-3: oklch(0.606 0.219 292.7);
+  --chart-4: oklch(0.592 0.218 0.6);
+  --chart-5: oklch(0.604 0.151 255.1);
+  --seq-1: oklch(0.330 0.048 185.0);
+  --seq-2: oklch(0.440 0.070 185.0);
+  --seq-3: oklch(0.550 0.092 184.0);
+  --seq-4: oklch(0.660 0.108 182.0);
+  --seq-5: oklch(0.780 0.110 179.0);
+  --sidebar: oklch(0.240 0.048 253.0);
+  --sidebar-foreground: oklch(0.982 0.004 91.4);
+  --sidebar-primary: oklch(0.730 0.115 179.1);
+  --sidebar-primary-foreground: oklch(0.216 0.047 256.0);
+  --sidebar-accent: oklch(0.298 0.045 251.0);
+  --sidebar-accent-foreground: oklch(0.982 0.004 91.4);
+  --sidebar-border: oklch(0.324 0.048 253.8);
+  --sidebar-ring: oklch(0.730 0.115 179.1);
 }
 
 *{box-sizing:border-box}
 [hidden]{display:none !important}
 html,body{margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
-h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.015em}
+body{
+  background:var(--background);color:var(--foreground);
+  font-family:var(--font-sans);font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;font-feature-settings:'cv02','cv03','cv04';
+}
+h1,h2,h3,h4{margin:0;font-family:var(--font-heading);font-weight:600;letter-spacing:-.015em}
 button{font:inherit;cursor:pointer}
-a{color:var(--brand);text-underline-offset:2px}
-:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
-.num{font-family:var(--serif);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+a{color:var(--primary)}
+:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:calc(var(--radius) - 2px)}
+svg{flex:0 0 auto}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- primitives ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;justify-content:center;
+  height:36px;padding:0 14px;border-radius:calc(var(--radius) - 2px);
+  background:var(--primary);color:var(--primary-foreground);border:none;
+  font-size:13.5px;font-weight:500;white-space:nowrap;transition:opacity .15s
+}
+.btn:hover{opacity:.9}
+.btn-outline{background:transparent;color:var(--foreground);border:1px solid var(--border)}
+.btn-outline:hover{background:var(--accent)}
+.btn-sm{height:32px;padding:0 11px;font-size:13px}
+
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;
+  border:1px solid transparent;white-space:nowrap
+}
+.badge-ok{background:color-mix(in oklab,var(--success) 14%,transparent);color:var(--success)}
+.badge-warn{background:color-mix(in oklab,var(--warning) 16%,transparent);color:var(--warning)}
+.badge-bad{background:color-mix(in oklab,var(--destructive) 14%,transparent);color:var(--destructive)}
+.badge-mute{background:var(--muted);color:var(--muted-foreground)}
+.badge-brand{background:color-mix(in oklab,var(--primary) 13%,transparent);color:var(--primary)}
+
+.card{
+  background:var(--card);color:var(--card-foreground);
+  border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:0 1px 2px 0 color-mix(in oklab,var(--foreground) 5%,transparent);
+  min-width:0
+}
+.card-head{padding:18px 20px 0}
+.card-title{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-desc{font-size:12.5px;color:var(--muted-foreground);margin-top:4px}
+.card-body{padding:16px 20px 20px}
+.sep{height:1px;background:var(--border);border:0;margin:0}
+
+/* ---------- layout ---------- */
+.shell{display:grid;grid-template-columns:236px 1fr;min-height:100dvh}
+.sidebar{
+  background:var(--sidebar);color:var(--sidebar-foreground);
+  border-right:1px solid var(--sidebar-border);
+  display:flex;flex-direction:column;position:sticky;top:0;height:100dvh;overflow-y:auto
+}
+.sb-head{padding:18px 16px;display:flex;align-items:center;gap:10px}
+.sb-mark{
+  width:32px;height:32px;border-radius:9px;background:var(--sidebar-primary);
+  color:var(--sidebar-primary-foreground);display:grid;place-items:center;
+  font-family:var(--font-heading);font-weight:700;font-size:15px;flex:0 0 auto
+}
+.sb-name{font-family:var(--font-heading);font-weight:600;font-size:14.5px;line-height:1.2}
+.sb-sub{font-size:11.5px;color:var(--muted-foreground)}
+.sb-group{padding:6px 10px}
+.sb-label{font-size:11px;font-weight:600;color:var(--muted-foreground);padding:8px 8px 5px;letter-spacing:.02em}
+.sb-item{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:8px 9px;border-radius:calc(var(--radius) - 2px);
+  background:none;border:none;color:var(--sidebar-foreground);
+  font-size:13.5px;text-align:left;transition:background .12s
+}
+.sb-item:hover{background:var(--sidebar-accent)}
+.sb-item[aria-current="true"]{background:var(--sidebar-accent);font-weight:600;color:var(--sidebar-primary)}
+.sb-item svg{color:var(--muted-foreground)}
+.sb-item[aria-current="true"] svg{color:var(--sidebar-primary)}
+.sb-foot{margin-top:auto;padding:12px}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:20;background:color-mix(in oklab,var(--background) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--border);
+  padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between
+}
+.topbar h1{font-size:16px}
+.topbar .stamp{font-size:12px;color:var(--muted-foreground);margin-top:1px}
+.content{padding:22px 24px 80px;display:flex;flex-direction:column;gap:26px}
+
+.tabs{display:inline-flex;background:var(--muted);border-radius:calc(var(--radius) - 2px);padding:3px;gap:2px}
+.tabs button{
+  background:none;border:none;padding:6px 12px;border-radius:calc(var(--radius) - 4px);
+  font-size:13px;color:var(--muted-foreground)
+}
+.tabs button[aria-pressed="true"]{background:var(--card);color:var(--foreground);font-weight:600;
+  box-shadow:0 1px 2px color-mix(in oklab,var(--foreground) 8%,transparent)}
+
+.alert{
+  display:flex;gap:11px;align-items:flex-start;
+  padding:14px 16px;border-radius:var(--radius);
+  border:1px solid color-mix(in oklab,var(--destructive) 35%,transparent);
+  background:color-mix(in oklab,var(--destructive) 8%,transparent);
+  color:var(--destructive);font-size:13.5px
+}
+.alert.warn{border-color:color-mix(in oklab,var(--warning) 40%,transparent);
+  background:color-mix(in oklab,var(--warning) 10%,transparent);color:var(--warning)}
+.alert b{font-weight:700}
+.alert code{background:color-mix(in oklab,var(--foreground) 8%,transparent);padding:1px 5px;border-radius:4px;font-size:12px}
+
+.sec-title{font-size:15px;display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.sec-note{font-size:12.5px;color:var(--muted-foreground);margin-bottom:12px}
+
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(400px,100%),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:760px){.stats{grid-template-columns:repeat(4,1fr)}}
+
+/* ---------- stat card ---------- */
+.stat{padding:16px 18px}
+.stat .k{font-size:12px;color:var(--muted-foreground);display:flex;align-items:center;gap:6px;font-weight:500}
+.stat .v{font-family:var(--font-heading);font-size:30px;font-weight:700;letter-spacing:-.03em;margin-top:7px;line-height:1.05}
+.stat .d{font-size:11.5px;color:var(--muted-foreground);margin-top:5px}
+
+/* ---------- charts ---------- */
+.donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.keys{display:flex;flex-direction:column;gap:7px;flex:1;min-width:0}
+.key{display:flex;align-items:center;gap:8px;font-size:12.5px;min-width:0}
+.key .sw{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
+.key .nm{color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.key .vl{font-weight:600;font-variant-numeric:tabular-nums}
+.key .pc{color:var(--muted-foreground);width:40px;text-align:right;font-variant-numeric:tabular-nums}
+
+.rows{display:flex;flex-direction:column;gap:9px}
+.row{display:grid;grid-template-columns:minmax(84px,136px) 1fr auto;gap:11px;align-items:center;font-size:12.5px}
+.row .lab{color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track{display:block;background:var(--muted);border-radius:5px;height:9px;overflow:hidden}
+.fill{display:block;height:100%;border-radius:0 5px 5px 0;min-width:2px}
+.row .val{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.row .val small{color:var(--muted-foreground);font-weight:400;margin-left:3px}
+
+.fun{display:flex;flex-direction:column;gap:10px}
+.fstep{display:grid;grid-template-columns:minmax(108px,158px) 1fr auto;gap:11px;align-items:center;font-size:12.5px}
+.fstep .lab{color:var(--muted-foreground)}
+.fbar{display:block;background:var(--muted);border-radius:5px;height:11px;overflow:hidden}
+.fbar span{display:block;height:100%;background:var(--primary);border-radius:0 5px 5px 0}
+.fdrop{grid-column:2/4;font-size:11px;color:var(--destructive)}
+.fdrop.none{color:var(--muted-foreground)}
+
+.chart{position:relative}
+svg.line{display:block;width:100%;height:168px;overflow:visible}
+.tip{position:absolute;pointer-events:none;background:var(--popover);color:var(--popover-foreground);
+  border:1px solid var(--border);padding:7px 10px;border-radius:calc(var(--radius) - 2px);
+  font-size:12px;transform:translate(-50%,-125%);white-space:nowrap;opacity:0;transition:opacity .12s;
+  box-shadow:0 4px 14px color-mix(in oklab,var(--foreground) 12%,transparent)}
+.tip.on{opacity:1}
+
+/* ---------- kanban ---------- */
+.kan{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(224px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px;align-items:start}
+.col{background:var(--muted);border-radius:var(--radius);padding:11px}
+.col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px;padding:0 3px}
+.col-head .t{font-size:12.5px;font-weight:600}
+.col-head .c{font-size:12px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:0 8px;font-variant-numeric:tabular-nums}
+.col .stripe{height:3px;border-radius:3px;margin-bottom:10px}
+.cards{display:flex;flex-direction:column;gap:7px;max-height:400px;overflow-y:auto}
+.kcard{background:var(--card);border:1px solid var(--border);border-radius:calc(var(--radius) - 2px);
+  padding:10px 11px;cursor:pointer;text-align:left;width:100%;font:inherit;color:inherit;transition:border-color .12s}
+.kcard:hover{border-color:var(--primary)}
+.kcard .n{font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kcard .m{font-size:11px;color:var(--muted-foreground);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap}
+.col .more{font-size:11px;color:var(--muted-foreground);text-align:center;padding-top:7px}
+
+/* ---------- table ---------- */
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:440px}
+th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+th{font-size:11px;color:var(--muted-foreground);font-weight:600;background:transparent}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--muted)}
+tr:last-child td{border-bottom:none}
+.linkish{color:var(--primary);cursor:pointer;background:none;border:none;padding:0;font:inherit;text-decoration:underline;text-underline-offset:2px}
+.empty{color:var(--muted-foreground);font-size:12.5px;padding:20px 0;text-align:center}
 
 /* ---------- login ---------- */
 .login{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
-.login-card{width:100%;max-width:370px;background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:36px}
-.login-card h1{font-family:var(--serif);font-size:24px;margin-bottom:8px}
-.login-card p{color:var(--ink-2);font-size:14px;margin:0 0 24px}
-label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:7px}
-input[type=password]{font:inherit;padding:12px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--bg);color:var(--ink);width:100%}
-.btn{background:var(--brand);color:#fff;border:none;border-radius:10px;padding:12px 18px;font-weight:600}
-.btn:hover{filter:brightness(.93)}
-.btn-ghost{background:transparent;color:var(--ink-2);border:1px solid var(--rule)}
-.btn-ghost:hover{background:var(--rule-2);color:var(--ink)}
-.msg{font-size:13px;padding:11px 13px;border-radius:10px;margin-bottom:16px;background:var(--crit-bg);color:var(--crit)}
-
-/* ---------- shell ---------- */
-.app{max-width:1280px;margin:0 auto;padding:30px 26px 90px}
-.top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:34px}
-.brand{display:flex;align-items:center;gap:11px}
-.brand .mark{width:30px;height:30px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:15px;font-weight:600}
-.brand h1{font-family:var(--serif);font-size:20px}
-.brand .sub{font-size:12px;color:var(--ink-3);margin-top:1px}
-.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.seg{display:inline-flex;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:3px}
-.seg button{background:none;border:none;padding:6px 13px;font-size:13px;color:var(--ink-2);border-radius:7px}
-.seg button[aria-pressed="true"]{background:var(--brand);color:#fff;font-weight:600}
-
-.banner{padding:13px 16px;border-radius:10px;margin-bottom:22px;font-size:13.5px;background:var(--warn-bg);color:var(--warn)}
-.banner.crit{background:var(--crit-bg);color:var(--crit)}
-
-/* ---------- sections ---------- */
-.sec{margin-bottom:34px}
-.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.sec-head h2{font-family:var(--serif);font-size:17px}
-.sec-head .note{font-size:12.5px;color:var(--ink-3)}
-
-.card{background:var(--panel);border:1px solid var(--rule);border-radius:var(--r);padding:20px 22px;min-width:0}
-.grid{display:grid;gap:14px}
-.g2{grid-template-columns:repeat(auto-fit,minmax(min(400px,100%),1fr))}
-.g3{grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr))}
-.g4{grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr))}
-
-/* ---------- hero figures ---------- */
-.hero{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;margin-bottom:34px}
-@media (min-width:720px){ .hero{grid-template-columns:repeat(4,1fr)} }
-.hero .cell{background:var(--panel);padding:20px 22px}
-.hero .k{font-size:12px;color:var(--ink-3);font-weight:500}
-.hero .v{font-family:var(--serif);font-size:34px;line-height:1.05;margin-top:8px;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
-.hero .d{font-size:12px;color:var(--ink-3);margin-top:5px}
-
-.card h3{font-size:14px;margin-bottom:3px}
-.card .sub{font-size:12.5px;color:var(--ink-3);margin-bottom:16px}
-
-/* ---------- donut ---------- */
-.donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.donut{flex:0 0 auto}
-.keys{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1}
-.key{display:flex;align-items:center;gap:9px;font-size:13px;min-width:0}
-.key .sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
-.key .nm{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.key .vl{font-family:var(--serif);font-variant-numeric:tabular-nums;font-size:13px;color:var(--ink)}
-.key .pc{color:var(--ink-3);font-size:12px;width:44px;text-align:right;font-variant-numeric:tabular-nums}
-
-/* ---------- bars ---------- */
-.rows{display:flex;flex-direction:column;gap:10px}
-.row{display:grid;grid-template-columns:minmax(90px,140px) 1fr auto;gap:12px;align-items:center;font-size:13px}
-.row .lab{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.track{display:block;background:var(--rule-2);border-radius:5px;height:10px;overflow:hidden}
-.fill{display:block;height:100%;border-radius:0 5px 5px 0;min-width:2px}
-.row .val{font-family:var(--serif);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.row .val small{color:var(--ink-3);font-family:var(--sans);font-size:11.5px}
-
-/* ---------- funnel ---------- */
-.fun{display:flex;flex-direction:column;gap:11px}
-.fstep{display:grid;grid-template-columns:minmax(110px,160px) 1fr auto;gap:12px;align-items:center;font-size:13px}
-.fstep .lab{color:var(--ink-2)}
-.fbar{display:block;background:var(--rule-2);border-radius:5px;height:12px;overflow:hidden}
-.fbar span{display:block;height:100%;background:var(--brand);border-radius:0 5px 5px 0}
-.fdrop{font-size:11.5px;color:var(--crit);grid-column:2/4}
-
-/* ---------- kanban ---------- */
-.kan{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px;align-items:start}
-.col{background:var(--rule-2);border-radius:var(--r);padding:12px;min-width:0}
-.col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px;padding:0 3px}
-.col-head .t{font-size:12.5px;font-weight:600;color:var(--ink-2)}
-.col-head .c{font-family:var(--serif);font-size:13px;color:var(--ink);background:var(--panel);border-radius:20px;padding:1px 9px;font-variant-numeric:tabular-nums}
-.col .stripe{height:3px;border-radius:3px;margin-bottom:11px}
-.cards{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto}
-.kcard{background:var(--panel);border:1px solid var(--rule);border-radius:9px;padding:10px 11px;cursor:pointer;text-align:left;width:100%;font:inherit;color:inherit}
-.kcard:hover{border-color:var(--brand)}
-.kcard .n{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.kcard .m{font-size:11.5px;color:var(--ink-3);margin-top:3px;display:flex;gap:7px;flex-wrap:wrap}
-.kcard .lead{display:inline-block;font-size:10.5px;font-weight:600;color:var(--good);background:var(--good-bg);border-radius:20px;padding:1px 7px;margin-top:6px}
-.col .more{font-size:11.5px;color:var(--ink-3);text-align:center;padding-top:8px}
-
-/* ---------- tables ---------- */
-.tw{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:13px;min-width:480px}
-th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--rule-2);white-space:nowrap}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);font-weight:600}
-td.n,th.n{text-align:right;font-family:var(--serif);font-variant-numeric:tabular-nums}
-tbody tr:hover{background:var(--rule-2)}
-tr:last-child td{border-bottom:none}
-.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
-.pill.good{background:var(--good-bg);color:var(--good)}
-.pill.warn{background:var(--warn-bg);color:var(--warn)}
-.pill.crit{background:var(--crit-bg);color:var(--crit)}
-.pill.mute{background:var(--rule-2);color:var(--ink-3)}
-.linkish{color:var(--brand);cursor:pointer;background:none;border:none;padding:0;font:inherit;text-decoration:underline;text-underline-offset:2px}
-.empty{color:var(--ink-3);font-size:13px;padding:22px 0;text-align:center}
-
-/* ---------- line chart ---------- */
-.chart{position:relative}
-svg.line{display:block;width:100%;height:170px;overflow:visible}
-.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);padding:7px 10px;border-radius:7px;font-size:12px;transform:translate(-50%,-120%);white-space:nowrap;opacity:0;transition:opacity .12s}
-.tip.on{opacity:1}
+.login .card{width:100%;max-width:372px}
+.login h1{font-size:20px}
+.field{margin-top:16px}
+label{display:block;font-size:12.5px;font-weight:500;margin-bottom:6px}
+input[type=password]{
+  font:inherit;width:100%;height:38px;padding:0 12px;
+  border:1px solid var(--input);border-radius:calc(var(--radius) - 2px);
+  background:var(--background);color:var(--foreground)
+}
 
 /* ---------- drawer ---------- */
-.drawer{position:fixed;inset:0;background:rgba(10,26,47,.5);display:flex;justify-content:flex-end;z-index:40}
-.dinner{background:var(--panel);width:min(560px,100%);height:100%;overflow-y:auto;padding:24px}
-.dinner header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
-.tl{list-style:none;margin:0;padding:0;border-left:2px solid var(--rule);margin-left:6px}
-.tl li{position:relative;padding:0 0 15px 19px}
-.tl li::before{content:"";position:absolute;left:-6px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--panel);background:var(--s1)}
-.tl li.INTENT::before{background:var(--s3)}
-.tl li.CONVERSION::before{background:var(--s4)}
-.tl li.TECHNICAL::before{background:var(--s2)}
-.tl .ev{font-weight:600;font-size:13.5px}
-.tl .meta{font-size:11.5px;color:var(--ink-3);margin-top:2px}
-.tl .pr{font-size:11.5px;color:var(--ink-2);margin-top:3px;word-break:break-word}
+.drawer{position:fixed;inset:0;background:color-mix(in oklab,var(--foreground) 45%,transparent);display:flex;justify-content:flex-end;z-index:60}
+.dinner{background:var(--card);width:min(540px,100%);height:100%;overflow-y:auto;padding:22px;border-left:1px solid var(--border)}
+.dinner header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+.tl{list-style:none;margin:0;padding:0;border-left:2px solid var(--border);margin-left:6px}
+.tl li{position:relative;padding:0 0 14px 18px}
+.tl li::before{content:"";position:absolute;left:-6px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--card);background:var(--chart-1)}
+.tl li.INTENT::before{background:var(--chart-3)}
+.tl li.CONVERSION::before{background:var(--chart-4)}
+.tl li.TECHNICAL::before{background:var(--chart-2)}
+.tl .ev{font-weight:600;font-size:13px}
+.tl .meta{font-size:11px;color:var(--muted-foreground);margin-top:2px}
+.tl .pr{font-size:11px;color:var(--muted-foreground);margin-top:3px;word-break:break-word}
 
-@media (max-width:640px){
-  .app{padding:20px 15px 60px}
-  .row,.fstep{grid-template-columns:minmax(74px,92px) 1fr auto}
+.sb-toggle{display:none}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;width:236px;z-index:50;transform:translateX(-100%);transition:transform .2s}
+  .sidebar.open{transform:none}
+  .sb-toggle{display:inline-flex}
+  .content{padding:18px 15px 60px}
+  .topbar{padding:11px 15px}
+  .row,.fstep{grid-template-columns:minmax(72px,90px) 1fr auto}
 }
 </style>
 </head>
 <body>
 
 <div class="login" id="login">
-  <form class="login-card" id="loginForm">
-    <h1>Digi Dental</h1>
-    <p>Control room. Shows lead contact details, so it stays behind a password.</p>
-    <div class="msg" id="loginErr" hidden></div>
-    <label for="pw">Password</label>
-    <input type="password" id="pw" autocomplete="current-password" required>
-    <button class="btn" type="submit" style="width:100%;margin-top:16px" id="loginBtn">Sign in</button>
+  <form class="card" id="loginForm">
+    <div class="card-head">
+      <h1>Digi Dental</h1>
+      <div class="card-desc">Control room. Shows lead contact details, so it stays behind a password.</div>
+    </div>
+    <div class="card-body">
+      <div class="alert" id="loginErr" hidden style="margin-bottom:14px"></div>
+      <div class="field">
+        <label for="pw">Password</label>
+        <input type="password" id="pw" autocomplete="current-password" required>
+      </div>
+      <button class="btn" type="submit" style="width:100%;margin-top:16px" id="loginBtn">Sign in</button>
+    </div>
   </form>
 </div>
 
-<div class="app" id="app" hidden>
-  <div class="top">
-    <div class="brand">
-      <div class="mark">D</div>
+<div class="shell" id="app" hidden>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <div class="sb-mark">D</div>
       <div>
-        <h1>Control room</h1>
-        <div class="sub" id="stamp">loading…</div>
+        <div class="sb-name">Digi Dental</div>
+        <div class="sb-sub">Control room</div>
       </div>
     </div>
-    <div class="controls">
-      <div class="seg" id="range" role="group" aria-label="Date range">
-        <button data-days="7">7d</button>
-        <button data-days="30" aria-pressed="true">30d</button>
-        <button data-days="90">90d</button>
-      </div>
-      <button class="btn btn-ghost" id="refresh">Refresh</button>
-      <button class="btn btn-ghost" id="logout">Sign out</button>
+    <hr class="sep">
+    <nav class="sb-group" id="nav"></nav>
+    <div class="sb-foot">
+      <button class="btn btn-outline btn-sm" id="logout" style="width:100%">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
     </div>
-  </div>
+  </aside>
 
-  <div class="banner crit" id="degraded" hidden></div>
-  <div class="banner" id="nodata" hidden>No events recorded yet in this window. If the site is live, check that the analytics migrations have been applied.</div>
-
-  <!-- headline figures -->
-  <div class="hero" id="hero"></div>
-
-  <!-- the four questions -->
-  <div class="sec">
-    <div class="sec-head"><h2>Clicks and attention</h2><span class="note">Every link and button on the page, counted</span></div>
-    <div class="grid g2">
-      <div class="card">
-        <h3>Where the clicks go</h3>
-        <div class="sub">Most-clicked controls, by total clicks</div>
-        <div class="rows" id="clicks"></div>
-      </div>
-      <div class="card">
-        <h3>Click-through by placement</h3>
-        <div class="sub">Impressions count people who actually scrolled the button into view</div>
-        <div class="tw"><table id="ctaTable"></table></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-head"><h2>How people reach you</h2><span class="note">Form, WhatsApp, email, Calendly</span></div>
-    <div class="grid g2">
-      <div class="card">
-        <h3>Contact channel mix</h3>
-        <div class="sub">Share of everyone who arrived</div>
-        <div class="donut-wrap"><div class="donut" id="contactDonut"></div><div class="keys" id="contactKeys"></div></div>
-      </div>
-      <div class="card">
-        <h3>Did they fill the form first?</h3>
-        <div class="sub">Whether each contact came after a form submission or instead of one</div>
-        <div class="tw"><table id="contactTable"></table></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-head"><h2>Conversion funnel</h2><span class="note">Unique visitors, not event counts</span></div>
-    <div class="grid g2">
-      <div class="card"><div class="fun" id="funnel"></div></div>
-      <div class="card">
-        <h3>Visitors per day</h3>
-        <div class="sub">Distinct people, with leads marked</div>
-        <div class="chart" id="dailyWrap">
-          <svg class="line" id="daily" role="img" aria-label="Visitors per day"></svg>
-          <div class="tip" id="dailyTip"></div>
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn btn-outline btn-sm sb-toggle" id="sbToggle" aria-label="Menu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div>
+          <h1>Traffic &amp; conversion</h1>
+          <div class="stamp" id="stamp">loading…</div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-head"><h2>Pipeline</h2><span class="note">Every visitor, in the furthest stage they reached. Click a card for their journey.</span></div>
-    <div class="kan" id="kanban"></div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-head"><h2>Video</h2><span class="note">How much of each clip actually gets watched</span></div>
-    <div class="grid g2">
-      <div class="card">
-        <h3>Watch-through</h3>
-        <div class="sub">Share of starts reaching each quarter</div>
-        <div class="rows" id="videoBars"></div>
-      </div>
-      <div class="card">
-        <h3>Time watched</h3>
-        <div class="sub">Real seconds, ignoring seeks</div>
-        <div class="tw"><table id="videoTable"></table></div>
+      <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">
+        <div class="tabs" id="range" role="group" aria-label="Date range">
+          <button data-days="7">7 days</button>
+          <button data-days="30" aria-pressed="true">30 days</button>
+          <button data-days="90">90 days</button>
+        </div>
+        <button class="btn btn-outline btn-sm" id="refresh">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+          Refresh
+        </button>
       </div>
     </div>
-  </div>
 
-  <div class="sec">
-    <div class="sec-head"><h2>Audience</h2></div>
-    <div class="grid g3">
-      <div class="card">
-        <h3>Devices</h3><div class="sub">&nbsp;</div>
-        <div class="donut-wrap"><div class="donut" id="devDonut"></div><div class="keys" id="devKeys"></div></div>
-      </div>
-      <div class="card">
-        <h3>Traffic sources</h3><div class="sub">&nbsp;</div>
-        <div class="donut-wrap"><div class="donut" id="srcDonut"></div><div class="keys" id="srcKeys"></div></div>
-      </div>
-      <div class="card">
-        <h3>Countries</h3><div class="sub">&nbsp;</div>
-        <div class="rows" id="countries"></div>
-      </div>
+    <div class="content">
+      <div class="alert" id="degraded" hidden></div>
+      <div class="alert warn" id="nodata" hidden>No events recorded in this window yet. If the site is live, check that the analytics migrations have been applied.</div>
+
+      <!-- OVERVIEW -->
+      <section id="s-overview">
+        <div class="stats" id="stats"></div>
+      </section>
+
+      <!-- CLICKS -->
+      <section id="s-clicks">
+        <h2 class="sec-title">Clicks and attention</h2>
+        <div class="sec-note">Every link and button on the page, counted by one delegated listener</div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">Where the clicks go</div><div class="card-desc">Most-clicked controls</div></div>
+            <div class="card-body"><div class="rows" id="clicks"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Click-through by placement</div><div class="card-desc">Impressions count people who scrolled the button into view</div></div>
+            <div class="card-body"><div class="tw"><table id="ctaTable"></table></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="s-contact">
+        <h2 class="sec-title">How people reach you</h2>
+        <div class="sec-note">Form, WhatsApp, email and Calendly, compared on one footing</div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">Channel mix</div><div class="card-desc">Share of everyone who arrived</div></div>
+            <div class="card-body"><div class="donut-wrap"><div id="contactDonut"></div><div class="keys" id="contactKeys"></div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Did they fill the form first?</div><div class="card-desc">Whether contact came after a submission or instead of one</div></div>
+            <div class="card-body"><div class="tw"><table id="contactTable"></table></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FUNNEL -->
+      <section id="s-funnel">
+        <h2 class="sec-title">Conversion funnel</h2>
+        <div class="sec-note">Unique visitors reaching each step, not event counts</div>
+        <div class="grid g2">
+          <div class="card"><div class="card-body"><div class="fun" id="funnel"></div></div></div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Visitors per day</div><div class="card-desc">Distinct people, with leads marked</div></div>
+            <div class="card-body"><div class="chart"><svg class="line" id="daily" role="img" aria-label="Visitors per day"></svg><div class="tip" id="dailyTip"></div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PIPELINE -->
+      <section id="s-pipeline">
+        <h2 class="sec-title">Pipeline</h2>
+        <div class="sec-note">Every visitor sits in exactly one stage, the furthest they reached. Click a card for their journey.</div>
+        <div class="kan" id="kanban"></div>
+      </section>
+
+      <!-- VIDEO -->
+      <section id="s-video">
+        <h2 class="sec-title">Video</h2>
+        <div class="sec-note">How much of each clip actually gets watched</div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">Watch-through</div><div class="card-desc">People reaching each quarter</div></div>
+            <div class="card-body"><div class="rows" id="videoBars"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Time watched</div><div class="card-desc">Real seconds, ignoring seeks</div></div>
+            <div class="card-body"><div class="tw"><table id="videoTable"></table></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUDIENCE -->
+      <section id="s-audience">
+        <h2 class="sec-title">Audience</h2>
+        <div class="sec-note">Where visitors come from and what they use</div>
+        <div class="grid g3">
+          <div class="card">
+            <div class="card-head"><div class="card-title">Devices</div></div>
+            <div class="card-body"><div class="donut-wrap"><div id="devDonut"></div><div class="keys" id="devKeys"></div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Sources</div></div>
+            <div class="card-body"><div class="donut-wrap"><div id="srcDonut"></div><div class="keys" id="srcKeys"></div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Countries</div></div>
+            <div class="card-body"><div class="rows" id="countries"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ATTENTION -->
+      <section id="s-attention">
+        <h2 class="sec-title">Reach and problems</h2>
+        <div class="sec-note">Which sections hold attention, and what is going wrong</div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">Sections</div><div class="card-desc">Reach, median time, and where visits end</div></div>
+            <div class="card-body"><div class="tw"><table id="secTable"></table></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Scroll depth</div><div class="card-desc">Share of visitors reaching each point</div></div>
+            <div class="card-body">
+              <div class="rows" id="scroll"></div>
+              <hr class="sep" style="margin:18px 0">
+              <div class="card-title" style="font-size:13.5px;margin-bottom:10px">Errors and dead ends</div>
+              <div class="tw"><table id="errTable"></table></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LEADS -->
+      <section id="s-leads">
+        <h2 class="sec-title">Leads</h2>
+        <div class="sec-note">Bots excluded, with the campaign that produced each one</div>
+        <div class="card"><div class="card-body"><div class="tw"><table id="leadTable"></table></div></div></div>
+      </section>
     </div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-head"><h2>Attention and reach</h2></div>
-    <div class="grid g2">
-      <div class="card">
-        <h3>Sections</h3>
-        <div class="sub">Reach, median time, and where visits end</div>
-        <div class="tw"><table id="secTable"></table></div>
-      </div>
-      <div class="card">
-        <h3>Scroll depth</h3>
-        <div class="sub">Share of visitors reaching each point</div>
-        <div class="rows" id="scroll"></div>
-        <h3 style="margin-top:24px">Errors and dead ends</h3>
-        <div class="sub">Blocked demos, failed calls, missing pages</div>
-        <div class="tw"><table id="errTable"></table></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-head"><h2>Leads</h2><span class="note">Bots excluded, with the campaign that produced each one</span></div>
-    <div class="card"><div class="tw"><table id="leadTable"></table></div></div>
   </div>
 </div>
 
@@ -356,10 +576,10 @@ svg.line{display:block;width:100%;height:170px;overflow:visible}
   <div class="dinner">
     <header>
       <div>
-        <h2 style="font-family:var(--serif);font-size:18px">Visitor journey</h2>
-        <div style="font-size:11.5px;color:var(--ink-3)" id="drawerId"></div>
+        <h2 style="font-size:16px">Visitor journey</h2>
+        <div style="font-size:11.5px;color:var(--muted-foreground)" id="drawerId"></div>
       </div>
-      <button class="btn btn-ghost" id="drawerClose">Close</button>
+      <button class="btn btn-outline btn-sm" id="drawerClose">Close</button>
     </header>
     <ol class="tl" id="timeline"></ol>
   </div>
@@ -370,7 +590,39 @@ svg.line{display:block;width:100%;height:170px;overflow:visible}
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var state = { days: 30, data: null };
-  var SERIES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)'];
+  // Categorical, in fixed order, never cycled. A sixth series folds into "other".
+  var CAT = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
+
+  // lucide, inlined — the icon set the preset specifies, without a runtime dependency.
+  var ICON = {
+    gauge: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+    pointer: '<path d="M9 9l5 12 1.774-5.226L21 14 9 9z"/><path d="M16.071 16.071l4.243 4.243"/><path d="M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122M5.16 12.828l-2.122 2.121"/>',
+    message: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>',
+    funnel: '<path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>',
+    kanban: '<path d="M6 5v11"/><path d="M12 5v6"/><path d="M18 5v14"/>',
+    play: '<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
+    globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+    eye: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>'
+  };
+  function icon(name, size) {
+    return '<svg width="' + (size || 16) + '" height="' + (size || 16) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICON[name] || '') + '</svg>';
+  }
+
+  var NAV = [
+    { id: 's-overview', t: 'Overview', i: 'gauge' },
+    { id: 's-clicks', t: 'Clicks', i: 'pointer' },
+    { id: 's-contact', t: 'Contact', i: 'message' },
+    { id: 's-funnel', t: 'Funnel', i: 'funnel' },
+    { id: 's-pipeline', t: 'Pipeline', i: 'kanban' },
+    { id: 's-video', t: 'Video', i: 'play' },
+    { id: 's-audience', t: 'Audience', i: 'globe' },
+    { id: 's-attention', t: 'Reach', i: 'eye' },
+    { id: 's-leads', t: 'Leads', i: 'users' }
+  ];
+  $('nav').innerHTML = '<div class="sb-label">Dashboard</div>' + NAV.map(function (n, i) {
+    return '<button class="sb-item" data-goto="' + n.id + '"' + (i === 0 ? ' aria-current="true"' : '') + '>' + icon(n.i, 15) + n.t + '</button>';
+  }).join('');
 
   function num(n) { return (n === null || n === undefined || isNaN(n)) ? '0' : Number(n).toLocaleString(); }
   function pct(n) { return (n === null || n === undefined || n === '') ? '—' : Number(n).toFixed(1) + '%'; }
@@ -379,53 +631,40 @@ svg.line{display:block;width:100%;height:170px;overflow:visible}
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
-  function dur(s) {
-    s = Math.round(Number(s) || 0);
-    if (s < 60) return s + 's';
-    return Math.floor(s / 60) + 'm ' + (s % 60) + 's';
-  }
+  function dur(s) { s = Math.round(Number(s) || 0); return s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + (s % 60) + 's'; }
   function when(iso) {
     try { return new Date(iso).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
     catch (e) { return iso || ''; }
   }
 
-  // Donut. Segments are drawn as stroked arcs with a 2px surface gap between them, and the
-  // legend carries the identity so nothing depends on colour alone.
   function donut(elId, keysId, rows) {
     var el = $(elId), keys = $(keysId);
     var total = rows.reduce(function (a, r) { return a + (Number(r.value) || 0); }, 0);
     if (!total) { el.innerHTML = ''; keys.innerHTML = '<div class="empty">Nothing yet.</div>'; return; }
-    var R = 54, C = 2 * Math.PI * R, off = 0;
+    var R = 50, C = 2 * Math.PI * R, off = 0;
     var segs = rows.slice(0, 5).map(function (r, i) {
       var frac = (Number(r.value) || 0) / total;
-      var len = Math.max(0, frac * C - 2); // 2px gap so adjacent segments stay distinct
-      var s = '<circle cx="64" cy="64" r="' + R + '" fill="none" stroke="' + SERIES[i % 5] +
-        '" stroke-width="17" stroke-dasharray="' + len + ' ' + (C - len) +
-        '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 64 64)"/>';
-      off += frac * C;
-      return s;
+      var len = Math.max(0, frac * C - 3); // 3px gap keeps adjacent segments legible
+      var s = '<circle cx="60" cy="60" r="' + R + '" fill="none" stroke="' + CAT[i % 5] + '" stroke-width="15" stroke-linecap="butt" stroke-dasharray="' + len + ' ' + (C - len) + '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 60 60)"/>';
+      off += frac * C; return s;
     }).join('');
-    el.innerHTML = '<svg width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Share breakdown">' + segs +
-      '<text x="64" y="60" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="23" fill="currentColor">' + num(total) + '</text>' +
-      '<text x="64" y="77" text-anchor="middle" font-size="10" fill="var(--ink-3)">total</text></svg>';
+    el.innerHTML = '<svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Share breakdown">' + segs +
+      '<text x="60" y="57" text-anchor="middle" font-family="Manrope,Inter,sans-serif" font-weight="700" font-size="21" fill="currentColor">' + num(total) + '</text>' +
+      '<text x="60" y="73" text-anchor="middle" font-size="10" fill="var(--muted-foreground)">total</text></svg>';
     keys.innerHTML = rows.slice(0, 5).map(function (r, i) {
-      return '<div class="key"><span class="sw" style="background:' + SERIES[i % 5] + '"></span>' +
-        '<span class="nm" title="' + esc(r.label) + '">' + esc(r.label) + '</span>' +
-        '<span class="vl">' + num(r.value) + '</span>' +
-        '<span class="pc">' + (Number(r.value) / total * 100).toFixed(0) + '%</span></div>';
+      return '<div class="key"><span class="sw" style="background:' + CAT[i % 5] + '"></span><span class="nm" title="' + esc(r.label) + '">' + esc(r.label) +
+        '</span><span class="vl">' + num(r.value) + '</span><span class="pc">' + (Number(r.value) / total * 100).toFixed(0) + '%</span></div>';
     }).join('');
   }
 
-  // `right` and `sub` are both escaped as plain text. Passing markup through here would be
-  // escaped and shown literally, so a secondary value gets its own field rather than a tag.
+  // `right` and `sub` are escaped text; markup passed here would show literally.
   function bars(el, rows, color) {
     if (!rows || !rows.length) { el.innerHTML = '<div class="empty">Nothing yet.</div>'; return; }
     var max = Math.max.apply(null, rows.map(function (r) { return Number(r.value) || 0; })) || 1;
     el.innerHTML = rows.map(function (r) {
       return '<div class="row"><span class="lab" title="' + esc(r.label) + '">' + esc(r.label) + '</span>' +
-        '<span class="track"><span class="fill" style="width:' + Math.max(1, (Number(r.value) || 0) / max * 100) + '%;background:' + (r.color || color || SERIES[0]) + '"></span></span>' +
-        '<span class="val">' + esc(r.right !== undefined ? r.right : num(r.value)) +
-        (r.sub ? ' <small>' + esc(r.sub) + '</small>' : '') + '</span></div>';
+        '<span class="track"><span class="fill" style="width:' + Math.max(1, (Number(r.value) || 0) / max * 100) + '%;background:' + (r.color || color || 'var(--chart-1)') + '"></span></span>' +
+        '<span class="val">' + esc(r.right !== undefined ? r.right : num(r.value)) + (r.sub ? ' <small>' + esc(r.sub) + '</small>' : '') + '</span></div>';
     }).join('');
   }
 
@@ -458,11 +697,19 @@ svg.line{display:block;width:100%;height:170px;overflow:visible}
       .then(function () { showLogin(''); });
   });
   $('refresh').addEventListener('click', load);
+  $('sbToggle').addEventListener('click', function () { $('sidebar').classList.toggle('open'); });
   $('range').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-days]'); if (!b) return;
     state.days = Number(b.dataset.days);
     Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
     load();
+  });
+  $('nav').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-goto]'); if (!b) return;
+    Array.prototype.forEach.call(this.querySelectorAll('.sb-item'), function (x) { x.removeAttribute('aria-current'); });
+    b.setAttribute('aria-current', 'true');
+    var t = $(b.dataset.goto); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('sidebar').classList.remove('open');
   });
 
   function load() {
@@ -476,7 +723,7 @@ svg.line{display:block;width:100%;height:170px;overflow:visible}
       .catch(function (err) {
         $('stamp').textContent = 'error';
         $('degraded').hidden = false;
-        $('degraded').textContent = 'Could not load the report. ' + err.message;
+        $('degraded').innerHTML = '<div><b>Could not load the report.</b> ' + esc(err.message) + '</div>';
       });
   }
 
@@ -485,111 +732,107 @@ svg.line{display:block;width:100%;height:170px;overflow:visible}
     $('stamp').textContent = 'Last ' + d.range_days + ' days · updated ' + when(d.generated_at);
 
     if (d.degraded && d.degraded.length) {
+      // Name the fix, not just the symptom: this exact error means a migration has not run.
+      var missing = d.degraded.some(function (m) { return /schema cache|does not exist|Could not find/i.test(m); });
       $('degraded').hidden = false;
-      $('degraded').textContent = 'Some panels could not be built: ' + d.degraded.join(' · ') +
-        '. This usually means the analytics migrations have not been applied yet.';
+      $('degraded').innerHTML = '<div><b>' + (d.degraded_count || d.degraded.length) + ' panel(s) could not be built.</b> ' +
+        esc(d.degraded.join(' · ')) +
+        (missing ? '<br><br>Those functions live in migration <code>007</code>. Run <code>supabase/APPLY_TO_SUPABASE.sql</code> in the Supabase SQL editor — it now includes 005, 006 and 007, and is safe to re-run.' : '') + '</div>';
     } else { $('degraded').hidden = true; }
     $('nodata').hidden = !(Number(o.visitors || 0) === 0 && Number(o.page_views || 0) === 0);
 
-    // Contact totals feed the headline conversion figures.
-    var byCh = {};
-    (d.contact || []).forEach(function (c) { byCh[c.channel] = c; });
+    var byCh = {}; (d.contact || []).forEach(function (c) { byCh[c.channel] = c; });
     var reach = function (ch) { return byCh[ch] ? Number(byCh[ch].visitors) : 0; };
-    var emailed = reach('email'), whats = reach('whatsapp'), phoned = reach('phone'), cal = reach('calendly');
+    var emailed = reach('email'), whats = reach('whatsapp'), cal = reach('calendly');
 
-    $('hero').innerHTML = [
-      { k: 'Visitors', v: num(o.visitors), d: num(o.returning_visitors) + ' returning · ' + num(o.sessions) + ' visits' },
-      { k: 'Total clicks', v: num(ct.total_clicks), d: (ct.clicks_per_visitor || 0) + ' per visitor' },
-      { k: 'Typical visit', v: dur(o.median_seconds), d: Math.round(o.median_scroll || 0) + '% scrolled' },
-      { k: 'Form submits', v: num(o.form_submits), d: num(o.form_opens) + ' opened · ' + (o.form_opens ? (o.form_submits / o.form_opens * 100).toFixed(0) + '% finished' : '—') },
-      { k: 'WhatsApp', v: num(whats), d: o.visitors ? (whats / o.visitors * 100).toFixed(1) + '% of visitors' : '—' },
-      { k: 'Emailed you', v: num(emailed), d: o.visitors ? (emailed / o.visitors * 100).toFixed(1) + '% of visitors' : '—' },
-      { k: 'Calendly', v: num(cal), d: 'booking intent' },
-      { k: 'Leads', v: num(o.leads), d: o.visitors ? (o.leads / o.visitors * 100).toFixed(1) + '% of visitors' : '—' }
+    $('stats').innerHTML = [
+      { k: 'Visitors', i: 'users', v: num(o.visitors), d: num(o.returning_visitors) + ' returning · ' + num(o.sessions) + ' visits' },
+      { k: 'Total clicks', i: 'pointer', v: num(ct.total_clicks), d: (ct.clicks_per_visitor || 0) + ' per visitor' },
+      { k: 'Typical visit', i: 'gauge', v: dur(o.median_seconds), d: Math.round(o.median_scroll || 0) + '% scrolled' },
+      { k: 'Form submits', i: 'funnel', v: num(o.form_submits), d: num(o.form_opens) + ' opened · ' + (o.form_opens ? (o.form_submits / o.form_opens * 100).toFixed(0) + '% finished' : '—') },
+      { k: 'WhatsApp', i: 'message', v: num(whats), d: o.visitors ? (whats / o.visitors * 100).toFixed(1) + '% of visitors' : '—' },
+      { k: 'Emailed you', i: 'message', v: num(emailed), d: o.visitors ? (emailed / o.visitors * 100).toFixed(1) + '% of visitors' : '—' },
+      { k: 'Calendly', i: 'funnel', v: num(cal), d: 'booking intent' },
+      { k: 'Leads', i: 'users', v: num(o.leads), d: o.visitors ? (o.leads / o.visitors * 100).toFixed(1) + '% of visitors' : '—' }
     ].map(function (t) {
-      return '<div class="cell"><div class="k">' + esc(t.k) + '</div><div class="v">' + esc(t.v) + '</div><div class="d">' + esc(t.d) + '</div></div>';
+      return '<div class="card stat"><div class="k">' + icon(t.i, 13) + esc(t.k) + '</div><div class="v tnum">' + esc(t.v) + '</div><div class="d">' + esc(t.d) + '</div></div>';
     }).join('');
 
-    // clicks
     bars($('clicks'), (d.clicks || []).slice(0, 9).map(function (c) {
       return { label: c.label, value: c.clicks, right: num(c.clicks), sub: num(c.visitors) + ' people' };
-    }), 'var(--s1)');
+    }), 'var(--seq-4)');
 
     table($('ctaTable'),
       [{ t: 'Placement' }, { t: 'Seen', n: 1 }, { t: 'Clicks', n: 1 }, { t: 'CTR', n: 1 }, { t: 'Submitted', n: 1 }],
       d.cta || [],
       function (r) {
-        var c = (r.ctr === null || r.ctr === undefined) ? 'mute' : (r.ctr >= 8 ? 'good' : r.ctr >= 3 ? 'warn' : 'crit');
+        var c = (r.ctr === null || r.ctr === undefined) ? 'mute' : (r.ctr >= 8 ? 'ok' : r.ctr >= 3 ? 'warn' : 'bad');
         return '<tr><td>' + esc(r.placement) + '</td><td class="n">' + num(r.impressions) + '</td><td class="n">' + num(r.clicks) +
-          '</td><td class="n"><span class="pill ' + c + '">' + pct(r.ctr) + '</span></td><td class="n">' + num(r.submitted) + '</td></tr>';
+          '</td><td class="n"><span class="badge badge-' + c + '">' + pct(r.ctr) + '</span></td><td class="n">' + num(r.submitted) + '</td></tr>';
       });
 
-    // contact
     donut('contactDonut', 'contactKeys', (d.contact || []).map(function (c) { return { label: c.channel, value: Number(c.visitors) }; }));
     table($('contactTable'),
-      [{ t: 'Channel' }, { t: 'People', n: 1 }, { t: '% of visitors', n: 1 }, { t: 'After the form', n: 1 }, { t: 'Instead of it', n: 1 }],
+      [{ t: 'Channel' }, { t: 'People', n: 1 }, { t: '% of visitors', n: 1 }, { t: 'After form', n: 1 }, { t: 'Instead', n: 1 }],
       d.contact || [],
       function (r) {
-        return '<tr><td>' + esc(r.channel) + '</td><td class="n">' + num(r.visitors) + '</td><td class="n">' + pct(r.pct_of_visitors) +
-          '</td><td class="n">' + num(r.after_form) + '</td><td class="n">' + num(r.without_form) + '</td></tr>';
+        return '<tr><td><span class="badge badge-brand">' + esc(r.channel) + '</span></td><td class="n">' + num(r.visitors) +
+          '</td><td class="n">' + pct(r.pct_of_visitors) + '</td><td class="n">' + num(r.after_form) + '</td><td class="n">' + num(r.without_form) + '</td></tr>';
       });
 
-    // funnel
     var f = d.funnel || [], top = f.length ? Number(f[0].visitors) || 0 : 0;
     $('funnel').innerHTML = f.length ? f.map(function (s) {
       var lost = Number(s.drop_pct) > 0 && Number(s.step) !== 1;
+      var showDrop = Number(s.step) !== 1 && s.drop_pct !== null && s.drop_pct !== undefined;
       return '<div class="fstep"><span class="lab">' + esc(s.label) + '</span>' +
         '<span class="fbar"><span style="width:' + (top ? Math.max(1, (Number(s.visitors) || 0) / top * 100) : 1) + '%"></span></span>' +
         '<span class="val">' + num(s.visitors) + ' <small>' + pct(s.pct_of_landed) + '</small></span>' +
-        (lost ? '<span class="fdrop">↓ ' + pct(s.drop_pct) + ' lost here</span>' : '') + '</div>';
+        (showDrop ? '<span class="fdrop' + (lost ? '' : ' none') + '">' + (lost ? '↓ ' + pct(s.drop_pct) + ' lost here' : 'no drop') + '</span>' : '') + '</div>';
     }).join('') : '<div class="empty">Nothing yet.</div>';
 
     drawDaily(d.daily || []);
     drawKanban(d.pipeline || []);
 
-    // video
     var vb = [];
     (d.video || []).forEach(function (v) {
-      [['25%', v.p25], ['50%', v.p50], ['75%', v.p75], ['Finished', v.p95]].forEach(function (m, i) {
-        vb.push({ label: v.clip + ' · ' + m[0], value: Number(m[1]) || 0, right: num(m[1]), color: SERIES[i % 5] });
+      [['25%', v.p25], ['50%', v.p50], ['75%', v.p75], ['finished', v.p95]].forEach(function (m, i) {
+        vb.push({ label: v.clip + ' · ' + m[0], value: Number(m[1]) || 0, right: num(m[1]), color: 'var(--seq-' + (i + 2) + ')' });
       });
     });
     bars($('videoBars'), vb);
     table($('videoTable'),
-      [{ t: 'Clip' }, { t: 'Starts', n: 1 }, { t: 'Finished', n: 1 }, { t: 'Median watch', n: 1 }, { t: 'Total', n: 1 }],
+      [{ t: 'Clip' }, { t: 'Starts', n: 1 }, { t: 'Finished', n: 1 }, { t: 'Median', n: 1 }, { t: 'Total', n: 1 }],
       d.video || [],
       function (r) {
         var cp = Number(r.completion_pct) || 0;
         return '<tr><td>' + esc(r.clip) + '</td><td class="n">' + num(r.starts) +
-          '</td><td class="n"><span class="pill ' + (cp >= 40 ? 'good' : cp >= 15 ? 'warn' : 'mute') + '">' + pct(r.completion_pct) +
+          '</td><td class="n"><span class="badge badge-' + (cp >= 40 ? 'ok' : cp >= 15 ? 'warn' : 'mute') + '">' + pct(r.completion_pct) +
           '</span></td><td class="n">' + dur(r.median_seconds) + '</td><td class="n">' + num(r.total_minutes) + 'm</td></tr>';
       });
 
-    // audience
     donut('devDonut', 'devKeys', (d.devices || []).map(function (r) { return { label: r.label || 'unknown', value: Number(r.visitors) }; }));
     donut('srcDonut', 'srcKeys', (d.referrers || []).map(function (r) { return { label: r.label || 'direct', value: Number(r.visitors) }; }));
     bars($('countries'), (d.countries || []).slice(0, 7).map(function (r) {
       return { label: r.label || 'unknown', value: Number(r.visitors), right: num(r.visitors) };
-    }), 'var(--s5)');
+    }), 'var(--chart-5)');
 
-    // sections + scroll + errors
     table($('secTable'),
       [{ t: 'Section' }, { t: 'Reach', n: 1 }, { t: '%', n: 1 }, { t: 'Median', n: 1 }, { t: 'Exit', n: 1 }],
       d.sections || [],
       function (r) {
         var ex = Number(r.exit_pct) || 0;
         return '<tr><td>' + esc(r.section) + '</td><td class="n">' + num(r.reach) + '</td><td class="n">' + pct(r.reach_pct) +
-          '</td><td class="n">' + dur(r.median_seconds) + '</td><td class="n"><span class="pill ' +
-          (ex >= 40 ? 'crit' : ex >= 20 ? 'warn' : 'mute') + '">' + pct(r.exit_pct) + '</span></td></tr>';
+          '</td><td class="n">' + dur(r.median_seconds) + '</td><td class="n"><span class="badge badge-' +
+          (ex >= 40 ? 'bad' : ex >= 20 ? 'warn' : 'mute') + '">' + pct(r.exit_pct) + '</span></td></tr>';
       });
     bars($('scroll'), (d.scroll || []).map(function (r) {
       return { label: r.depth + '% down', value: Number(r.visitors), right: num(r.visitors), sub: pct(r.pct) };
-    }), 'var(--s3)');
+    }), 'var(--seq-3)');
     table($('errTable'),
       [{ t: 'Problem' }, { t: 'Detail' }, { t: 'Hits', n: 1 }],
       d.errors || [],
       function (r) {
-        return '<tr><td><span class="pill crit">' + esc(r.event) + '</span></td><td>' + esc(r.detail) + '</td><td class="n">' + num(r.hits) + '</td></tr>';
+        return '<tr><td><span class="badge badge-bad">' + esc(r.event) + '</span></td><td>' + esc(r.detail) + '</td><td class="n">' + num(r.hits) + '</td></tr>';
       });
 
     table($('leadTable'),
@@ -604,57 +847,53 @@ svg.line{display:block;width:100%;height:170px;overflow:visible}
       });
   }
 
-  // Pipeline board. Columns are the funnel stages, in order, and a visitor sits in exactly
-  // one of them — the furthest they reached — so the columns sum to the visitor count.
   function drawKanban(cards) {
     var STAGES = [
-      { n: 'Browsing', o: 1, c: 'var(--s5)' },
-      { n: 'Engaged', o: 2, c: 'var(--s3)' },
-      { n: 'Opened the form', o: 3, c: 'var(--s1)' },
-      { n: 'Submitted the form', o: 4, c: 'var(--s2)' },
-      { n: 'Reached out', o: 5, c: 'var(--s4)' }
+      { n: 'Browsing', o: 1, c: 'var(--chart-5)' },
+      { n: 'Engaged', o: 2, c: 'var(--chart-3)' },
+      { n: 'Opened the form', o: 3, c: 'var(--chart-1)' },
+      { n: 'Submitted', o: 4, c: 'var(--chart-2)' },
+      { n: 'Reached out', o: 5, c: 'var(--chart-4)' }
     ];
     $('kanban').innerHTML = STAGES.map(function (st) {
       var mine = (cards || []).filter(function (c) { return Number(c.stage_order) === st.o; });
       var shown = mine.slice(0, 25);
-      return '<div class="col"><div class="col-head"><span class="t">' + esc(st.n) + '</span><span class="c">' + mine.length + '</span></div>' +
+      return '<div class="col"><div class="col-head"><span class="t">' + esc(st.n) + '</span><span class="c tnum">' + mine.length + '</span></div>' +
         '<div class="stripe" style="background:' + st.c + '"></div><div class="cards">' +
         (shown.length ? shown.map(function (c) {
-          var title = c.lead_name || (String(c.visitor_id).slice(0, 8) + '…');
           return '<button class="kcard" data-vid="' + esc(c.visitor_id) + '">' +
-            '<div class="n">' + esc(title) + '</div>' +
+            '<div class="n">' + esc(c.lead_name || (String(c.visitor_id).slice(0, 8) + '…')) + '</div>' +
             '<div class="m"><span>' + esc(c.country || '—') + '</span><span>' + esc(c.device || '—') + '</span><span>' + esc(c.source || 'direct') + '</span></div>' +
-            (c.is_lead ? '<span class="lead">lead</span>' : '') + '</button>';
-        }).join('') : '<div class="empty" style="padding:12px 0">Empty</div>') +
-        '</div>' + (mine.length > shown.length ? '<div class="more">+' + (mine.length - shown.length) + ' more</div>' : '') + '</div>';
+            (c.is_lead ? '<span class="badge badge-ok" style="margin-top:6px">lead</span>' : '') + '</button>';
+        }).join('') : '<div class="empty" style="padding:10px 0">Empty</div>') + '</div>' +
+        (mine.length > shown.length ? '<div class="more">+' + (mine.length - shown.length) + ' more</div>' : '') + '</div>';
     }).join('');
   }
 
   function drawDaily(rows) {
     var svg = $('daily'), tip = $('dailyTip');
     if (!rows.length) { svg.innerHTML = ''; return; }
-    var W = svg.clientWidth || 520, H = 170, P = { t: 10, r: 8, b: 20, l: 26 };
+    var W = svg.clientWidth || 500, H = 168, P = { t: 10, r: 8, b: 20, l: 26 };
     var iw = Math.max(10, W - P.l - P.r), ih = H - P.t - P.b;
     var max = Math.max(1, Math.max.apply(null, rows.map(function (r) { return Number(r.visitors) || 0; })));
     var x = function (i) { return P.l + (rows.length === 1 ? iw / 2 : i / (rows.length - 1) * iw); };
     var y = function (v) { return P.t + ih - (Number(v) || 0) / max * ih; };
-
     var out = [0, max].map(function (v) {
-      return '<line x1="' + P.l + '" y1="' + y(v) + '" x2="' + (W - P.r) + '" y2="' + y(v) + '" stroke="var(--rule-2)" stroke-width="1"/>' +
-        '<text x="' + (P.l - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="10" fill="var(--ink-3)">' + v + '</text>';
+      return '<line x1="' + P.l + '" y1="' + y(v) + '" x2="' + (W - P.r) + '" y2="' + y(v) + '" stroke="var(--border)" stroke-width="1"/>' +
+        '<text x="' + (P.l - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="10" fill="var(--muted-foreground)">' + v + '</text>';
     }).join('');
     var line = rows.map(function (r, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(r.visitors).toFixed(1); }).join(' ');
-    out += '<path d="' + line + ' L' + x(rows.length - 1).toFixed(1) + ' ' + (P.t + ih) + ' L' + x(0).toFixed(1) + ' ' + (P.t + ih) + ' Z" fill="var(--brand)" opacity="0.08"/>';
-    out += '<path d="' + line + '" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linejoin="round"/>';
+    out += '<path d="' + line + ' L' + x(rows.length - 1).toFixed(1) + ' ' + (P.t + ih) + ' L' + x(0).toFixed(1) + ' ' + (P.t + ih) + ' Z" fill="var(--primary)" opacity="0.10"/>';
+    out += '<path d="' + line + '" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round"/>';
     out += rows.map(function (r, i) {
-      return Number(r.leads) > 0 ? '<circle cx="' + x(i) + '" cy="' + y(r.visitors) + '" r="4.5" fill="var(--s4)" stroke="var(--panel)" stroke-width="2"/>' : '';
+      return Number(r.leads) > 0 ? '<circle cx="' + x(i) + '" cy="' + y(r.visitors) + '" r="4.5" fill="var(--chart-4)" stroke="var(--card)" stroke-width="2"/>' : '';
     }).join('');
-    out += '<text x="' + P.l + '" y="' + (H - 5) + '" font-size="10" fill="var(--ink-3)">' + rows[0].day + '</text>';
-    if (rows.length > 1) out += '<text x="' + (W - P.r) + '" y="' + (H - 5) + '" text-anchor="end" font-size="10" fill="var(--ink-3)">' + rows[rows.length - 1].day + '</text>';
+    out += '<text x="' + P.l + '" y="' + (H - 5) + '" font-size="10" fill="var(--muted-foreground)">' + rows[0].day + '</text>';
+    if (rows.length > 1) out += '<text x="' + (W - P.r) + '" y="' + (H - 5) + '" text-anchor="end" font-size="10" fill="var(--muted-foreground)">' + rows[rows.length - 1].day + '</text>';
     out += '<rect id="hit" x="' + P.l + '" y="' + P.t + '" width="' + iw + '" height="' + ih + '" fill="transparent"/>';
     svg.innerHTML = out;
-
-    svg.querySelector('#hit').addEventListener('mousemove', function (e) {
+    var hit = svg.querySelector('#hit');
+    hit.addEventListener('mousemove', function (e) {
       var box = svg.getBoundingClientRect();
       var i = Math.max(0, Math.min(rows.length - 1, Math.round((e.clientX - box.left - P.l) / (iw || 1) * (rows.length - 1))));
       var r = rows[i];
@@ -662,7 +901,7 @@ svg.line{display:block;width:100%;height:170px;overflow:visible}
       tip.style.left = x(i) + 'px'; tip.style.top = y(r.visitors) + 'px';
       tip.classList.add('on');
     });
-    svg.querySelector('#hit').addEventListener('mouseleave', function () { tip.classList.remove('on'); });
+    hit.addEventListener('mouseleave', function () { tip.classList.remove('on'); });
   }
 
   document.addEventListener('click', function (e) {
@@ -686,9 +925,8 @@ svg.line{display:block;width:100%;height:170px;overflow:visible}
           var fresh = x.session_id !== last; last = x.session_id;
           var p = x.props || {}, keys = Object.keys(p);
           return '<li class="' + esc(x.category || 'BEHAVIOR') + '">' +
-            (fresh ? '<div class="meta" style="color:var(--brand);font-weight:600">— new visit —</div>' : '') +
-            '<div class="ev">' + esc(x.event) + '</div>' +
-            '<div class="meta">' + esc(when(x.created_at)) + '</div>' +
+            (fresh ? '<div class="meta" style="color:var(--primary);font-weight:600">— new visit —</div>' : '') +
+            '<div class="ev">' + esc(x.event) + '</div><div class="meta">' + esc(when(x.created_at)) + '</div>' +
             (keys.length ? '<div class="pr">' + esc(keys.map(function (k) { return k + ': ' + p[k]; }).join('  ·  ')) + '</div>' : '') + '</li>';
         }).join('');
       })

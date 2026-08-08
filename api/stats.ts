@@ -137,13 +137,18 @@ export default async function handler(req: any, res: any) {
 
     // If the very first call failed the schema is probably not there yet, which is worth
     // saying plainly rather than rendering a dashboard full of zeroes.
+    // Truncating this list to three used to hide the fourth failure, which made it look like
+    // one migration was partly applied when in fact a whole file had not run. Report the
+    // distinct causes and say how many panels each affected.
     const failures = [overview, funnel, daily, cta, sections, video, scroll, sources, countries, devices, referrers, errors, paths, leads, contact, clickTotals, clicks, pipeline]
-      .map(r => r.error).filter(Boolean);
+      .map(r => r.error).filter(Boolean) as string[];
+    const distinctFailures = Array.from(new Set(failures));
 
     return res.status(200).json({
       range_days: days,
       generated_at: new Date().toISOString(),
-      degraded: failures.length > 0 ? failures.slice(0, 3) : null,
+      degraded: distinctFailures.length > 0 ? distinctFailures : null,
+      degraded_count: failures.length || undefined,
       overview: overview.data || {},
       funnel: funnel.data || [],
       daily: daily.data || [],

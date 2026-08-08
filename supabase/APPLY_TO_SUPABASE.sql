@@ -5,6 +5,12 @@
 --   Migrations 005, 006 and 007 concatenated, in order, so the whole analytics
 --   layer can be applied in a single paste.
 --
+-- IF YOU RAN AN EARLIER COPY OF THIS FILE
+--   An earlier version contained only 005 and 006, so rpc_contact, rpc_clicks,
+--   rpc_click_totals and rpc_pipeline were never created and the dashboard
+--   reports them as missing from the schema cache. Re-run this whole file:
+--   it is safe to run twice and will add only what is absent.
+--
 -- HOW TO RUN
 --   Supabase dashboard -> SQL Editor -> New query -> paste all of this -> Run.
 --
@@ -18,10 +24,11 @@
 --
 -- DO NOT RUN 002 or 003. They were never applied and 005 supersedes them.
 --
--- AFTER RUNNING, verify with:
---   select count(*) from site_events;   -- should return 0, not an error
---   select rpc_overview(30);            -- should return a JSON object
---   select * from rpc_contact(30);      -- should return zero rows, not an error
+-- AFTER RUNNING, verify all four of these return a result rather than an error:
+--   select count(*) from site_events;
+--   select rpc_overview(30);
+--   select * from rpc_contact(30);
+--   select * from rpc_click_totals(30);
 -- ============================================================================
 
 
@@ -119,6 +126,9 @@ create table if not exists public.auth_attempts (
 create index if not exists auth_attempts_idx on public.auth_attempts (ip_hash, created_at desc);
 alter table public.auth_attempts enable row level security;
 grant select, insert, delete on public.auth_attempts to service_role;
+
+-- Make the new objects visible to the REST API immediately rather than on the next cache cycle.
+notify pgrst, 'reload schema';
 
 -- ==================== 006_analytics_functions.sql ====================
 -- Digi Dental — dashboard aggregation in the database
@@ -729,6 +739,9 @@ begin
   end loop;
 end $$;
 
+-- Make the new objects visible to the REST API immediately rather than on the next cache cycle.
+notify pgrst, 'reload schema';
+
 -- ==================== 007_contact_and_pipeline.sql ====================
 -- Digi Dental — contact channels, total click coverage, and the pipeline board
 --
@@ -914,4 +927,9 @@ begin
     execute format('grant execute on function public.%s to service_role', fn);
   end loop;
 end $$;
+
+-- PostgREST caches the schema, and new functions stay invisible to the API until it reloads —
+-- which is what "Could not find the function ... in the schema cache" means. Supabase normally
+-- reloads on DDL, but the notify makes it immediate and is harmless if it already happened.
+notify pgrst, 'reload schema';
 

@@ -182,3 +182,8 @@ begin
     execute format('grant execute on function public.%s to service_role', fn);
   end loop;
 end $$;
+
+-- PostgREST caches the schema, and new functions stay invisible to the API until it reloads —
+-- which is what "Could not find the function ... in the schema cache" means. Supabase normally
+-- reloads on DDL, but the notify makes it immediate and is harmless if it already happened.
+notify pgrst, 'reload schema';

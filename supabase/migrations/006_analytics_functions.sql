@@ -605,3 +605,6 @@ begin
     execute format('grant execute on function public.%s to service_role', fn);
   end loop;
 end $$;
+
+-- Make the new objects visible to the REST API immediately rather than on the next cache cycle.
+notify pgrst, 'reload schema';

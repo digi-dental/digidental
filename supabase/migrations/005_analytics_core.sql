@@ -91,3 +91,6 @@ create table if not exists public.auth_attempts (
 create index if not exists auth_attempts_idx on public.auth_attempts (ip_hash, created_at desc);
 alter table public.auth_attempts enable row level security;
 grant select, insert, delete on public.auth_attempts to service_role;
+
+-- Make the new objects visible to the REST API immediately rather than on the next cache cycle.
+notify pgrst, 'reload schema';

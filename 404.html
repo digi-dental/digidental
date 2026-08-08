@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found | Digi Dental</title>
+<meta name="description" content="That page does not exist. Head back to Digi Dental, the 24/7 AI receptionist that answers your dental practice's calls and books patients straight into your calendar.">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://digidental.vercel.app/404.html">
+<meta name="theme-color" content="#0A1A2F">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Digi Dental">
+<meta property="og:title" content="Page not found | Digi Dental">
+<meta property="og:description" content="That page does not exist. Head back to Digi Dental.">
+<meta property="og:image" content="https://digidental.vercel.app/og-image.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:#0A1A2F;color:#FAF9F6;font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+  a{color:#0F8B80;text-decoration:none}
+  a:hover{color:#3FBFA9}
+  @keyframes toothy-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @keyframes dd-fadeup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+  .wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;padding:clamp(48px,10vw,96px) clamp(20px,5vw,40px);max-width:640px;margin:0 auto;animation:dd-fadeup .5s cubic-bezier(.22,1,.36,1) both}
+  .code{font-family:'Fraunces',serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:#5A6E86}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2rem,6vw,3rem);line-height:1.1;letter-spacing:-0.025em;margin:0;text-wrap:balance}
+  p{font-size:16px;line-height:1.7;color:#B9C4D4;margin:0;max-width:460px;text-wrap:pretty}
+  .row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:6px}
+  .btn{background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:16px 32px;font-size:16px;font-weight:600;box-shadow:0 10px 28px rgba(0,0,0,0.3);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)}
+  .btn:hover{background:#0B6E66;color:#FAF9F6;transform:translateY(-2px)}
+  .ghost{border:1px solid rgba(250,249,246,0.28);border-radius:10px;padding:16px 28px;font-size:16px;font-weight:600;color:#B9C4D4;transition:border-color .25s,color .25s,transform .3s cubic-bezier(.22,1,.36,1)}
+  .ghost:hover{border-color:#0F8B80;color:#FAF9F6;transform:translateY(-2px)}
+  img.toothy{width:110px;height:110px;image-rendering:pixelated;object-fit:contain;animation:toothy-bob 2.6s ease-in-out infinite}
+  footer{border-top:1px solid #22344E;padding:22px clamp(20px,5vw,40px);display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:center;font-size:12.5px;color:#3D4F66}
+  footer a{color:#5A6E86}
+  footer a:hover{color:#8A9BB5}
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <img class="toothy" src="/uploads/denty_neutral.png" alt="Toothy, the Digi Dental receptionist" width="110" height="110">
+    <div class="code">Error 404</div>
+    <h1>This page went unanswered.</h1>
+    <p>The link is broken or the page has moved. Unlike your phone line, that is something we can fix in one click.</p>
+    <div class="row">
+      <a class="btn" href="/">Back to the homepage</a>
+      <a class="ghost" href="/#demo">Talk to the AI receptionist</a>
+    </div>
+  </main>
+  <footer>
+    <span>&copy; 2026 Digi Dental</span>
+    <a href="/#pricing">Pricing</a>
+    <a href="/#faq">FAQ</a>
+    <a href="mailto:bennysworkspace@gmail.com">bennysworkspace@gmail.com</a>
+    <a href="https://wa.me/351912859130" target="_blank" rel="noopener">WhatsApp</a>
+  </footer>
+  <script>
+    // Log the miss so broken links show up in the admin dashboard rather than silently rotting.
+    try {
+      var body = JSON.stringify({ event: 'page_not_found', props: { path: location.pathname }, path: location.pathname, ref: document.referrer || '', ts: Date.now() });
+      if (navigator.sendBeacon) navigator.sendBeacon('/api/event', new Blob([body], { type: 'application/json' }));
+    } catch (e) {}
+  </script>
+</body>
+</html>

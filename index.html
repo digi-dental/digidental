@@ -30,14 +30,14 @@
 <meta property="og:image" content="https://digidental.vercel.app/og-image.png">
 <meta property="og:image:width" content="2400">
 <meta property="og:image:height" content="1260">
-<meta property="og:image:alt" content="Digi Dental — your phone rings, a patient gets booked, you never lifted a finger.">
+<meta property="og:image:alt" content="Digi Dental: your phone rings, a patient gets booked, you never lifted a finger.">
 <meta property="og:locale" content="en_US">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Digi Dental | AI Receptionist for Dental Practices">
 <meta name="twitter:description" content="Your phone rings. A patient gets booked. You never lifted a finger.">
 <meta name="twitter:image" content="https://digidental.vercel.app/og-image.png">
-<meta name="twitter:image:alt" content="Digi Dental — AI receptionist for dental practices.">
+<meta name="twitter:image:alt" content="Digi Dental: AI receptionist for dental practices.">
 
 <meta name="theme-color" content="#0A1A2F">
 <meta name="author" content="Digi Dental">
@@ -115,7 +115,7 @@
         },
         {
           "@type": "Offer",
-          "name": "Care plan — Google Calendar integration",
+          "name": "Care plan: Google Calendar integration",
           "description": "Optional monthly plan: monitoring, security, updates and ongoing script refinements. Cancel anytime.",
           "priceCurrency": "USD",
           "priceSpecification": {
@@ -127,7 +127,7 @@
         },
         {
           "@type": "Offer",
-          "name": "Care plan — practice-management (PMS) integration",
+          "name": "Care plan: practice-management (PMS) integration",
           "description": "Optional monthly plan with PMS integration: monitoring, security, updates and ongoing script refinements. Cancel anytime.",
           "priceCurrency": "USD",
           "priceSpecification": {
@@ -149,7 +149,7 @@
           "name": "Is this HIPAA-compliant?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We'll walk you through exactly how data flows on your strategy call — and we're happy to sign a BAA with the voice platform if your practice requires one."
+            "text": "Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We'll walk you through exactly how data flows on your strategy call, and we're happy to sign a BAA with the voice platform if your practice requires one."
           }
         },
         {
@@ -181,7 +181,7 @@
           "name": "How is this different from an answering service?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list — every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier."
+            "text": "An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list, and every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier."
           }
         },
         {
@@ -194,10 +194,10 @@
         },
         {
           "@type": "Question",
-          "name": "I use Dentrix, Eaglesoft or Open Dental — will this work?",
+          "name": "Will this work with Dentrix, Eaglesoft or Open Dental?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes — that's the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn't, Denty still books into a calendar your team already lives in."
+            "text": "Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes. That is the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn't, Denty still books into a calendar your team already lives in."
           }
         },
         {
@@ -213,7 +213,7 @@
           "name": "Contracts, cancellation, and data?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No long-term contract. The setup fee is one-time, and care plans cancel anytime — the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don't receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we'll have it in place before a single patient call is answered. Ask us to delete anything you've given us and it's deleted."
+            "text": "No long-term contract. The setup fee is one-time, and care plans cancel anytime: the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don't receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we'll have it in place before a single patient call is answered. Ask us to delete anything you've given us and it's deleted."
           }
         }
       ]
@@ -251,8 +251,46 @@ input,select,button,textarea{font-family:inherit}
 @keyframes dd-shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
 .dd-navlink{display:none}
 .dd-navdemo{display:none}
-@media (min-width:600px){.dd-navdemo{display:inline}}
+@media (min-width:600px){.dd-navdemo{display:inline-flex}}
 @media (min-width:860px){.dd-navlink{display:inline}}
+/* ===== Desktop layout =====================================================
+   The page was authored mobile-first and kept mobile's narrow column on large
+   screens. Every rule here is additive and gated behind a min-width query, so
+   the mobile rendering below 900px is byte-for-byte what it was. */
+.dd-wrap{width:100%;max-width:1180px;margin:0 auto}
+@media (min-width:1440px){.dd-wrap{max-width:1300px}}
+.dd-hero{display:flex;flex-direction:column;align-items:center;gap:72px;width:100%}
+.dd-hero-copy{display:flex;flex-direction:column;align-items:center;gap:28px;max-width:820px}
+.dd-hero-demo{width:min(720px,94vw);min-height:230px}
+.dd-hero-links{justify-content:center}
+@media (min-width:1024px){
+  .dd-hero{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,0.98fr);align-items:center;gap:clamp(40px,5vw,80px);text-align:left}
+  .dd-hero-copy{align-items:flex-start;max-width:none}
+  .dd-hero-copy h1,.dd-hero-copy p{text-align:left}
+  .dd-hero-cta{align-items:flex-start !important}
+  .dd-hero-links{justify-content:flex-start}
+  .dd-hero-demo{width:100%;justify-self:end}
+}
+/* The four cost statistics stay in the original 2x2 block. Four across read as a thin
+   ribbon of percentages on a wide screen; capping the grid keeps the pairs balanced. */
+.dd-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:110px clamp(48px,7vw,120px);align-items:start;max-width:1060px;margin:0 auto;width:100%}
+.dd-split{display:flex;flex-direction:column;gap:40px;width:100%;align-items:center}
+@media (min-width:980px){
+  .dd-split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,0.85fr);align-items:center;gap:clamp(40px,5vw,72px)}
+  .dd-split>*{width:100%}
+  .dd-split-side{text-align:left}
+  .dd-split-side .dd-center{align-items:flex-start;text-align:left}
+}
+/* Founder card: square portrait with the note overlapping it on desktop. */
+.dd-founder{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.dd-founder-photo{width:100%;aspect-ratio:1;border-radius:24px;overflow:hidden;background:#12263F;flex-shrink:0}
+.dd-founder-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.dd-founder-card{background:#FAF9F6;color:#0A1A2F;border-radius:24px;padding:clamp(24px,4vw,34px);box-shadow:0 30px 70px rgba(0,0,0,0.45);margin-top:-40px;position:relative;z-index:2}
+@media (min-width:900px){
+  .dd-founder{display:flex;flex-direction:row;align-items:center;gap:0}
+  .dd-founder-photo{width:min(420px,42%);aspect-ratio:1}
+  .dd-founder-card{margin-top:0;margin-left:-72px;flex:1;min-width:0;padding:clamp(28px,3vw,40px)}
+}
 button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic-bezier(.4,0,.2,1),transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1),border-color .25s cubic-bezier(.4,0,.2,1)}
 :focus-visible{outline:2px solid #0F8B80;outline-offset:2px;border-radius:4px}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}html{scroll-behavior:auto}}
@@ -279,7 +317,10 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <div style="font-family:'Fraunces',serif;font-weight:600;font-size:21px;letter-spacing:-0.02em;line-height:1;white-space:nowrap;color:{{ navFg }};transition:color .35s ease">Digi<span style="color:#0F8B80"> Dental</span></div>
   </div>
   <div style="display:flex;align-items:center;gap:clamp(12px,2.2vw,24px)">
-    <a href="#demo" onClick="{{ navDemo }}" class="dd-navdemo" style="font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap">Hear the demo</a>
+    <a href="#demo" onClick="{{ navDemo }}" class="dd-navdemo" style="align-items:center;gap:9px;font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap;text-decoration:none;padding:7px 16px 7px 8px;border:1.5px solid rgba(15,139,128,0.45);border-radius:999px;background:rgba(15,139,128,0.08);transition:background-color .25s,border-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:rgba(15,139,128,0.16);border-color:#0F8B80;color:#0F8B80;text-decoration:none;transform:translateY(-1px)">
+      <span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#0F8B80;flex-shrink:0">
+        <svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M8 4.13a1 1 0 0 1 0 1.74L1.5 9.4A1 1 0 0 1 0 8.53V1.47A1 1 0 0 1 1.5.6L8 4.13Z" fill="#FAF9F6"></path></svg>
+      </span>Hear the demo</a>
     <a href="#pricing" class="dd-navlink" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">Pricing</a>
     <a href="#faq" class="dd-navlink" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">FAQ</a>
     <button onClick="{{ openBookingNav }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
@@ -287,26 +328,27 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 </nav>
 
 <!-- ================= HERO ================= -->
-<header style="background:#FAF9F6;padding:170px 24px 150px;display:flex;flex-direction:column;align-items:center;text-align:center">
-  <div style="max-width:820px;display:flex;flex-direction:column;align-items:center;gap:28px">
+<header data-section="hero" style="background:#FAF9F6;padding:170px clamp(20px,4vw,48px) 150px;display:flex;flex-direction:column;align-items:center;text-align:center">
+  <div class="dd-wrap dd-hero">
+  <div class="dd-hero-copy">
     <!-- Headline candidates:
       1. "Your phone rings. A patient gets booked. You never lifted a finger."  (shipped — concrete, sequential, zero jargon)
       2. "Every call answered. Every opening filled. Nobody hired."
       3. "The receptionist that never sleeps, never sighs, and never misses a call." -->
     <h1 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2.5rem,6vw,4.25rem);line-height:1.05;letter-spacing:-0.025em;margin:0;text-wrap:balance">Your phone rings. A patient gets booked. You never lifted a finger.</h1>
     <p style="font-size:17px;line-height:1.65;color:#3D4F66;max-width:740px;margin:0;text-wrap:pretty">A 24/7 human-sounding AI receptionist that answers every call and writes appointments straight into your calendar, set up entirely for you.</p>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+    <div class="dd-hero-cta" style="display:flex;flex-direction:column;align-items:center;gap:14px">
       <button onClick="{{ openBookingHero }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(10,26,47,0.2)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
       <div style="font-size:13px;color:#5A6E86;font-variant-numeric:tabular-nums;line-height:1.6;text-wrap:pretty">A free 20-minute call, no pressure. $2,000 one-time setup, and most practices are live within a week.</div>
-      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 16px">
+      <div class="dd-hero-links" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px">
         <a href="#demo" onClick="{{ scrollToToothy }}" style="font-size:15px;color:#0F8B80;background:none;border:none;cursor:pointer">Or talk to the AI yourself ↓</a>
         <span aria-hidden="true" style="color:#D8D2C4">·</span>
         <a href="https://wa.me/351912859130" target="_blank" rel="noopener" onClick="{{ trackWhatsappHero }}" style="font-size:15px;color:#0F8B80">Prefer to talk? WhatsApp us</a>
       </div>
     </div>
   </div>
-  <!-- Hero animation loop: call card → transcript → booked -->
-  <div style="margin-top:72px;width:min(720px,94vw);min-height:230px" aria-hidden="true">
+  <!-- Hero animation loop: call card, transcript, booked -->
+  <div class="dd-hero-demo" aria-hidden="true">
     <sc-if value="{{ heroLoading }}" hint-placeholder-val="{{ true }}">
       <div style="background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:24px 28px;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:flex;flex-direction:column;gap:14px">
         <div style="height:26px;width:42%;border-radius:6px;background:linear-gradient(90deg,#EFECE4 25%,#F7F4EC 50%,#EFECE4 75%);background-size:200% 100%;animation:dd-shimmer 1.4s linear infinite"></div>
@@ -344,21 +386,22 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       </div>
     </sc-if>
   </div>
-  <div style="margin-top:72px;display:flex;flex-direction:column;align-items:center;gap:16px">
-    <video controls="controls" preload="metadata" playsInline="{{ true }}" poster="uploads/poster-vsl.png" src="/api/video?clip=vsl" onPlay="{{ trackVsl }}" style="width:min(1060px,94vw);aspect-ratio:16/9;border-radius:16px;border:1px solid #E8E4DA;background:#0A1A2F;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:block;object-fit:cover"></video>
+  </div>
+  <div class="dd-wrap" style="margin-top:80px;display:flex;flex-direction:column;align-items:center;gap:16px">
+    <video controls="controls" preload="metadata" playsInline="{{ true }}" src="/api/video?clip=vsl" onPlay="{{ trackVsl }}" style="width:min(1180px,100%);aspect-ratio:16/9;border-radius:16px;border:1px solid #E8E4DA;background:#0A1A2F;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:block;object-fit:cover"></video>
     <div style="font-size:13px;color:#5A6E86">2 minutes: watch the exact call that books a patient at 9 PM.</div>
   </div>
 </header>
 
 <!-- ================= 3. THE COST ================= -->
-<!-- Statistics sourced June 2026 — refresh annually. Sources listed in footnotes below. -->
-<section style="background:#FAF9F6;padding:150px 24px;border-top:1px solid #EEEAE0">
-  <div style="max-width:1060px;margin:0 auto;display:flex;flex-direction:column;gap:110px">
+<!-- Statistics sourced June 2026, refresh annually. Sources listed in footnotes below. -->
+<section data-section="cost" style="background:#FAF9F6;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+  <div class="dd-wrap" style="display:flex;flex-direction:column;gap:110px">
     <div data-reveal="" style="text-align:center;display:flex;flex-direction:column;gap:14px">
       <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#5A6E86;">The cost</div>
       <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">What missed calls actually cost your practice</h2>
     </div>
-    <div data-reveal="" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:110px clamp(48px,7vw,120px);align-items:start">
+    <div data-reveal="" class="dd-stats">
     <div style="text-align:center">
       <div style="font-family:'Fraunces',serif;font-size:clamp(3rem,7vw,4.75rem);font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#0F8B80"><span data-count="32">32</span>–38%<sup style="font-size:0.3em"><a href="https://peerlogic.com" target="_blank" rel="noopener" data-linkpreview="https://peerlogic.com" title="Source: Peerlogic 2026 study, 4,280 calls across 26 practices" style="color:#5A6E86;text-decoration:none;padding:2px 4px">1</a></sup></div>
       <p style="font-size:18px;line-height:1.6;color:#3D4F66;max-width:480px;margin:20px auto 0;text-wrap:pretty">of calls to dental practices go unanswered. During business hours.</p>
@@ -372,8 +415,8 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       <p style="font-size:18px;line-height:1.6;color:#3D4F66;max-width:480px;margin:20px auto 0;text-wrap:pretty">A missed new patient isn't one appointment. It's that much lifetime value, walking to a competitor.</p>
     </div>
     <div style="text-align:center">
-      <div style="font-family:'Fraunces',serif;font-size:clamp(3rem,7vw,4.75rem);font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#0F8B80">$<span data-count="200000">200,000</span>+<sup style="font-size:0.3em"><a href="#sources" title="Our own arithmetic on the rates above — see note 4" style="color:#5A6E86;text-decoration:none">4</a></sup></div>
-      <p style="font-size:18px;line-height:1.6;color:#3D4F66;max-width:500px;margin:20px auto 0;text-wrap:pretty">a year of unanswered calls, at the rates above: one location, 20 calls a day, an $850 first visit. That one is arithmetic, not a survey — run your own numbers below.</p>
+      <div style="font-family:'Fraunces',serif;font-size:clamp(3rem,7vw,4.75rem);font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:#0F8B80">$<span data-count="200000">200,000</span>+<sup style="font-size:0.3em"><a href="#sources" title="Our own arithmetic on the rates above, see note 4" style="color:#5A6E86;text-decoration:none">4</a></sup></div>
+      <p style="font-size:18px;line-height:1.6;color:#3D4F66;max-width:500px;margin:20px auto 0;text-wrap:pretty">a year of unanswered calls, at the rates above: one location, 20 calls a day, an $850 first visit. That one is arithmetic, not a survey, so run your own numbers below.</p>
     </div>
     </div>
     <div data-reveal="" style="text-align:center">
@@ -383,7 +426,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         1. Peerlogic 2026 study of 4,280 calls across 26 practices; corroborated by multiple industry analyses. &nbsp;
         2. Industry call-tracking data: Weave / Forbes Healthcare 2025; DenteMax. &nbsp;
         3. Resonate; industry patient-lifetime-value analyses. &nbsp;
-        4. Not a published statistic — our own calculation, using the miss rate in note 1 and the booking rate in the calculator below: one location × 20 calls a day × 5 days × 52 weeks × 17% unanswered × 30% booking opportunities × $850 first visit. Change any input and the number changes with it. &nbsp;
+        4. Not a published statistic, but our own calculation, using the miss rate in note 1 and the booking rate in the calculator below: one location × 20 calls a day × 5 days × 52 weeks × 17% unanswered × 30% booking opportunities × $850 first visit. Change any input and the number changes with it. &nbsp;
         5. ZipRecruiter national average $38,966; Salary.com California $42,132; CA staffing placements ~$27/hr. Figures sourced June 2026.
       </div>
     </div>
@@ -391,14 +434,14 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 </section>
 
 <!-- ================= 4. THE FIX ================= -->
-<section style="background:#FFFFFF;padding:160px 24px;border-top:1px solid #EEEAE0">
-  <div data-reveal="" style="max-width:1140px;margin:0 auto;display:flex;flex-direction:column;gap:72px">
+<section data-section="before_after" style="background:#FFFFFF;padding:160px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+  <div data-reveal="" class="dd-wrap" style="display:flex;flex-direction:column;gap:72px">
     <div style="text-align:center;display:flex;flex-direction:column;gap:12px;max-width:640px;margin:0 auto">
       <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0">Before and after.</h2>
       <p style="font-size:15px;color:#5A6E86;margin:0;text-wrap:pretty">Your front desk alone, then with the AI overflow receptionist. Same sourced numbers as above.</p>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:clamp(36px,5vw,72px);align-items:center;justify-content:center">
-    <div style="flex:1 1 560px;max-width:840px;min-width:0;display:flex;flex-direction:column;gap:14px">
+    <div style="flex:1 1 560px;max-width:100%;min-width:0;display:flex;flex-direction:column;gap:14px">
       <div style="background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;box-shadow:0 18px 44px rgba(10,26,47,0.08)">
         <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1fr) minmax(0,1.05fr);gap:clamp(10px,2.5vw,16px);padding:clamp(14px,3vw,16px) clamp(12px,4vw,24px);background:#FAF9F6;border-bottom:1px solid #EEEAE0;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;align-items:center;border-radius:16px 16px 0 0">
           <div style="min-width:0;color:#8A93A1">The moment</div>
@@ -456,7 +499,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
            frame this as a real patient or a real client's result. -->
       <div style="border:1px dashed #E0DACB;border-radius:14px;background:#FAF9F6;padding:18px 22px;font-size:13.5px;line-height:1.7;color:#5A6E86;text-wrap:pretty">
         <span style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#8A93A1">An illustrative scenario</span><br>
-        “Mrs. Alvarez, 7:42 PM — chipped tooth.” Your voicemail greeting plays; she hangs up and calls the practice two miles away. Same evening, with Denty: she's asked what happened, told Tuesday 2:00 PM is open, and booked before she's off the phone. <em>Fictional example — not a real patient or client.</em>
+        “Mrs. Alvarez, 7:42 PM, chipped tooth.” Your voicemail greeting plays; she hangs up and calls the practice two miles away. Same evening, with Denty: she's asked what happened, told Tuesday 2:00 PM is open, and booked before she's off the phone. <em>Fictional example, not a real patient or client.</em>
       </div>
     </div>
     </div>
@@ -468,10 +511,11 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 </section>
 
 <!-- ================= 5. THE MATH ================= -->
-<section style="background:#FAF9F6;padding:160px 24px;border-top:1px solid #EEEAE0">
-  <div data-reveal="" style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
+<section data-section="calculator" style="background:#FAF9F6;padding:160px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+  <div data-reveal="" style="width:100%;max-width:1080px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
     <img src="uploads/denty_happy.png" alt="" width="72" height="72" style="width:72px;height:72px;object-fit:contain;image-rendering:pixelated;animation:toothy-bob 2.6s ease-in-out infinite">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-0.02em;margin:0">The math is short.</h2>
+    <div class="dd-split">
     <div style="width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:28px;text-align:left;background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:clamp(22px,4vw,34px);box-shadow:0 18px 44px rgba(10,26,47,0.06)">
 
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -495,16 +539,16 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
           <label for="dd-value" style="font-size:15px;color:#3D4F66">Average patient value <span style="color:#8A93A1;font-size:13px">(first visit)</span></label>
           <div style="display:flex;align-items:center;gap:5px">
             <span aria-hidden="true" style="font-family:'Fraunces',serif;font-size:20px;color:#5A6E86">$</span>
-            <input id="dd-value" type="{{ numType }}" min="300" max="3000" step="10" value="{{ calcValue }}" onChange="{{ setCalcValue }}" onBlur="{{ blurCalcValue }}" aria-label="Average patient value in dollars" style="width:104px;text-align:right;font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#0A1A2F;font-variant-numeric:tabular-nums;padding:8px 10px;border:1px solid #D8D2C4;border-radius:8px;background:#FAF9F6;outline:none" style-focus="border-color:#0F8B80">
+            <input id="dd-value" type="{{ numType }}" min="50" max="3000" step="10" value="{{ calcValue }}" onChange="{{ setCalcValue }}" onBlur="{{ blurCalcValue }}" aria-label="Average patient value in dollars" style="width:104px;text-align:right;font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#0A1A2F;font-variant-numeric:tabular-nums;padding:8px 10px;border:1px solid #D8D2C4;border-radius:8px;background:#FAF9F6;outline:none" style-focus="border-color:#0F8B80">
           </div>
         </div>
-        <input type="range" min="300" max="3000" step="10" value="{{ calcValueN }}" onChange="{{ setCalcValue }}" onInput="{{ setCalcValue }}" aria-label="Average patient value slider" style="width:100%;accent-color:#0F8B80;cursor:pointer">
+        <input type="range" min="50" max="3000" step="10" value="{{ calcValueN }}" onChange="{{ setCalcValue }}" onInput="{{ setCalcValue }}" aria-label="Average patient value slider" style="width:100%;accent-color:#0F8B80;cursor:pointer">
       </div>
 
       <div style="border-top:1px solid #EEEAE0;padding-top:18px;font-size:13.5px;color:#5A6E86;line-height:1.6;font-variant-numeric:tabular-nums;text-wrap:pretty">That works out to roughly <strong style="color:#0A1A2F">{{ calcMissedWeek }}</strong> missed calls a week, or <strong style="color:#0A1A2F">{{ calcMissedYear }}</strong> a year.</div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:22px;width:100%">
-      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(22px,6vw,72px)">
+    <div class="dd-split-side" style="display:flex;flex-direction:column;align-items:center;gap:22px;width:100%">
+      <div class="dd-center" style="display:flex;flex-wrap:wrap;justify-content:center;gap:26px clamp(22px,6vw,72px)">
         <div style="display:flex;flex-direction:column;gap:8px">
           <div style="font-size:14px;color:#5A6E86">New patients you never hear from</div>
           <div style="font-family:'Fraunces',serif;font-size:clamp(2.3rem,5.4vw,3.4rem);font-weight:600;color:#0A1A2F;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">{{ lostPatients }}<span style="font-size:0.4em;font-weight:500;color:#8A93A1"> / year</span></div>
@@ -515,7 +559,6 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         </div>
       </div>
       <div style="font-size:15px;color:#0A1A2F;font-variant-numeric:tabular-nums">Cost of never missing another one: <strong>$2,000, once.</strong></div>
-    </div>
     <details style="font-size:13px;color:#5A6E86;max-width:420px">
       <summary style="cursor:pointer;color:#0F8B80">Our math</summary>
       <p style="line-height:1.7;text-align:left;font-variant-numeric:tabular-nums">Conservative assumptions: 17% of inbound calls go unanswered (the low end of the 17–38% range cited above), and 30% of those are booking opportunities (industry call-tracking data). Locations × calls per day × 5 days × 52 weeks × 17% × 30% × your patient value. Lifetime value not included. The real number is higher.</p>
@@ -523,12 +566,14 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <!-- Routed into the booking modal rather than straight out to Calendly: the modal
          qualifies the lead and captures it even if they never pick a slot. -->
     <button onClick="{{ openBookingCalc }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">See exactly where you're leaking revenue</button>
+    </div>
+    </div>
   </div>
 </section>
 
 <!-- ================= 6+7. TOOTHY — LIVE DEMO ================= -->
-<section id="demo" data-toothy="" style="background:#0A1A2F;padding:160px 24px;color:#FAF9F6;border-top:1px solid #EEEAE0">
-  <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center">
+<section id="demo" data-toothy="" data-section="demo" style="background:#0A1A2F;padding:160px clamp(20px,4vw,48px);color:#FAF9F6;border-top:1px solid #EEEAE0">
+  <div style="width:100%;max-width:900px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center">
     <p style="font-family:'Fraunces',serif;font-size:clamp(1.8rem,4.2vw,2.7rem);line-height:1.4;margin:0;text-wrap:balance;color:#FAF9F6">“Don't take anyone's word for it. Talk to the receptionist yourself.”</p>
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.3rem,2.8vw,1.7rem);letter-spacing:-0.02em;margin:0;text-wrap:balance;color:#8A9BB5">Meet the receptionist. Right now.</h2>
     <!-- Speech bubble -->
@@ -568,15 +613,15 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 
   <!-- Proof + professionalism next to the mascot: the recording, and exactly how the
        assistant is configured before it answers anything. -->
-  <div style="max-width:1000px;margin:96px auto 0;border-top:1px solid #22344E;padding-top:72px;display:flex;flex-wrap:wrap;gap:clamp(32px,5vw,64px);align-items:center;justify-content:center">
+  <div style="width:100%;max-width:1140px;margin:96px auto 0;border-top:1px solid #22344E;padding-top:72px;display:flex;flex-wrap:wrap;gap:clamp(32px,5vw,64px);align-items:center;justify-content:center">
     <div style="flex:0 1 300px;display:flex;flex-direction:column;align-items:center;gap:14px">
-      <video controls="controls" preload="metadata" playsInline="{{ true }}" poster="uploads/poster-demo-call.png" src="/api/video?clip=demo" onPlay="{{ trackDemoVideo }}" style="width:min(300px,80vw);aspect-ratio:9/16;border-radius:16px;border:1px solid #22344E;background:#08131F;box-shadow:0 18px 44px rgba(0,0,0,0.35);display:block;object-fit:cover"></video>
+      <video controls="controls" preload="metadata" playsInline="{{ true }}" src="/api/video?clip=demo" onPlay="{{ trackDemoVideo }}" style="width:min(300px,80vw);aspect-ratio:9/16;border-radius:16px;border:1px solid #22344E;background:#08131F;box-shadow:0 18px 44px rgba(0,0,0,0.35);display:block;object-fit:cover"></video>
       <div style="font-size:13px;color:#8A9BB5;text-align:center;line-height:1.6;max-width:300px;text-wrap:pretty">A recorded call, start to finish: answered, questions handled, appointment booked.</div>
     </div>
     <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:18px;text-align:left">
       <h3 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.2rem,2.6vw,1.5rem);letter-spacing:-0.02em;margin:0;color:#FAF9F6">What we configure before it answers a single call</h3>
       <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;font-size:14.5px;line-height:1.6;color:#B9C4D4">
-        <li style="display:flex;gap:12px"><span aria-hidden="true" style="color:#0F8B80">•</span>Your services and your insurance list, answered in your own words — not a generic script.</li>
+        <li style="display:flex;gap:12px"><span aria-hidden="true" style="color:#0F8B80">•</span>Your services and your insurance list, answered in your own words, not a generic script.</li>
         <li style="display:flex;gap:12px"><span aria-hidden="true" style="color:#0F8B80">•</span>Your calendar rules: which slots it can offer, how far ahead it may book, what it must never book.</li>
         <li style="display:flex;gap:12px"><span aria-hidden="true" style="color:#0F8B80">•</span>Escalation: anything outside the script becomes a message flagged for your staff, never a guess.</li>
         <li style="display:flex;gap:12px"><span aria-hidden="true" style="color:#0F8B80">•</span>Tested with you against real call scenarios before go-live. Nothing goes live that you haven't heard.</li>
@@ -586,8 +631,8 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 </section>
 
 <!-- ================= 8. PRICING ================= -->
-<section id="pricing" style="background:#FAF9F6;padding:160px 24px">
-  <div data-reveal="" style="max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:48px">
+<section id="pricing" data-section="pricing" style="background:#FAF9F6;padding:160px clamp(20px,4vw,48px)">
+  <div data-reveal="" style="width:100%;max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:48px">
     <div style="text-align:center;display:flex;flex-direction:column;gap:12px;max-width:640px;margin:0 auto">
       <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0">Simple pricing. No surprises.</h2>
       <p style="font-size:15px;color:#5A6E86;margin:0;text-wrap:pretty">One setup fee. Usage billed at cost on your own account. Everything monthly is optional.</p>
@@ -615,7 +660,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:15px;color:#0A1A2F;border-bottom:1px solid #EEEAE0;padding-bottom:14px"><span>Google Calendar integration</span><span style="font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">$149<span style="font-weight:400;color:#8A93A1;font-size:13px">/mo</span></span></div>
             <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:15px;color:#0A1A2F;border-bottom:1px solid #EEEAE0;padding-bottom:14px"><span>Practice-management (PMS) integration</span><span style="font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">$299<span style="font-weight:400;color:#8A93A1;font-size:13px">/mo</span></span></div>
           </div>
-          <div style="font-size:13px;color:#5A6E86;line-height:1.6;text-wrap:pretty">What you're paying for is the ongoing service, not the integration. Optional, no minimum term, cancel anytime. Skip the plan entirely and Google Calendar setup is still included with your setup fee — your receptionist keeps answering either way.</div>
+          <div style="font-size:13px;color:#5A6E86;line-height:1.6;text-wrap:pretty">What you're paying for is the ongoing service, not the integration. Optional, no minimum term, cancel anytime. Skip the plan entirely and Google Calendar setup is still included with your setup fee, and your receptionist keeps answering either way.</div>
         </div>
       </div>
       <!-- Risk reversal: this is the load-bearing line of the pricing section, not a footnote. -->
@@ -625,7 +670,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       </div>
       <div style="display:flex;flex-direction:column;gap:14px">
         <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" onClick="{{ trackCalendlyPricing }}" style="display:block;text-align:center;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:17px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Claim your practice audit slot</a>
-        <div style="font-size:12.5px;color:#8A93A1;line-height:1.6;text-align:center;font-variant-numeric:tabular-nums">Free 20-minute call. Ask about the split start on it — no paperwork, just say the word.</div>
+        <div style="font-size:12.5px;color:#8A93A1;line-height:1.6;text-align:center;font-variant-numeric:tabular-nums">Free 20-minute call. Ask about the split start on it. No paperwork, just say the word.</div>
       </div>
       <div ref="{{ glareRef }}" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;opacity:0.15;border-radius:24px"></div>
     </div>
@@ -633,8 +678,8 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 </section>
 
 <!-- ================= 9. FAQ ================= -->
-<section id="faq" style="background:#FFFFFF;padding:150px 24px;border-top:1px solid #EEEAE0">
-  <div data-reveal="" style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:8px">
+<section id="faq" data-section="faq" style="background:#FFFFFF;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+  <div data-reveal="" style="width:100%;max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:8px">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0 0 40px;text-align:center">Questions owners ask</h2>
     <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="9">
       <div style="border-bottom:1px solid #EEEAE0">
@@ -650,8 +695,8 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 </section>
 
 <!-- ================= 10. FINAL + FOOTER ================= -->
-<section style="background:#0A1A2F;color:#FAF9F6;padding:160px 24px 0">
-  <div data-reveal="" style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;padding-bottom:90px">
+<section data-section="final" style="background:#0A1A2F;color:#FAF9F6;padding:160px clamp(20px,4vw,48px) 0">
+  <div data-reveal="" style="width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;padding-bottom:90px">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2rem,5vw,3rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">Every call answered. Every opening filled.</h2>
     <p style="font-size:16px;color:#B9C4D4;margin:0;font-variant-numeric:tabular-nums">$2,000 one-time setup. Every call answered from day one.</p>
     <button onClick="{{ openBookingFinal }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,0.3)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
@@ -670,27 +715,43 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   </div>
 
   <!-- ================= FOUNDER ================= -->
-  <!-- BENNY: this block is written only from what is already true and public on this site —
-       one operator, direct contact, no client or usage claims. Replace the monogram with a
-       real photo (drop it in uploads/ and swap the img in) and rewrite the two sentences in
-       your own words: why you built this. Do not add results, client counts or testimonials
-       until they are real. -->
-  <div data-reveal="" style="max-width:640px;margin:0 auto;padding-bottom:120px">
-    <div style="background:rgba(250,249,246,0.04);border:1px solid #22344E;border-radius:18px;padding:clamp(26px,4vw,36px);display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
-      <div aria-hidden="true" style="width:64px;height:64px;flex-shrink:0;border-radius:50%;background:#0F8B80;color:#FAF9F6;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:26px;font-weight:600">B</div>
-      <div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:12px">
-        <div>
-          <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;color:#FAF9F6">Built by Benny — meet the founder</div>
-          <div style="font-size:12.5px;letter-spacing:0.08em;text-transform:uppercase;color:#5A6E86;margin-top:4px">Founder, Digi Dental</div>
+  <!-- Portrait + overlapping note, adapted from the profile-card pattern into this page's
+       own markup and palette. BENNY: the photo is uploads/profile.jpg. Until that file
+       exists the card falls back to the monogram automatically, so nothing ever renders broken. -->
+  <div data-reveal="" class="dd-wrap" style="padding-bottom:120px">
+    <div class="dd-founder">
+      <div class="dd-founder-photo">
+        <sc-if value="{{ founderPhotoOn }}" hint-placeholder-val="{{ true }}">
+          <img id="founder-photo" alt="Benny, founder of Digi Dental" width="470" height="470" style="width:100%;height:100%;object-fit:cover;display:block">
+        </sc-if>
+        <sc-if value="{{ founderMonogramOn }}" hint-placeholder-val="{{ false }}">
+          <div aria-hidden="true" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0F8B80;color:#FAF9F6;font-family:'Fraunces',serif;font-size:96px;font-weight:600">B</div>
+        </sc-if>
+      </div>
+      <div class="dd-founder-card">
+        <div style="margin-bottom:18px">
+          <div style="font-family:'Fraunces',serif;font-size:clamp(1.4rem,2.6vw,1.75rem);font-weight:600;letter-spacing:-0.02em;color:#0A1A2F">Built by Benny</div>
+          <div style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#8A93A1;margin-top:6px">Founder, Digi Dental</div>
         </div>
-        <p style="margin:0;font-size:15px;line-height:1.7;color:#B9C4D4;text-wrap:pretty">Digi Dental is a one-person shop, on purpose. I build and tune every receptionist myself — your script, your insurance list, your calendar — and when something needs changing you message me, not a support queue. The demo above is the same system I'd configure for your practice; that's the whole pitch, and it's why I'd rather you try it than take my word for it.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:13.5px">
-          <a href="https://wa.me/351912859130" target="_blank" rel="noopener" style="color:#0F8B80">WhatsApp me directly</a>
-          <a href="mailto:bennysworkspace@gmail.com" style="color:#0F8B80">bennysworkspace@gmail.com</a>
+        <p style="margin:0 0 24px;font-size:15.5px;line-height:1.75;color:#3D4F66;text-wrap:pretty">Digi Dental is a one-person shop, on purpose. I build and tune every receptionist myself: your script, your insurance list, your calendar. When something needs changing you message me, not a support queue. The demo above is the same system I would configure for your practice, which is why I would rather you try it than take my word for it.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px">
+          <a href="https://wa.me/351912859130" target="_blank" rel="noopener" onClick="{{ trackFounderWhatsapp }}" aria-label="WhatsApp Benny" title="WhatsApp" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="#FAF9F6" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.87 9.87 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.25-4.35c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.83 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.2-8.24 8.2Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07s.89 2.4 1.02 2.56c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.22-.17-.47-.29Z"></path></svg>
+          </a>
+          <a href="mailto:bennysworkspace@gmail.com" onClick="{{ trackFounderEmail }}" aria-label="Email Benny" title="Email" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FAF9F6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"></rect><path d="m3 6.5 9 6.5 9-6.5"></path></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/ceobenny/" target="_blank" rel="noopener" onClick="{{ trackFounderLinkedin }}" aria-label="Benny on LinkedIn" title="LinkedIn" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="#FAF9F6" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5ZM3 9.75h4v10.75H3V9.75Zm6.5 0h3.83v1.47h.05c.53-1 1.84-2.06 3.78-2.06 4.04 0 4.79 2.66 4.79 6.12v5.22h-4v-4.63c0-1.1-.02-2.53-1.54-2.53-1.54 0-1.78 1.2-1.78 2.45v4.71h-4V9.75Z"></path></svg>
+          </a>
+          <a href="https://bennys-portfolio.vercel.app/" target="_blank" rel="noopener" onClick="{{ trackFounderPortfolio }}" aria-label="Benny's portfolio" title="Portfolio" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FAF9F6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"></circle><path d="M2.9 12h18.2M12 2.8c2.3 2.5 3.6 5.8 3.6 9.2s-1.3 6.7-3.6 9.2c-2.3-2.5-3.6-5.8-3.6-9.2s1.3-6.7 3.6-9.2Z"></path></svg>
+          </a>
         </div>
       </div>
     </div>
   </div>
+
   <footer style="border-top:1px solid #22344E;max-width:1080px;margin:0 auto;padding:64px clamp(20px,5vw,32px) 28px;display:flex;flex-direction:column;gap:44px">
     <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:44px">
       <div style="display:flex;flex-direction:column;gap:14px;max-width:280px">
@@ -829,14 +890,14 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
            the markets you sell into, (3) governing law / entity name, deliberately left out
            here rather than invented. Keep the "no certification" posture in any rewrite. -->
       <div style="font-size:14px;line-height:1.75;color:#3D4F66;display:flex;flex-direction:column;gap:16px">
-        <p style="margin:0;color:#8A93A1;font-size:12.5px">Last updated 6 August 2026. Digi Dental is a business-to-business service for dental practices. If you are a patient of a practice that uses Digi Dental, contact that practice directly about your records — we do not hold them.</p>
+        <p style="margin:0;color:#8A93A1;font-size:12.5px">Last updated 6 August 2026. Digi Dental is a business-to-business service for dental practices. If you are a patient of a practice that uses Digi Dental, contact that practice directly about your records, as we do not hold them.</p>
         <p style="margin:0"><strong>What we collect.</strong> What you type into the form on this page: your name, practice name, email, phone, country, rough monthly call volume, and number of locations. Nothing more, and nothing you haven't typed.</p>
-        <p style="margin:0"><strong>Demo calls.</strong> The in-browser demo is a live call: your microphone audio is streamed to the third-party voice-AI platform that powers the conversation, processed there under that platform's own security and data-processing terms, and used to generate the assistant's replies. Demo calls are capped at 60 seconds. Please don't share patient, health, or payment information during the demo — the assistant is not configured to receive it, and neither are we.</p>
+        <p style="margin:0"><strong>Demo calls.</strong> The in-browser demo is a live call: your microphone audio is streamed to the third-party voice-AI platform that powers the conversation, processed there under that platform's own security and data-processing terms, and used to generate the assistant's replies. Demo calls are capped at 60 seconds. Please don't share patient, health, or payment information during the demo. The assistant is not configured to receive it, and neither are we.</p>
         <p style="margin:0"><strong>Demo limits and your IP address.</strong> The free demo is one per visitor. To enforce that without keeping a record of who you are, we store a one-way salted hash of your IP address, never the address itself, and the hash cannot be reversed back into an IP.</p>
-        <p style="margin:0"><strong>Usage measurement.</strong> We record anonymous events about how this page is used — for example that a demo was started, that a section was viewed, or which button was clicked — together with a coarse timestamp. These events carry no name, email, cookie, or advertising identifier, and are used only to understand which parts of the page work.</p>
+        <p style="margin:0"><strong>Usage measurement.</strong> We record anonymous events about how this page is used: for example that a demo was started, that a section was viewed, or which button was clicked, together with a coarse timestamp. These events carry no name, email, cookie, or advertising identifier, and are used only to understand which parts of the page work.</p>
         <p style="margin:0"><strong>Who else touches it.</strong> We use a small number of established service providers to run this: a voice-AI platform (live call audio), a hosted database (your form details and usage events), an email delivery service (so your enquiry reaches our inbox), a hosting provider (serving this page), and a scheduling tool (booking your strategy call). Each processes data only to provide its part of the service. We do not sell your information, we do not share it for advertising, and we run no advertising trackers on this page.</p>
         <p style="margin:0"><strong>How long we keep it.</strong> Enquiry details are kept while we're in touch and for as long as we may need them to answer you. Ask us to delete them and we delete them.</p>
-        <p style="margin:0"><strong>Your choices.</strong> Email us to see what we hold, correct it, or have it deleted. One message is enough — there is no form to fill in.</p>
+        <p style="margin:0"><strong>Your choices.</strong> Email us to see what we hold, correct it, or have it deleted. One message is enough, and there is no form to fill in.</p>
         <p style="margin:0"><strong>Working with your practice.</strong> When we set up a receptionist for a practice, how call data is handled is agreed in writing with that practice before go-live, including a BAA or data-processing agreement where the practice requires one. This page's policy covers this website and its demo only.</p>
         <p style="margin:0"><strong>Contact.</strong> <a href="mailto:bennysworkspace@gmail.com">bennysworkspace@gmail.com</a> · <a href="https://wa.me/351912859130" target="_blank" rel="noopener">WhatsApp +351 912 859 130</a></p>
       </div>
@@ -864,9 +925,9 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <p style="margin:0;color:#8A93A1;font-size:12.5px">Last updated 6 August 2026. These terms cover the setup service sold on this page. Anything agreed in writing with your practice takes precedence over what's here.</p>
         <p style="margin:0"><strong>What the setup fee covers.</strong> $2,000, one-time: the voice assistant configured to your practice, Google Calendar setup so appointments are written directly, call scripting for your services and insurance list, and testing, tuning and go-live. One practice location unless we agree otherwise in writing.</p>
         <p style="margin:0"><strong>Split start.</strong> On request, setup begins with $1,000. If the receptionist books a real patient appointment into your calendar within 14 days of go-live, the remaining $1,000 falls due, completing the standard $2,000 setup fee. If it does not, the balance is not owed.</p>
-        <p style="margin:0"><strong>Go-live timeline.</strong> Your receptionist is normally live within 7 days of the onboarding call. The 7 days start once we have what we need from you: your services list, your insurance list, and calendar access. Delays caused by waiting on those, or by a third party we don't control (your phone carrier or practice-management vendor), pause the clock — we'll tell you in writing when that happens and why.</p>
+        <p style="margin:0"><strong>Go-live timeline.</strong> Your receptionist is normally live within 7 days of the onboarding call. The 7 days start once we have what we need from you: your services list, your insurance list, and calendar access. Delays caused by waiting on those, or by a third party we don't control (your phone carrier or practice-management vendor), pause the clock, and we'll tell you in writing when that happens and why.</p>
         <p style="margin:0"><strong>Usage.</strong> Voice-AI usage is billed at cost on the practice's own platform account, typically $0.10–$0.15 per minute of live conversation. Digi Dental applies no markup and never bills you for usage.</p>
-        <p style="margin:0"><strong>Care plans.</strong> Ongoing care plans ($149/month for Google Calendar integration, $299/month for practice-management integration) cover monitoring, updates, and ongoing script refinement. Optional, no minimum term, cancel anytime effective at the end of the current billing month. Without a plan, Google Calendar setup remains included in the setup fee and the receptionist keeps running — we simply stop actively tuning it.</p>
+        <p style="margin:0"><strong>Care plans.</strong> Ongoing care plans ($149/month for Google Calendar integration, $299/month for practice-management integration) cover monitoring, updates, and ongoing script refinement. Optional, no minimum term, cancel anytime effective at the end of the current billing month. Without a plan, Google Calendar setup remains included in the setup fee and the receptionist keeps running, we simply stop actively tuning it.</p>
         <p style="margin:0"><strong>What we need from you.</strong> Accurate service and insurance information, calendar access, and a named person who can approve the script. The assistant answers from what you give us; if the underlying information is wrong, its answers will be too.</p>
         <p style="margin:0"><strong>What this is not.</strong> Digi Dental sets up an AI receptionist. It is not a dental practice, gives no clinical or diagnostic advice, and is not an emergency service. Your scripts must direct urgent callers to appropriate care, and the practice remains responsible for the clinical and regulatory side of every patient interaction.</p>
         <p style="margin:0"><strong>Availability.</strong> The receptionist runs on third-party voice and telephony infrastructure. We monitor it and fix what we can, but we can't guarantee those platforms never have an outage, and the practice should keep its existing phone path in place as a fallback.</p>
@@ -911,6 +972,7 @@ class Component extends DCLogic {
     calcSize: '1', calcCalls: '20', calcValue: '850', faqOpen: -1,
     modal: null, // null | 'booking' | 'privacy' | 'terms' | 'exit'
     step: 0, bName: '', bPractice: '', bCountry: '', bVolume: '', bLocations: '', bEmail: '', bPhone: '',
+    founderPhotoOk: false, // flipped true only once uploads/profile.jpg has actually loaded
     bWebsite: '', // honeypot — must stay empty; anything in it means a bot filled the form
     formError: '', shake: false,
     toothy: 'idle', // idle | connecting | live | ended | limited
@@ -945,6 +1007,7 @@ class Component extends DCLogic {
   SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_MWPe84PkAw7Zo1T_MMvlFg_ppAOL';
 
   CALENDLY_URL = 'https://calendly.com/digidental/digi-dental-inquiry';
+  FOUNDER_PHOTO = 'uploads/profile.jpg';
 
   // Analytics (BUG-12). Events always go first-party to /api/event. Plausible and GA4 are
   // optional extras: set PLAUSIBLE_DOMAIN to the live domain to load Plausible automatically,
@@ -966,6 +1029,11 @@ class Component extends DCLogic {
     this._timers = [];
     this.initAnalytics();
     Object.values(this.FRAMES).forEach(src => { const im = new Image(); im.src = src; }); // preload sprite frames
+    // Founder portrait: probed in JS so a missing file never renders a broken image, and never
+    // fires a request during the raw-HTML pass. Drop the photo at uploads/profile.jpg.
+    const fp = new Image();
+    fp.onload = () => this.setState({ founderPhotoOk: true });
+    fp.src = this.FOUNDER_PHOTO;
 
     this._mq = window.matchMedia('(prefers-reduced-motion: reduce)'); // useReducedMotion equivalent, live-updating
     this._reduced = this._mq.matches;
@@ -1107,6 +1175,76 @@ class Component extends DCLogic {
         this._hio.observe(hero);
       }
     }
+
+    this._t0 = Date.now();
+    this.track('page_view', {
+      referrer_host: (() => { try { return document.referrer ? new URL(document.referrer).hostname : 'direct'; } catch (e) { return 'direct'; } })(),
+      viewport: window.innerWidth < 768 ? 'mobile' : (window.innerWidth < 1200 ? 'tablet' : 'desktop'),
+      utm: location.search.slice(0, 200)
+    });
+
+    // Scroll depth: how far down the page people actually get, once per threshold.
+    this._depth = {}; this._maxDepth = 0;
+    this._onDepth = () => {
+      const doc = document.documentElement;
+      const pct = Math.min(100, Math.round(((window.scrollY + window.innerHeight) / doc.scrollHeight) * 100));
+      if (pct > this._maxDepth) this._maxDepth = pct;
+      [25, 50, 75, 90].forEach(t => {
+        if (pct >= t && !this._depth[t]) { this._depth[t] = true; this.track('scroll_depth', { depth: t }); }
+      });
+    };
+    window.addEventListener('scroll', this._onDepth, { passive: true });
+
+    // Dwell time per section: which parts of the page hold attention. Accumulated while a
+    // section is at least half on screen, and sent as one event at the end of the visit.
+    this._dwell = {}; this._dwellFrom = {};
+    if ('IntersectionObserver' in window) {
+      this._sio = new IntersectionObserver(es => es.forEach(en => {
+        const name = en.target.getAttribute('data-section');
+        if (!name) return;
+        if (en.isIntersecting) { this._dwellFrom[name] = Date.now(); }
+        else if (this._dwellFrom[name]) {
+          this._dwell[name] = (this._dwell[name] || 0) + (Date.now() - this._dwellFrom[name]);
+          delete this._dwellFrom[name];
+        }
+      }), { threshold: 0.5 });
+      document.querySelectorAll('[data-section]').forEach(el => this._sio.observe(el));
+    }
+
+    // Video watch time: real seconds watched, plus quarter milestones per clip.
+    this._watch = {};
+    document.querySelectorAll('video').forEach((v, i) => {
+      const clip = i === 0 ? 'vsl' : 'demo_recording';
+      const w = this._watch[clip] = { seconds: 0, last: 0, marks: {} };
+      v.addEventListener('timeupdate', () => {
+        const d = v.currentTime - w.last;
+        if (d > 0 && d < 1.5) w.seconds += d; // ignore seeks
+        w.last = v.currentTime;
+        if (v.duration) {
+          const pct = Math.round((v.currentTime / v.duration) * 100);
+          [25, 50, 75, 95].forEach(t => {
+            if (pct >= t && !w.marks[t]) { w.marks[t] = true; this.track('video_progress', { clip, percent: t }); }
+          });
+        }
+      });
+      v.addEventListener('seeked', () => { w.last = v.currentTime; });
+    });
+
+    // One summary per visit, on the way out.
+    this._onLeave = () => {
+      if (this._left) return;
+      this._left = true;
+      Object.keys(this._dwellFrom).forEach(n => { this._dwell[n] = (this._dwell[n] || 0) + (Date.now() - this._dwellFrom[n]); });
+      const secs = o => Object.keys(o).reduce((a, k) => (a[k] = Math.round(o[k] / 1000), a), {});
+      this.track('section_time', secs(this._dwell));
+      Object.keys(this._watch).forEach(clip => {
+        const w = this._watch[clip];
+        if (w.seconds > 0.5) this.track('video_watch', { clip, seconds: Math.round(w.seconds) });
+      });
+      this.track('session_end', { seconds: Math.round((Date.now() - this._t0) / 1000), max_depth: this._maxDepth });
+    };
+    window.addEventListener('pagehide', this._onLeave);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') this._onLeave(); });
   }
 
   track(name, props) {
@@ -1212,7 +1350,9 @@ class Component extends DCLogic {
     document.removeEventListener('keydown', this._onKey);
     document.removeEventListener('mouseout', this._onMouseOut);
     if (this._mq && this._mq.removeEventListener) this._mq.removeEventListener('change', this._onMq);
-    [this._rio, this._cio, this._tio, this._hio].forEach(o => o && o.disconnect());
+    [this._rio, this._cio, this._tio, this._hio, this._sio].forEach(o => o && o.disconnect());
+    window.removeEventListener('scroll', this._onDepth);
+    window.removeEventListener('pagehide', this._onLeave);
     if (this._lpRaf) cancelAnimationFrame(this._lpRaf);
     if (this._lpCard) this._lpCard.remove();
     if (this._vapiPoll) clearInterval(this._vapiPoll);
@@ -1354,6 +1494,8 @@ class Component extends DCLogic {
       const src = this.FRAMES[this.currentFrame()];
       if (el.getAttribute('src') !== src) el.setAttribute('src', src);
     }
+    const fpEl = document.getElementById('founder-photo');
+    if (fpEl && fpEl.getAttribute('src') !== this.FOUNDER_PHOTO) fpEl.setAttribute('src', this.FOUNDER_PHOTO);
   }
 
   finishDemo() {
@@ -1376,7 +1518,7 @@ class Component extends DCLogic {
     'Pick a country to continue.',
     'Pick a rough call volume to continue.',
     'How many locations? Enter at least 1.',
-    'That email doesn’t look right — try something like you@practice.com.'
+    'That email doesn’t look right. Try something like you@practice.com.'
   ];
 
   valid(step) {
@@ -1493,7 +1635,7 @@ class Component extends DCLogic {
   CALC = {
     size:  { min: 1,   max: 10   },
     calls: { min: 5,   max: 200  },
-    value: { min: 300, max: 3000 }
+    value: { min: 50,  max: 3000 }
   };
 
   // Fields hold raw strings so a half-typed or momentarily empty box doesn't fight
@@ -1527,15 +1669,15 @@ class Component extends DCLogic {
     // NOTE FOR BENNY: the HIPAA answer and the contracts/data answer below make no
     // certification claims by design. Have your own counsel read both before launch.
     const faqData = [
-      { q: 'Is this HIPAA-compliant?', a: "Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We'll walk you through exactly how data flows on your strategy call — and we're happy to sign a BAA with the voice platform if your practice requires one." },
+      { q: 'Is this HIPAA-compliant?', a: "Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We'll walk you through exactly how data flows on your strategy call, and we're happy to sign a BAA with the voice platform if your practice requires one." },
       { q: "Will patients know it's AI?", a: "Some ask. The voice is natural enough that most don't. It never pretends to be human when asked directly. It says it's the practice's automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM." },
       { q: 'What does usage roughly cost monthly?', a: 'Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us, and nothing else is billed monthly unless you choose a care plan.' },
       { q: 'What if it mishears something, or books the wrong details?', a: "It confirms every detail that matters. Name, phone number, and appointment time are read back to the caller before anything is booked. If a caller needs something outside its script, it takes a message and flags it for your staff instead of guessing. And when something does slip through, it slips through where you can see it: the appointment sits in your calendar like any other, so your team fixes it in seconds and we tune the script so it doesn't happen twice." },
-      { q: 'How is this different from an answering service?', a: "An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list — every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier." },
+      { q: 'How is this different from an answering service?', a: "An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list, and every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier." },
       { q: 'Does it replace my front desk?', a: "No. It catches what they physically can't: after-hours calls, lunch rushes, the second line while they're checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself." },
-      { q: 'I use Dentrix, Eaglesoft or Open Dental — will this work?', a: "Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes — that's the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn't, Denty still books into a calendar your team already lives in." },
+      { q: 'Will this work with Dentrix, Eaglesoft or Open Dental?', a: "Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes. That is the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn't, Denty still books into a calendar your team already lives in." },
       { q: 'How fast is go-live?', a: 'Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access.' },
-      { q: 'Contracts, cancellation, and data?', a: "No long-term contract. The setup fee is one-time, and care plans cancel anytime — the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don't receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we'll have it in place before a single patient call is answered. Ask us to delete anything you've given us and it's deleted." }
+      { q: 'Contracts, cancellation, and data?', a: "No long-term contract. The setup fee is one-time, and care plans cancel anytime: the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don't receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we'll have it in place before a single patient call is answered. Ask us to delete anything you've given us and it's deleted." }
     ];
     const vols = ['<200', '200–500', '500–1,000', '1,000+'];
     return {
@@ -1601,6 +1743,13 @@ class Component extends DCLogic {
       trackCalendlyPricing: () => this.track('calendly_click', { location: 'pricing' }),
       trackCalendlyModal: () => this.track('calendly_click', { location: 'form_complete' }),
       trackCalendlyExit: () => this.track('calendly_click', { location: 'exit_intent' }),
+      // Founder card: the portrait swaps itself for the monogram if the file is not there yet.
+      founderPhotoOn: !!s.founderPhotoOk,
+      founderMonogramOn: !s.founderPhotoOk,
+      trackFounderWhatsapp: () => this.track('cta_click', { location: 'founder_whatsapp' }),
+      trackFounderEmail: () => this.track('cta_click', { location: 'founder_email' }),
+      trackFounderLinkedin: () => this.track('cta_click', { location: 'founder_linkedin' }),
+      trackFounderPortfolio: () => this.track('cta_click', { location: 'founder_portfolio' }),
       trackVsl: () => this.track('video_play', { clip: 'vsl' }),
       trackDemoVideo: () => this.track('video_play', { clip: 'demo_recording' }),
       openPrivacy: e => { e && e.preventDefault(); this.setState({ modal: 'privacy' }); },

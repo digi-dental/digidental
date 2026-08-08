@@ -78,6 +78,23 @@ complete→Calendly click (≥25%), form open→submit (≥40%, with per-step dr
 exit-intent conversion — have ready-to-run SQL in
 `supabase/migrations/002_site_events.sql`.
 
+## Admin dashboard
+`/admin.html` is a private traffic dashboard: visitors and sessions, the full funnel,
+click-through per button placement, dwell time per section, video watch seconds, scroll
+depth, countries, devices, referrers, the latest leads, and which broken links people hit.
+
+- **Set `ADMIN_PASSWORD`** in Vercel → Settings → Environment Variables. Until it is set,
+  `/api/stats` and `/api/admin-login` return 503 and the dashboard shows nothing. It never
+  falls open.
+- Signing in sets an HttpOnly, Secure, SameSite=Strict cookie holding an expiry plus an
+  HMAC of that expiry, valid 7 days. No session table, nothing a page script can read.
+  Login attempts are throttled per IP.
+- `/api/stats` aggregates server-side with the service-role key, so the browser never holds
+  a database credential and raw event rows never leave the server.
+- The page is `noindex` and disallowed in `robots.txt`, but that is tidiness, not security.
+  The password is the security.
+- Needs migrations `002` and `003` applied, otherwise there is nothing to read.
+
 ## Videos
 Both clips are served through `/api/video?clip=vsl|demo`, so the page carries no expiring
 token. The signed URLs hardcoded as a fallback in `api/video.ts` **expire 2027-07-24**.

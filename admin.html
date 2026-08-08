@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traffic | Digi Dental</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="theme-color" content="#FAF9F6">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Palette: brand teal stepped up to a chart-legal chroma, plus three hues far enough
+     apart to survive colour-blind vision. Validated against the six checks on this
+     surface: lightness band, chroma floor, CVD separation, normal-vision separation,
+     and contrast. Do not swap a hue without re-validating the set. */
+  :root{
+    --surface:#FFFFFF; --page:#FAF9F6; --line:#EDE9E0; --grid:#F3F0E9;
+    --ink:#0A1A2F; --ink-2:#3D4F66; --ink-3:#8A93A1;
+    --accent:#00A092; --accent-soft:#E4F4F1;
+    --cat-1:#00A092; --cat-2:#C2410C; --cat-3:#7C3AED; --cat-4:#BE185D;
+    --good:#2F7D5A; --bad:#B4453C;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important} /* class rules below set display, which would beat the hidden attribute */
+  body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.5}
+  a{color:var(--accent);text-decoration:none}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-0.02em;margin:0}
+  .wrap{max-width:1240px;margin:0 auto;padding:clamp(20px,3vw,36px)}
+  header.bar{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:28px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand img{width:30px;height:30px;image-rendering:pixelated}
+  .brand span{font-family:'Fraunces',serif;font-size:19px;font-weight:600}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .chip{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:border-color .2s,color .2s,background-color .2s}
+  .chip:hover{border-color:var(--accent);color:var(--ink)}
+  .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .ghost{border:none;background:none;color:var(--ink-3);font-size:13px;cursor:pointer;font-family:inherit;padding:8px}
+  .ghost:hover{color:var(--ink)}
+  .grid{display:grid;gap:16px}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+  .cols-2{grid-template-columns:1fr}
+  @media (min-width:900px){.cols-2{grid-template-columns:1fr 1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .card h2{font-size:16px;margin-bottom:2px}
+  .card .sub{font-size:12.5px;color:var(--ink-3);margin-bottom:18px}
+  .tile .label{font-size:12.5px;color:var(--ink-3);margin-bottom:8px}
+  .tile .value{font-family:'Fraunces',serif;font-size:34px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+  .tile .foot{font-size:12px;color:var(--ink-3);margin-top:8px;font-variant-numeric:tabular-nums}
+  /* Bars: capped thickness, 4px rounded data-end, square at the baseline, 2px of surface
+     between neighbours. The row label and value are always visible, so the chart is its
+     own table. */
+  .rows{display:flex;flex-direction:column;gap:12px}
+  .row{display:grid;grid-template-columns:minmax(90px,32%) 1fr auto;gap:12px;align-items:center}
+  .row .name{font-size:13px;color:var(--ink-2);overflow-wrap:anywhere}
+  .track{background:var(--grid);border-radius:0 4px 4px 0;height:14px;position:relative}
+  .fill{height:14px;border-radius:0 4px 4px 0;background:var(--accent);min-width:2px;transition:width .5s cubic-bezier(.22,1,.36,1)}
+  .row .val{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+  .cols{display:flex;align-items:flex-end;gap:2px;height:130px;border-bottom:1px solid var(--line);padding-top:8px}
+  .col{flex:1;min-width:0;background:var(--accent);border-radius:4px 4px 0 0;max-width:24px;margin:0 auto;transition:height .5s cubic-bezier(.22,1,.36,1)}
+  .colwrap{flex:1;display:flex;align-items:flex-end;justify-content:center;height:100%}
+  .axis{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-3);margin-top:8px;font-variant-numeric:tabular-nums}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:0 10px 10px 0;border-bottom:1px solid var(--line)}
+  td{padding:11px 10px 11px 0;border-bottom:1px solid var(--grid);color:var(--ink-2);vertical-align:top}
+  td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;font-size:12.5px;color:var(--ink-2)}
+  .key{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .empty{color:var(--ink-3);font-size:13px;padding:10px 0}
+  .login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .login .card{width:min(400px,100%);text-align:center}
+  .login input{width:100%;font-size:16px;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;margin:18px 0 12px;font-family:inherit;outline:none}
+  .login input:focus{border-color:var(--accent)}
+  .login button{width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+  .err{color:var(--bad);font-size:13px;min-height:18px;margin-top:10px}
+  .note{font-size:12px;color:var(--ink-3);margin-top:26px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="login" id="login" hidden>
+  <div class="card">
+    <img src="/uploads/denty_neutral.png" alt="" width="52" height="52" style="image-rendering:pixelated">
+    <h2 style="font-size:20px;margin-top:12px">Digi Dental traffic</h2>
+    <div class="sub" style="margin-bottom:0">Private dashboard.</div>
+    <form id="loginForm">
+      <input type="password" id="pw" placeholder="Password" autocomplete="current-password" aria-label="Password">
+      <button type="submit">Sign in</button>
+    </form>
+    <div class="err" id="loginErr" role="alert"></div>
+  </div>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header class="bar">
+    <div class="brand">
+      <img src="/uploads/denty_neutral.png" alt="">
+      <span>Digi <span style="color:var(--accent)">Dental</span></span>
+      <h1 style="font-size:19px;font-weight:500;color:var(--ink-3);margin-left:8px">Traffic</h1>
+    </div>
+    <div class="controls">
+      <button class="chip" data-days="7">7 days</button>
+      <button class="chip" data-days="30" aria-pressed="true">30 days</button>
+      <button class="chip" data-days="90">90 days</button>
+      <a class="ghost" href="/" target="_blank" rel="noopener">View site</a>
+      <button class="ghost" id="signout">Sign out</button>
+    </div>
+  </header>
+  <div id="report"></div>
+  <div class="note" id="stamp"></div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var days = 30, data = null;
+
+  var fmt = function (n) { return (n == null ? 0 : n).toLocaleString('en-US'); };
+  var pct = function (a, b) { return b ? Math.round((a / b) * 100) : 0; };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); };
+  var dur = function (s) { if (!s) return '0s'; return s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + (s % 60) + 's'; };
+  var COUNTRY = new Intl.DisplayNames(['en'], { type: 'region' });
+  var country = function (code) { try { return COUNTRY.of(code) || code; } catch (e) { return code; } };
+
+  function tile(label, value, foot) {
+    return '<div class="card tile"><div class="label">' + esc(label) + '</div>' +
+           '<div class="value">' + value + '</div>' +
+           (foot ? '<div class="foot">' + foot + '</div>' : '') + '</div>';
+  }
+
+  // One bar row: name, track, value. The value rides the row, so nothing is colour-only.
+  function bars(items, opt) {
+    opt = opt || {};
+    if (!items || !items.length) return '<div class="empty">Nothing recorded yet.</div>';
+    var max = Math.max.apply(null, items.map(function (i) { return i.value; })) || 1;
+    return '<div class="rows">' + items.map(function (i) {
+      var w = Math.max(2, Math.round((i.value / max) * 100));
+      return '<div class="row" title="' + esc(i.title || (i.name + ': ' + i.value)) + '">' +
+        '<div class="name">' + esc(i.name) + '</div>' +
+        '<div class="track"><div class="fill" style="width:' + w + '%;background:' + (i.color || 'var(--accent)') + '"></div></div>' +
+        '<div class="val">' + esc(i.display != null ? i.display : fmt(i.value)) + (opt.suffix || '') + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  function card(title, sub, body) {
+    return '<div class="card"><h2>' + esc(title) + '</h2><div class="sub">' + esc(sub) + '</div>' + body + '</div>';
+  }
+
+  function columns(series) {
+    var max = Math.max.apply(null, series.map(function (d) { return d.sessions; })) || 1;
+    var cols = series.map(function (d) {
+      var h = Math.max(2, Math.round((d.sessions / max) * 118));
+      return '<div class="colwrap" title="' + d.date + ': ' + d.sessions + ' sessions"><div class="col" style="height:' + h + 'px"></div></div>';
+    }).join('');
+    return '<div class="cols">' + cols + '</div><div class="axis"><span>' + series[0].date + '</span><span>peak ' + fmt(max) + '</span><span>' + series[series.length - 1].date + '</span></div>';
+  }
+
+  function render(d) {
+    var t = d.totals, r = [];
+
+    r.push('<div class="grid kpis" style="margin-bottom:16px">' +
+      tile('Visitors', fmt(t.visitors), fmt(t.sessions) + ' sessions, ' + fmt(t.page_views) + ' views') +
+      tile('Demo calls finished', fmt(t.demo_completes), fmt(t.demo_starts) + ' started, ' + pct(t.demo_completes, t.demo_starts) + '% completed') +
+      tile('Leads', fmt(t.leads), fmt(t.form_submits) + ' form submissions') +
+      tile('Calendly clicks', fmt(t.calendly_clicks), pct(t.calendly_clicks, t.sessions) + '% of sessions') +
+      tile('Typical visit', dur(t.median_seconds_on_page), 'median, ' + t.median_scroll_depth + '% scrolled') +
+    '</div>');
+
+    var f = d.funnel, top = (f[0] && f[0].sessions) || 1;
+    r.push('<div class="grid cols-2" style="margin-bottom:16px">' +
+      card('The funnel', 'Sessions reaching each step, out of ' + fmt(top) + '.',
+        bars(f.map(function (s) {
+          return { name: s.label, value: s.sessions, display: fmt(s.sessions) + '  ' + pct(s.sessions, top) + '%' };
+        }))) +
+      card('Sessions per day', 'Unique sessions, oldest on the left.', columns(d.daily)) +
+    '</div>');
+
+    r.push('<div class="grid cols-2" style="margin-bottom:16px">' +
+      card('Where the clicks go', 'Every button, by placement.',
+        bars(d.clicks.map(function (c) { return { name: c.label.replace(/_/g, ' '), value: c.events, title: c.label + ': ' + c.events + ' clicks from ' + c.sessions + ' sessions' }; }))) +
+      card('Where attention goes', 'Median seconds spent in each section.',
+        bars(d.sections.map(function (s) { return { name: s.label.replace(/_/g, ' '), value: s.median_seconds, display: dur(s.median_seconds) }; }))) +
+    '</div>');
+
+    var cats = ['var(--cat-1)', 'var(--cat-2)', 'var(--cat-3)', 'var(--cat-4)'];
+    r.push('<div class="grid cols-2" style="margin-bottom:16px">' +
+      card('Countries', 'Sessions by country, from edge geography.',
+        bars(d.countries.slice(0, 10).map(function (c) { return { name: country(c.label), value: c.sessions }; }))) +
+      card('Devices and sources', 'How people arrive.',
+        '<div class="legend">' + d.devices.map(function (dv, i) {
+          return '<span class="key"><span class="dot" style="background:' + cats[i % 4] + '"></span>' + esc(dv.label) + ' ' + pct(dv.sessions, t.sessions) + '%</span>';
+        }).join('') + '</div>' +
+        bars(d.devices.map(function (dv, i) { return { name: dv.label, value: dv.sessions, color: cats[i % 4] }; })) +
+        '<div class="sub" style="margin:20px 0 10px">Referrers</div>' +
+        bars(d.referrers.slice(0, 6).map(function (x) { return { name: x.label, value: x.sessions }; }))) +
+    '</div>');
+
+    r.push('<div class="grid cols-2" style="margin-bottom:16px">' +
+      card('Video watch time', 'Real seconds watched, and how far people get.',
+        d.clips.map(function (c, i) {
+          var name = c.clip === 'vsl' ? 'Hero sales letter' : 'Demo call recording';
+          return '<div style="margin-bottom:' + (i ? '0' : '22px') + '">' +
+            '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">' +
+              '<strong style="font-size:13.5px">' + name + '</strong>' +
+              '<span class="val" style="font-size:12.5px;color:var(--ink-3)">' + fmt(c.plays) + ' plays, median ' + dur(c.median_seconds) + ', ' + fmt(c.total_minutes) + ' min total</span>' +
+            '</div>' +
+            bars(c.marks.map(function (m) { return { name: 'watched ' + m.pct + '%', value: m.sessions }; })) +
+          '</div>';
+        }).join('')) +
+      card('How far people scroll', 'Sessions reaching each depth.',
+        bars(d.scroll.map(function (s) { return { name: 'past ' + s.label, value: s.sessions, display: fmt(s.sessions) + '  ' + pct(s.sessions, t.sessions) + '%' }; }))) +
+    '</div>');
+
+    r.push(card('Latest leads', fmt(d.leads.length) + ' shown, newest first. Bot submissions are excluded.',
+      d.leads.length ? '<div style="overflow-x:auto"><table><thead><tr><th>When</th><th>Name</th><th>Practice</th><th>Contact</th><th>Volume</th><th>Source</th></tr></thead><tbody>' +
+        d.leads.map(function (l) {
+          return '<tr><td class="num">' + new Date(l.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + '</td>' +
+            '<td>' + esc(l.name || '') + '</td><td>' + esc(l.practice_name || '') + '</td>' +
+            '<td>' + (l.email ? '<a href="mailto:' + esc(l.email) + '">' + esc(l.email) + '</a>' : '') + (l.phone ? '<br>' + esc(l.phone) : '') + '</td>' +
+            '<td class="num">' + esc(l.monthly_call_volume || '') + '</td><td>' + esc(l.source) + '</td></tr>';
+        }).join('') + '</tbody></table></div>'
+        : '<div class="empty">No leads in this range.</div>'));
+
+    if (d.broken_links && d.broken_links.length) {
+      r.push('<div style="margin-top:16px">' + card('Broken links hit', fmt(t.not_found) + ' visits landed on the 404 page.',
+        bars(d.broken_links.slice(0, 8).map(function (b) { return { name: b.label, value: b.events }; }))) + '</div>');
+    }
+
+    $('report').innerHTML = r.join('');
+    $('stamp').textContent = 'Last ' + d.range_days + ' days, built ' + new Date(d.generated_at).toLocaleString('en-GB') +
+      (d.truncated ? '. Row cap reached, older events in this range are not counted.' : '');
+  }
+
+  function load() {
+    fetch('/api/stats?days=' + days, { credentials: 'same-origin' })
+      .then(function (res) {
+        if (res.status === 401) { $('login').hidden = false; $('app').hidden = true; return null; }
+        return res.json();
+      })
+      .then(function (d) {
+        if (!d) return;
+        if (d.error) { $('report').innerHTML = '<div class="card"><div class="empty">' + esc(d.error) + '</div></div>'; $('app').hidden = false; return; }
+        data = d; $('login').hidden = true; $('app').hidden = false; render(d);
+      })
+      .catch(function () {
+        $('report').innerHTML = '<div class="card"><div class="empty">Could not reach the server. Try again in a moment.</div></div>';
+        $('app').hidden = false;
+      });
+  }
+
+  $('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    $('loginErr').textContent = '';
+    fetch('/api/admin-login', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: $('pw').value })
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.ok) { $('pw').value = ''; load(); }
+      else $('loginErr').textContent = (j && j.error) || 'Could not sign in.';
+    }).catch(function () { $('loginErr').textContent = 'Could not reach the server.'; });
+  });
+
+  $('signout').addEventListener('click', function () {
+    fetch('/api/admin-login', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ logout: true })
+    }).then(function () { location.reload(); });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) {
+    c.addEventListener('click', function () {
+      Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (o) { o.setAttribute('aria-pressed', 'false'); });
+      c.setAttribute('aria-pressed', 'true');
+      days = parseInt(c.dataset.days, 10);
+      load();
+    });
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>

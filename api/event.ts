@@ -18,7 +18,10 @@ const ALLOWED = new Set([
   'view_hero', 'cta_click', 'demo_start', 'demo_complete', 'demo_error', 'demo_blocked',
   'calc_interact', 'form_open', 'form_step_1', 'form_step_2', 'form_step_3', 'form_step_4',
   'form_step_5', 'form_submit', 'form_error', 'calendly_click', 'exit_intent_shown',
-  'exit_intent_demo', 'video_play'
+  'exit_intent_demo', 'video_play',
+  // Attention and reach, for the admin dashboard
+  'page_view', 'page_not_found', 'scroll_depth', 'section_time', 'video_progress',
+  'video_watch', 'session_end'
 ]);
 
 const MAX_BODY = 4000; // bytes — an event this big is not one of ours
@@ -40,13 +43,22 @@ export default async function handler(req: any, res: any) {
     const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
     const ipHash = createHash('sha256').update(ip + (process.env.IP_HASH_SALT || '')).digest('hex');
 
+    // Geography comes free from Vercel's edge headers, so no IP lookup and no third party.
+    // These are coarse (country/region/city), and the IP itself is still never stored.
+    const country = String(req.headers['x-vercel-ip-country'] || '').slice(0, 2).toUpperCase() || null;
+    const region = String(req.headers['x-vercel-ip-country-region'] || '').slice(0, 8) || null;
+    const city = (() => { try { return decodeURIComponent(String(req.headers['x-vercel-ip-city'] || '')).slice(0, 80) || null; } catch { return null; } })();
+    const ua = String(req.headers['user-agent'] || '');
+    const device = /Mobi|Android|iPhone/i.test(ua) ? 'mobile' : (/iPad|Tablet/i.test(ua) ? 'tablet' : 'desktop');
+
     await supabase.from('site_events').insert({
       event: String(event).slice(0, 64),
       props: props && typeof props === 'object' ? props : {},
       session_id: String(sid || '').slice(0, 64),
       path: String(path || '/').slice(0, 200),
       referrer: String(ref || '').slice(0, 300),
-      ip_hash: ipHash
+      ip_hash: ipHash,
+      country, region, city, device
     });
     return res.status(204).end(); // nothing for the page to do with a response
   } catch {

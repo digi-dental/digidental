@@ -15,11 +15,12 @@
 //   Vercel → Settings → Environment Variables. No redeploy of the page required.
 //
 // The hardcoded values below are the current signed URLs, kept only as a fallback so the
-// site keeps working until the env vars are set. They stop working on 2027-07-24.
+// site keeps working until the env vars are set. The hero clip's token expires 2027-07-24
+// and the demo clip's (denty-live.mp4) expires 2027-08-07.
 
 const FALLBACK: Record<string, string> = {
   vsl: 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/sign/digi_dental-VSL/digidental-vsl.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjgzNDRkYS1mNzlkLTQ5MzAtOWNhZC1hOTk1NzYzYzhmN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkaWdpX2RlbnRhbC1WU0wvZGlnaWRlbnRhbC12c2wubXA0Iiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NDkxNDUyNCwiZXhwIjoxODE2NDUwNTI0fQ.TWFTOKvssrZSkX1AcpxPX_Rp0a1Xt3aIqrxW_EzT-1s',
-  demo: 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/sign/digi_dental-VSL/Digi%20Dental.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjgzNDRkYS1mNzlkLTQ5MzAtOWNhZC1hOTk1NzYzYzhmN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkaWdpX2RlbnRhbC1WU0wvRGlnaSBEZW50YWwubXA0Iiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NDkxOTQzOCwiZXhwIjoxODE2NDU1NDM4fQ.um8KH5pV1tYwTwm-L_QizXkBjGp-iXW0kOtvAlTuAB4',
+  demo: 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/sign/digi_dental-VSL/denty-live.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjgzNDRkYS1mNzlkLTQ5MzAtOWNhZC1hOTk1NzYzYzhmN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkaWdpX2RlbnRhbC1WU0wvZGVudHktbGl2ZS5tcDQiLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg2MTMwMDk4LCJleHAiOjE4MTc2NjYwOTh9._-S3YdeRW-Kz7cdL8EwV731YmCu5sWbBfa8b_69W15U',
 };
 
 const ENV_VAR: Record<string, string> = { vsl: 'VIDEO_VSL_URL', demo: 'VIDEO_DEMO_URL' };

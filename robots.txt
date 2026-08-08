@@ -1,4 +1,4 @@
-# Digi Dental — https://digidental.vercel.app
+# Digi Dental, https://digidental.vercel.app
 # AI receptionist for dental practices.
 # Policy: open to search engines and AI assistants. We want to be quoted,
 # summarised and cited. Structured summary for LLMs: /llms.txt and /api/site-info
@@ -31,7 +31,7 @@ User-agent: Applebot
 Allow: /
 
 # ---------------------------------------------------------------------------
-# AI assistants, answer engines and model crawlers — explicitly welcome.
+# AI assistants, answer engines and model crawlers are explicitly welcome.
 # Named individually because several ignore wildcard rules.
 # ---------------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ Allow: /
 User-agent: DuckAssistBot
 Allow: /
 
-# Common Crawl — feeds many open models
+# Common Crawl, feeds many open models
 User-agent: CCBot
 Allow: /
 
@@ -117,4 +117,9 @@ User-agent: Kagibot
 Allow: /
 
 # ---------------------------------------------------------------------------
+User-agent: *
+Disallow: /admin.html
+Disallow: /api/stats
+Disallow: /api/admin-login
+
 Sitemap: https://digidental.vercel.app/sitemap.xml

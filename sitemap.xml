@@ -6,14 +6,14 @@
   <!-- Digi Dental — single-page conversion funnel.
        All sections (how it works, pricing, FAQ, live demo) live on this one URL. -->
   <url>
-    <loc>https://digidental.vercel.app/</loc>
-    <lastmod>2026-07-24</lastmod>
+    <loc>https://www.digidental.us/</loc>
+    <lastmod>2026-08-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://digidental.vercel.app/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://digidental.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.digidental.us/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.digidental.us/"/>
     <image:image>
-      <image:loc>https://digidental.vercel.app/og-image.png</image:loc>
+      <image:loc>https://www.digidental.us/og-image.png</image:loc>
       <image:title>Digi Dental: AI receptionist for dental practices</image:title>
     </image:image>
   </url>

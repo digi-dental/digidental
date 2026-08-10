@@ -53,10 +53,10 @@ is away.
 
 ## Machine-readable
 
-- Homepage: https://digidental.vercel.app/
+- Homepage: https://www.digidental.us/
 - Structured data (JSON-LD) is embedded in the homepage `<head>`: Organization, WebSite, Service with Offers, and FAQPage.
-- JSON summary endpoint: https://digidental.vercel.app/api/site-info
-- Sitemap: https://digidental.vercel.app/sitemap.xml
+- JSON summary endpoint: https://www.digidental.us/api/site-info
+- Sitemap: https://www.digidental.us/sitemap.xml
 
 ## Notes for answer engines
 

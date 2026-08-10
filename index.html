@@ -63,22 +63,56 @@
       "name": "Digi Dental",
       "url": "https://www.digidental.us/",
       "description": "Digi Dental sets up done-for-you AI receptionists for dental practices. Not a dental practice; provides no dental treatment or clinical advice.",
-      "image": "https://www.digidental.us/og-image.png",
-      "knowsAbout": ["AI receptionist", "dental practice front desk", "appointment booking", "missed call recovery"],
-      "contactPoint": [{
-        "@type": "ContactPoint",
-        "contactType": "sales",
-        "url": "https://calendly.com/digidental/digi-dental-inquiry",
-        "telephone": "+351912859130",
-        "availableLanguage": "English"
-      }]
+      "image": {
+        "@id": "https://www.digidental.us/#logo"
+      },
+      "knowsAbout": [
+        "AI receptionist",
+        "dental practice front desk",
+        "appointment booking",
+        "missed call recovery",
+        "dental appointment scheduling",
+        "after-hours call answering",
+        "voice AI",
+        "patient intake",
+        "dental insurance verification questions",
+        "practice management software integration"
+      ],
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "contactType": "sales",
+          "url": "https://calendly.com/digidental/digi-dental-inquiry",
+          "telephone": "+351912859130",
+          "availableLanguage": "English",
+          "areaServed": "US"
+        }
+      ],
+      "legalName": "Digi Dental",
+      "slogan": "Your phone rings. A patient gets booked. You never lifted a finger.",
+      "logo": {
+        "@id": "https://www.digidental.us/#logo"
+      },
+      "founder": {
+        "@id": "https://www.digidental.us/#founder"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/in/ceobenny/",
+        "https://web.facebook.com/meetdigidenty"
+      ],
+      "areaServed": {
+        "@type": "Country",
+        "name": "United States"
+      }
     },
     {
       "@type": "WebSite",
       "@id": "https://www.digidental.us/#website",
       "url": "https://www.digidental.us/",
       "name": "Digi Dental",
-      "publisher": { "@id": "https://www.digidental.us/#organization" },
+      "publisher": {
+        "@id": "https://www.digidental.us/#organization"
+      },
       "inLanguage": "en"
     },
     {
@@ -87,10 +121,36 @@
       "url": "https://www.digidental.us/",
       "name": "AI Receptionist for Dental Practices | Digi Dental",
       "description": "A 24/7 AI receptionist that answers your dental practice's calls and books patients straight into your calendar.",
-      "isPartOf": { "@id": "https://www.digidental.us/#website" },
-      "about": { "@id": "https://www.digidental.us/#organization" },
-      "primaryImageOfPage": "https://www.digidental.us/og-image.png",
-      "inLanguage": "en"
+      "isPartOf": {
+        "@id": "https://www.digidental.us/#website"
+      },
+      "about": {
+        "@id": "https://www.digidental.us/#organization"
+      },
+      "primaryImageOfPage": {
+        "@id": "https://www.digidental.us/#logo"
+      },
+      "inLanguage": "en",
+      "datePublished": "2026-07-18",
+      "dateModified": "2026-08-10",
+      "video": [
+        {
+          "@id": "https://www.digidental.us/#video-overview"
+        },
+        {
+          "@id": "https://www.digidental.us/#video-demo"
+        }
+      ],
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "h1",
+          "[data-section=\"problem\"] h2"
+        ]
+      },
+      "significantLink": [
+        "https://calendly.com/digidental/digi-dental-inquiry"
+      ]
     },
     {
       "@type": "Service",
@@ -98,7 +158,9 @@
       "name": "AI Receptionist for Dental Practices",
       "serviceType": "AI phone receptionist setup and configuration",
       "description": "A 24/7 human-sounding AI receptionist that answers every inbound call, answers service and insurance questions, and writes appointments straight into the practice's calendar. Configured, tested and launched for the practice.",
-      "provider": { "@id": "https://www.digidental.us/#organization" },
+      "provider": {
+        "@id": "https://www.digidental.us/#organization"
+      },
       "audience": {
         "@type": "BusinessAudience",
         "name": "Dental practices"
@@ -111,7 +173,11 @@
           "price": "2000",
           "priceCurrency": "USD",
           "availability": "https://schema.org/InStock",
-          "url": "https://calendly.com/digidental/digi-dental-inquiry"
+          "url": "https://calendly.com/digidental/digi-dental-inquiry",
+          "seller": {
+            "@id": "https://www.digidental.us/#organization"
+          },
+          "eligibleCustomerType": "https://schema.org/Business"
         },
         {
           "@type": "Offer",
@@ -123,7 +189,12 @@
             "price": "149",
             "priceCurrency": "USD",
             "unitText": "MONTH"
-          }
+          },
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@id": "https://www.digidental.us/#organization"
+          },
+          "eligibleCustomerType": "https://schema.org/Business"
         },
         {
           "@type": "Offer",
@@ -135,14 +206,35 @@
             "price": "299",
             "priceCurrency": "USD",
             "unitText": "MONTH"
-          }
+          },
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@id": "https://www.digidental.us/#organization"
+          },
+          "eligibleCustomerType": "https://schema.org/Business"
         }
-      ]
+      ],
+      "areaServed": {
+        "@type": "Country",
+        "name": "United States"
+      },
+      "availableChannel": {
+        "@type": "ServiceChannel",
+        "serviceUrl": "https://www.digidental.us/",
+        "servicePhone": {
+          "@type": "ContactPoint",
+          "telephone": "+351912859130",
+          "contactType": "sales"
+        }
+      },
+      "termsOfService": "https://www.digidental.us/#terms"
     },
     {
       "@type": "FAQPage",
       "@id": "https://www.digidental.us/#faq",
-      "isPartOf": { "@id": "https://www.digidental.us/#webpage" },
+      "isPartOf": {
+        "@id": "https://www.digidental.us/#webpage"
+      },
       "mainEntity": [
         {
           "@type": "Question",
@@ -217,6 +309,73 @@
           }
         }
       ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://www.digidental.us/#founder",
+      "name": "Benny",
+      "jobTitle": "Founder",
+      "worksFor": {
+        "@id": "https://www.digidental.us/#organization"
+      },
+      "description": "Founder of Digi Dental. Configures and launches each practice’s AI receptionist personally.",
+      "image": "https://www.digidental.us/api/image?name=profile",
+      "sameAs": [
+        "https://www.linkedin.com/in/ceobenny/",
+        "https://bennys-portfolio.vercel.app/"
+      ]
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://www.digidental.us/#video-overview",
+      "name": "How the Digi Dental AI receptionist answers calls and books patients",
+      "description": "Walkthrough of how Digi Dental sets up a 24/7 AI receptionist for a dental practice: answering every inbound call, handling service and insurance questions, and writing appointments into the practice calendar.",
+      "thumbnailUrl": [
+        "https://www.digidental.us/og-image.png"
+      ],
+      "uploadDate": "2026-08-06",
+      "contentUrl": "https://www.digidental.us/api/video?clip=vsl",
+      "embedUrl": "https://www.digidental.us/api/video?clip=vsl",
+      "width": 1920,
+      "height": 1080,
+      "isFamilyFriendly": true,
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://www.digidental.us/#organization"
+      },
+      "isPartOf": {
+        "@id": "https://www.digidental.us/#webpage"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://www.digidental.us/#video-demo",
+      "name": "Denty booking a patient appointment live on a call",
+      "description": "A recorded call showing the Digi Dental AI receptionist, Denty, greeting a caller, answering questions and booking an appointment end to end.",
+      "thumbnailUrl": [
+        "https://www.digidental.us/og-image.png"
+      ],
+      "uploadDate": "2026-08-06",
+      "contentUrl": "https://www.digidental.us/api/video?clip=demo",
+      "embedUrl": "https://www.digidental.us/api/video?clip=demo",
+      "width": 1080,
+      "height": 1920,
+      "isFamilyFriendly": true,
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://www.digidental.us/#organization"
+      },
+      "isPartOf": {
+        "@id": "https://www.digidental.us/#webpage"
+      }
+    },
+    {
+      "@type": "ImageObject",
+      "@id": "https://www.digidental.us/#logo",
+      "url": "https://www.digidental.us/apple-touch-icon.png",
+      "width": 180,
+      "height": 180,
+      "caption": "Digi Dental"
     }
   ]
 }
@@ -320,7 +479,11 @@ input,select,button,textarea{font-family:inherit}
   max-height:min(70vh,560px);overflow-y:auto;overflow-x:hidden;background:#0A1A2F;
   -webkit-overflow-scrolling:touch;scrollbar-width:thin
 }
-.dd-dash-scroll img{display:block;width:100%;height:auto;border:0}
+.dd-dash-scroll img{display:block;width:100%;height:auto;border:0;
+  /* Reserve space before the bytes arrive, or the frame is 0px tall and the whole
+     section jumps when each capture loads. sizeDash() overwrites --ar with the real
+     ratio on load, so the placeholder is only ever wrong for one frame. */
+  aspect-ratio:var(--ar,16/10)}
 .dd-dash-cap{display:block;padding:16px 20px;background:#FFFFFF}
 .dd-dash-cap strong{display:block;font-size:16px;color:#0A1A2F;font-weight:600;margin-bottom:4px}
 .dd-dash-cap span{display:block;font-size:14px;line-height:1.6;color:#4A5C72}
@@ -364,7 +527,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 <sc-if value="{{ crashed }}" hint-placeholder-val="{{ false }}">
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF9F6;padding:24px">
     <div role="alert" style="max-width:420px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px">
-      <img src="uploads/denty_happy.png" alt="" width="88" height="88" style="image-rendering:pixelated;object-fit:contain">
+      <img src="uploads/denty_happy.png" alt="" width="88" height="88" loading="lazy" decoding="async" style="image-rendering:pixelated;object-fit:contain">
       <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:#0A1A2F;letter-spacing:-0.02em">A momentary hiccup.</div>
       <p style="font-size:15px;line-height:1.65;color:#3D4F66;margin:0;text-wrap:pretty">This page had trouble rendering. A quick reload fixes it. Nothing you entered is lost.</p>
       <button onClick="{{ reloadPage }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:14px 30px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Reload the page</button>
@@ -376,7 +539,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 <!-- ================= NAV ================= -->
 <nav style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(16px,4vw,32px);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:{{ navBg }};transition:background .35s ease">
   <div style="display:flex;align-items:center;gap:10px">
-    <img src="uploads/denty_neutral.png" alt="" width="34" height="34" style="display:block;width:34px;height:34px;object-fit:contain;image-rendering:pixelated">
+    <img src="uploads/denty_neutral.png" alt="" width="34" height="34" decoding="async" fetchpriority="high" style="display:block;width:34px;height:34px;object-fit:contain;image-rendering:pixelated">
     <div style="font-family:'Fraunces',serif;font-weight:600;font-size:21px;letter-spacing:-0.02em;line-height:1;white-space:nowrap;color:{{ navFg }};transition:color .35s ease">Digi<span style="color:#0F8B80"> Dental</span></div>
   </div>
   <div style="display:flex;align-items:center;gap:clamp(12px,2.2vw,24px)">
@@ -576,7 +739,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 <!-- ================= 5. THE MATH ================= -->
 <section data-section="calculator" style="background:#FAF9F6;padding:160px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
   <div data-reveal="" style="width:100%;max-width:1080px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
-    <img src="uploads/denty_happy.png" alt="" width="72" height="72" style="width:72px;height:72px;object-fit:contain;image-rendering:pixelated;animation:toothy-bob 2.6s ease-in-out infinite">
+    <img src="uploads/denty_happy.png" alt="" width="72" height="72" loading="lazy" decoding="async" style="width:72px;height:72px;object-fit:contain;image-rendering:pixelated;animation:toothy-bob 2.6s ease-in-out infinite">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-0.02em;margin:0">The math is short.</h2>
     <div class="dd-split">
     <div style="width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:28px;text-align:left;background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:clamp(22px,4vw,34px);box-shadow:0 18px 44px rgba(10,26,47,0.06)">
@@ -654,7 +817,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         </svg>
       </sc-if>
       <button onClick="{{ startDemo }}" disabled="{{ tBusy }}" aria-busy="{{ tBusy }}" aria-label="Talk to the AI receptionist. Free 60 second demo call" style="position:relative;width:100px;height:100px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
-        <img id="denty-sprite" src="uploads/denty_neutral.png" alt="Toothy, the pixel-art tooth receptionist" style="width:100px;height:100px;image-rendering:pixelated;display:block;object-fit:contain;position:absolute;inset:0">
+        <img id="denty-sprite" src="uploads/denty_neutral.png" alt="Toothy, the Digi Dental AI receptionist mascot" width="100" height="100" loading="lazy" decoding="async" style="width:100px;height:100px;image-rendering:pixelated;display:block;object-fit:contain;position:absolute;inset:0">
       </button>
     </div>
     <!-- Shown only when the browser refused the microphone. Generic "check your settings" is
@@ -848,7 +1011,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <div class="dd-founder">
       <div class="dd-founder-photo">
         <sc-if value="{{ founderPhotoOn }}" hint-placeholder-val="{{ true }}">
-          <img id="founder-photo" alt="Benny, founder of Digi Dental" width="470" height="470" style="width:100%;height:100%;object-fit:cover;display:block">
+          <img id="founder-photo" alt="Benny, founder of Digi Dental, who sets up each AI receptionist personally" width="470" height="470" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block">
         </sc-if>
         <sc-if value="{{ founderMonogramOn }}" hint-placeholder-val="{{ false }}">
           <div aria-hidden="true" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0F8B80;color:#FAF9F6;font-family:'Fraunces',serif;font-size:96px;font-weight:600">B</div>
@@ -882,7 +1045,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:44px">
       <div style="display:flex;flex-direction:column;gap:14px;max-width:280px">
         <div style="display:flex;align-items:center;gap:10px">
-          <img src="uploads/denty_neutral.png" alt="" width="28" height="28" style="display:block;width:28px;height:28px;object-fit:contain;image-rendering:pixelated">
+          <img src="uploads/denty_neutral.png" alt="" width="28" height="28" loading="lazy" decoding="async" style="display:block;width:28px;height:28px;object-fit:contain;image-rendering:pixelated">
           <div style="font-family:'Fraunces',serif;font-weight:600;font-size:19px;letter-spacing:-0.02em">Digi<span style="color:#0F8B80"> Dental</span></div>
         </div>
         <p style="font-size:13.5px;line-height:1.65;color:#8A9BB5;margin:0;text-wrap:pretty">A 24/7 AI receptionist that answers your practice's calls and books patients straight into your calendar.</p>
@@ -900,7 +1063,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
         <button onClick="{{ scrollToToothy }}" data-cta="hero_demo" aria-label="Talk to the AI receptionist" title="Talk to the AI receptionist" style="width:60px;height:60px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
-          <img src="uploads/denty_neutral.png" alt="" width="60" height="60" style="display:block;width:60px;height:60px;object-fit:contain;image-rendering:pixelated">
+          <img src="uploads/denty_neutral.png" alt="" width="60" height="60" loading="lazy" decoding="async" style="display:block;width:60px;height:60px;object-fit:contain;image-rendering:pixelated">
         </button>
         <div style="font-size:12px;color:#5A6E86">Talk to the receptionist</div>
       </div>

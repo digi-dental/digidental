@@ -1,21 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 
   <!-- Digi Dental — single-page conversion funnel.
-       All sections (how it works, pricing, FAQ, live demo) live on this one URL. -->
+       All sections (how it works, pricing, FAQ, live demo) live on this one URL, so this
+       sitemap has exactly one URL entry. Adding anchors as separate entries would be spam:
+       they are not separately addressable documents.
+
+       The image and video extensions matter more here than the URL list does. Both videos
+       are served through /api/video, which 302s to storage — crawlers follow that, but they
+       would never have discovered the clips otherwise because the <video> elements are
+       rendered client-side. -->
   <url>
     <loc>https://www.digidental.us/</loc>
     <lastmod>2026-08-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+
     <xhtml:link rel="alternate" hreflang="en" href="https://www.digidental.us/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.digidental.us/"/>
+
     <image:image>
       <image:loc>https://www.digidental.us/og-image.png</image:loc>
       <image:title>Digi Dental: AI receptionist for dental practices</image:title>
     </image:image>
+
+    <video:video>
+      <!-- TODO(benny): thumbnail_loc is the share card, not a frame from the clip. Google
+           accepts it, but a real still from the video earns a better video thumbnail. -->
+      <video:thumbnail_loc>https://www.digidental.us/og-image.png</video:thumbnail_loc>
+      <video:title>How the Digi Dental AI receptionist answers calls and books patients</video:title>
+      <video:description>Walkthrough of how Digi Dental sets up a 24/7 AI receptionist for a dental practice: answering every inbound call, handling service and insurance questions, and writing appointments into the practice calendar.</video:description>
+      <video:content_loc>https://www.digidental.us/api/video?clip=vsl</video:content_loc>
+      <video:publication_date>2026-08-06</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+      <video:live>no</video:live>
+      <video:requires_subscription>no</video:requires_subscription>
+    </video:video>
+
+    <video:video>
+      <video:thumbnail_loc>https://www.digidental.us/og-image.png</video:thumbnail_loc>
+      <video:title>Denty booking a patient appointment live on a call</video:title>
+      <video:description>A recorded call showing the Digi Dental AI receptionist, Denty, greeting a caller, answering questions and booking an appointment end to end.</video:description>
+      <video:content_loc>https://www.digidental.us/api/video?clip=demo</video:content_loc>
+      <video:publication_date>2026-08-06</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+      <video:live>no</video:live>
+      <video:requires_subscription>no</video:requires_subscription>
+    </video:video>
   </url>
 
 </urlset>

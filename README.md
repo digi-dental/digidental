@@ -158,6 +158,49 @@ journey drill-down, and the lead table with attribution.
   but that is tidiness. The password is the security.
 - Needs migrations `005` and `006` applied, otherwise there is nothing to read.
 
+## Voice demo (Vapi)
+The in-browser demo call uses the official **`@vapi-ai/web` SDK, pinned to an exact version** in
+the `<head>` of `index.html`.
+
+> It previously loaded `cdn.jsdelivr.net/gh/VapiAI/html-script-tag@**latest**`. An unpinned
+> dependency means every page load takes whatever upstream published last, so the call path can
+> change with no deploy on our side — which is how working calls became
+> `error-assistant-did-not-receive-customer-audio`. Change the pinned version deliberately, and
+> test a real call afterwards. Never go back to a floating tag.
+
+**Configuration.** `VAPI_PUBLIC_KEY` and `VAPI_ASSISTANT_ID` are class properties in `index.html`
+(mirrored by `VITE_VAPI_PUBLIC_KEY` / `VITE_VAPI_ASSISTANT_ID` in `.env` for a bundled build).
+The public web key is the *only* Vapi key that may appear client-side; a private/server key must
+never be in the browser. The assistant id is validated as a UUID before any call: if it is
+missing, a placeholder, or malformed, the page shows an error and **starts no call at all**,
+rather than creating one with no assistant attached.
+
+**Microphone.** Permission is requested explicitly before connecting, and the resulting track is
+inspected (`readyState`, `enabled`, `muted`). `NotAllowedError`, `NotFoundError`,
+`NotReadableError` and `OverconstrainedError` each get their own message, and a denial shows
+browser-specific instructions with a Retry. Once live, `getLocalAudioLevel()` is sampled: eight
+seconds of silence with nothing ever heard raises a "we can't hear you" hint, which is the
+client-side view of the same failure Vapi reports as *did not receive customer audio*.
+
+**Lifecycle.** One client per page, listeners attached once, so retries never duplicate handlers
+or create a second call. `start()` returns a Promise and is handled as one — the old code called
+it inside a `try/catch` and returned, so a rejection escaped and the UI hung on "Connecting…".
+The call is only shown as connected when the SDK emits `call-start`; the microphone is released on
+`call-end`, never during setup.
+
+**Requirements.** Calls start from a click, never on load. Microphone access needs HTTPS (or
+localhost). `vercel.json` sets `Permissions-Policy: … microphone=(self)`. If the page is ever
+embedded, the parent iframe needs `allow="microphone; autoplay"`. There is no CSP on the site
+today; if one is added it must permit the jsDelivr script and Daily's WebRTC endpoints
+(`*.daily.co`, `wss:`), or calls will fail to connect.
+
+**Diagnostics** are development-only — localhost, a Vercel preview, or `?debug=1`. They log
+configuration state, device label, track state and call lifecycle. No transcripts, no audio, no
+keys, no visitor identifiers.
+
+**Tests.** `npm test` drives the real page in headless Chromium with the SDK and microphone
+stubbed: missing assistant id, permission failures, duplicate clicks, listener reuse and cleanup.
+
 ## Videos
 Both clips are served through `/api/video?clip=vsl|demo`, so the page carries no expiring
 token. The signed URLs hardcoded as a fallback in `api/video.ts` **expire 2027-07-24**.

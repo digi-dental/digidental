@@ -233,7 +233,18 @@
      this block is injected client-side and would duplicate those tags. -->
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer async></script>
+<!-- Voice demo SDK.
+     Was: cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest — an UNPINNED build of a wrapper repo.
+     `@latest` means every page load takes whatever upstream published last, so the call path can
+     change without a deploy on our side. That is exactly how working calls turned into
+     `error-assistant-did-not-receive-customer-audio` with no commit to blame.
+     Now: the official SDK, pinned to an exact version, whose start(assistantId) is documented and
+     returns a Promise we can actually handle. Update the version deliberately, never implicitly. -->
+<script type="module">
+  import Vapi from 'https://cdn.jsdelivr.net/npm/@vapi-ai/web@2.6.1/+esm';
+  window.DentyVapiCtor = Vapi;
+  window.dispatchEvent(new Event('denty-vapi-ready'));
+</script>
 <style>
 #vapi-support-btn,#vapi-btn{display:none !important}
 html{scroll-behavior:smooth}
@@ -590,10 +601,24 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
           <circle cx="75" cy="75" r="68" fill="none" stroke="{{ ringColor }}" stroke-width="4" stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="{{ ringOffset }}" style="transition:stroke-dashoffset 1s linear, stroke .4s"></circle>
         </svg>
       </sc-if>
-      <button onClick="{{ startDemo }}" aria-label="Talk to the AI receptionist. Free 60 second demo call" style="position:relative;width:100px;height:100px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
+      <button onClick="{{ startDemo }}" disabled="{{ tBusy }}" aria-busy="{{ tBusy }}" aria-label="Talk to the AI receptionist. Free 60 second demo call" style="position:relative;width:100px;height:100px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
         <img id="denty-sprite" src="uploads/denty_neutral.png" alt="Toothy, the pixel-art tooth receptionist" style="width:100px;height:100px;image-rendering:pixelated;display:block;object-fit:contain;position:absolute;inset:0">
       </button>
     </div>
+    <!-- Shown only when the browser refused the microphone. Generic "check your settings" is
+         useless, so the instructions name the actual control for the visitor's browser. -->
+    <sc-if value="{{ micBlocked }}" hint-placeholder-val="{{ false }}">
+      <div role="alert" style="background:rgba(179,48,12,0.12);border:1px solid rgba(240,134,90,0.5);color:#FAF9F6;border-radius:14px;padding:16px 18px;max-width:420px;margin-top:6px;text-align:left">
+        <div style="font-weight:600;margin-bottom:6px">Your microphone is blocked</div>
+        <div style="font-size:14px;line-height:1.55;color:#D8E2E2">{{ micHelp }}</div>
+        <button onClick="{{ retryDemo }}" style="margin-top:12px;background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#0B6E66">Try again</button>
+      </div>
+    </sc-if>
+    <!-- Connected, but nothing is reaching the assistant. Better to say so than let them talk to
+         a dead input for the whole minute. -->
+    <sc-if value="{{ micWarn }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="background:rgba(138,90,6,0.16);border:1px solid rgba(224,177,85,0.5);color:#FAF9F6;border-radius:12px;padding:12px 16px;max-width:420px;margin-top:6px;font-size:14px;text-align:left">We can't hear you yet. Check that the right microphone is selected and not muted.</div>
+    </sc-if>
     <sc-if value="{{ tLive }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
         <div style="display:flex;align-items:flex-end;gap:3px;height:28px" aria-hidden="true">
@@ -976,8 +1001,22 @@ class Component extends DCLogic {
     bWebsite: '', // honeypot — must stay empty; anything in it means a bot filled the form
     formError: '', shake: false,
     toothy: 'idle', // idle | connecting | live | ended | limited
-    remaining: 60, bubble: '', demoUsed: false, sendState: null
+    remaining: 60, bubble: '', demoUsed: false, sendState: null,
+    // Voice demo plumbing. `starting` disables the button between the click and the first state
+    // change; `micState` drives the permission panel; `micWarn` is the "we cannot hear you" hint.
+    starting: false, micState: 'unknown', // unknown | granted | denied | error
+    micWarn: false, micDeviceId: null
   };
+
+  // Diagnostics are development-only: localhost, a Vercel preview URL, or ?debug=1 on the page.
+  // Production visitors never see voice logging in their console.
+  DEV = (() => {
+    try {
+      return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ||
+             /vercel\.app$/.test(location.hostname) && /-git-|-[a-z0-9]{9}-/.test(location.hostname) ||
+             new URLSearchParams(location.search).get('debug') === '1';
+    } catch (e) { return false; }
+  })();
 
   CALLERS = [
     { tag: 'New patient, 7:42 PM, after hours', l1: '\u201CHi, I chipped a tooth at dinner. Can I get in tomorrow?\u201D', l2: '\u201CDr. Patel has 2:00 PM Tuesday open. Shall I book it?\u201D', booked: 'Booked: Tuesday 2:00 PM', cap: 'Booked while the office was closed.' },
@@ -1122,28 +1161,161 @@ class Component extends DCLogic {
       }
     }
     if (window.matchMedia && window.matchMedia('(hover:hover)').matches) this.initLinkPreviews();
-    // Vapi SDK loads defer/async from helmet — poll until ready, then wire the call lifecycle.
-    this._vapiPoll = setInterval(() => {
-      if (!window.vapiSDK) return;
-      clearInterval(this._vapiPoll); this._vapiPoll = null;
-      try {
-        this._vapi = window.vapiSDK.run({ apiKey: this.VAPI_PUBLIC_KEY, assistant: this.VAPI_ASSISTANT_ID });
-        this._vapi.on('call-start', () => { this._vapiLive = true; this.goLive(); });
-        this._vapi.on('call-end', () => {
-          this._vapiLive = false;
-          if (this.state.toothy === 'live' || this.state.toothy === 'connecting') { clearInterval(this._callTimer); this.finishDemo(); }
-        });
-        this._vapi.on('error', () => {
-          this._vapiLive = false;
-          if (this.state.toothy === 'connecting' || this.state.toothy === 'live') {
-            clearInterval(this._callTimer); clearInterval(this._yapTimer);
-            this.setState({ toothy: 'idle', bubble: "Couldn't connect the call. Check your mic permission and try again." });
-            this.track('demo_error', { stage: this.state.toothy });
-          }
-        });
-      } catch (e) { console.error('Vapi init failed; demo falls back to simulation:', e); }
-    }, 400);
-    this._timers.push(setTimeout(() => { if (this._vapiPoll) { clearInterval(this._vapiPoll); this._vapiPoll = null; } }, 20000));
+    // Handle for the automated voice-call tests, which drive the real component rather than a
+    // re-implementation of it. Harmless in production: it exposes no keys and no visitor data.
+    try { window.__ddRoot = this; } catch (e) {}
+
+    // The SDK is an ES module, so it may already be present or still loading. Cover both, and
+    // build the client exactly once for the lifetime of the page (see initVapi).
+    if (window.DentyVapiCtor) this.initVapi();
+    else {
+      this._onVapiReady = () => this.initVapi();
+      window.addEventListener('denty-vapi-ready', this._onVapiReady, { once: true });
+      // If the CDN never answers, the demo quietly falls back to the simulated call.
+      this._timers.push(setTimeout(() => {
+        if (!this._vapi) this.vlog('SDK did not load within 20s; demo will simulate.');
+      }, 20000));
+    }
+  }
+
+  // Development-only diagnostics. Nothing here may carry personal data: no transcripts, no audio,
+  // no keys, no visitor identifiers — only configuration state, device labels and lifecycle.
+  vlog() {
+    if (!this.DEV) return;
+    try { console.log.apply(console, ['[denty-voice]'].concat(Array.prototype.slice.call(arguments))); } catch (e) {}
+  }
+
+  // Is the assistant actually configured? A blank, placeholder or malformed id must never reach
+  // start(): the SDK's assistant argument is optional, so start(undefined) happily creates a call
+  // with no assistant attached — which is precisely the "call exists, no assistant, no transcript"
+  // symptom. Vapi ids are UUIDs, so the shape is worth checking before we spend a call on it.
+  vapiConfigError() {
+    const key = String(this.VAPI_PUBLIC_KEY || '').trim();
+    const id = String(this.VAPI_ASSISTANT_ID || '').trim();
+    const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!key || /^(your|xxx|placeholder)/i.test(key)) return 'The voice demo is not configured yet (missing public key).';
+    if (!id || /^(your|xxx|placeholder)/i.test(id)) return 'The voice demo is not configured yet (missing assistant).';
+    if (!uuid.test(id)) return 'The voice demo is misconfigured (the assistant id is not valid).';
+    return null;
+  }
+
+  // One client per page. Recreating it mid-connection is a known way to lose the microphone
+  // track, so this runs once and the instance is never torn down between calls.
+  initVapi() {
+    if (this._vapi || this._vapiInit) return;
+    const configError = this.vapiConfigError();
+    if (configError) { this.vlog('not initialising:', configError); return; }
+    this._vapiInit = true;
+    try {
+      // alwaysIncludeMicInPermissionPrompt keeps the mic in the browser prompt even when the
+      // call starts muted, so a visitor cannot end up connected with no input track.
+      this._vapi = new window.DentyVapiCtor(this.VAPI_PUBLIC_KEY, undefined,
+        { alwaysIncludeMicInPermissionPrompt: true });
+      this.vlog('client ready · assistant configured:', true);
+
+      // Listeners are attached here and only here. Retrying a failed call reuses this same
+      // instance, so handlers can never stack up and fire twice.
+      this._vapi.on('call-start', () => { this._vapiLive = true; this.goLive(); });
+      this._vapi.on('call-end', () => {
+        this._vapiLive = false;
+        this.releaseMic();
+        if (this.state.toothy === 'live' || this.state.toothy === 'connecting') { clearInterval(this._callTimer); this.finishDemo(); }
+      });
+      this._vapi.on('error', e => {
+        this._vapiLive = false;
+        this.vlog('sdk error:', e && (e.errorMsg || e.message || e));
+        this.failCall("Couldn't connect the call. Please try again.");
+      });
+      // Lifecycle detail the old wrapper never exposed. Invaluable when a call dies at a
+      // specific stage rather than failing outright.
+      this._vapi.on('call-start-progress', ev => this.vlog('start progress:', ev && ev.stage, ev && ev.status));
+      this._vapi.on('call-start-success', ev => this.vlog('start success in', ev && ev.totalDuration, 'ms'));
+      this._vapi.on('call-start-failed', ev => {
+        this.vlog('start FAILED at stage:', ev && ev.stage, ev && ev.error);
+        this.failCall("Couldn't start the call. Please try again.");
+      });
+    } catch (e) {
+      this._vapiInit = false;
+      console.error('Voice SDK init failed; the demo will simulate instead:', e);
+    }
+  }
+
+  // Ask for the microphone explicitly, before the call, and inspect what we actually got.
+  // Doing this ourselves (rather than letting the SDK trigger it mid-connect) means a denial or a
+  // dead device is a clear message instead of a call that connects and hears silence.
+  ensureMic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      return Promise.resolve({ ok: false, reason: 'unsupported',
+        message: 'This browser cannot access a microphone. Try Chrome, Edge or Safari.' });
+    }
+    // Reuse a live track rather than opening a second one: two streams on one device is how you
+    // get NotReadableError on Windows.
+    if (this._micStream) {
+      const t = this._micStream.getAudioTracks()[0];
+      if (t && t.readyState === 'live' && t.enabled) return Promise.resolve({ ok: true, reused: true });
+      this.releaseMic();
+    }
+    const constraints = { audio: this.state.micDeviceId
+      ? { deviceId: { exact: this.state.micDeviceId }, echoCancellation: true, noiseSuppression: true }
+      : { echoCancellation: true, noiseSuppression: true }, video: false };
+
+    return navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+      this._micStream = stream;
+      const track = stream.getAudioTracks()[0];
+      if (!track) return { ok: false, reason: 'no-track', message: 'No microphone input was found.' };
+      this.vlog('mic granted ·', track.label || '(unnamed device)',
+        '· readyState:', track.readyState, '· enabled:', track.enabled, '· muted:', track.muted);
+      // A track that arrives already ended or disabled will produce a connected call with no
+      // audio, which is the exact Vapi error being investigated.
+      if (track.readyState !== 'live' || !track.enabled) {
+        return { ok: false, reason: 'inactive',
+          message: 'Your microphone is not active. Close other apps using it and try again.' };
+      }
+      if (track.muted) {
+        // `muted` here is the browser telling us the source is not delivering data — usually the
+        // OS has it muted. Warn, but let the call proceed; it can recover mid-call.
+        this.vlog('WARNING: track reports muted — the OS may have the input muted.');
+      }
+      this.setState({ micState: 'granted' });
+      return { ok: true, track };
+    }).catch(err => {
+      const name = (err && err.name) || '';
+      this.vlog('getUserMedia failed:', name);
+      this.setState({ micState: name === 'NotAllowedError' ? 'denied' : 'error' });
+      if (name === 'NotAllowedError' || name === 'SecurityError') {
+        return { ok: false, reason: 'denied',
+          message: 'Microphone access is blocked. Allow it for this site, then try again.' };
+      }
+      if (name === 'NotFoundError' || name === 'OverconstrainedError') {
+        return { ok: false, reason: 'missing',
+          message: 'No microphone was found. Plug one in or pick another input, then try again.' };
+      }
+      if (name === 'NotReadableError' || name === 'AbortError') {
+        return { ok: false, reason: 'busy',
+          message: 'Your microphone is in use by another app. Close it and try again.' };
+      }
+      return { ok: false, reason: 'unknown', message: 'Could not access the microphone. Please try again.' };
+    });
+  }
+
+  // Tracks are released only once a call is genuinely over. Stopping them during setup is another
+  // way to hand the SDK a dead device.
+  releaseMic() {
+    if (!this._micStream) return;
+    try { this._micStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+    this._micStream = null;
+    this.vlog('microphone released');
+  }
+
+  // One place to unwind a failed attempt, so every failure path leaves identical state and the
+  // next click starts genuinely clean.
+  failCall(message) {
+    if (this.state.toothy !== 'connecting' && this.state.toothy !== 'live') return;
+    clearInterval(this._callTimer); clearInterval(this._yapTimer); clearInterval(this._silenceTimer);
+    this._claimed = false; // an attempt that never connected must not burn the free demo
+    this.releaseMic();
+    this.setState({ toothy: 'idle', starting: false, bubble: message });
+    this.track('demo_error', { stage: this.state.toothy });
   }
 
   // ---- Instrumentation (BUG-12) ----
@@ -1482,8 +1654,15 @@ class Component extends DCLogic {
     window.removeEventListener('pagehide', this._onLeave);
     if (this._lpRaf) cancelAnimationFrame(this._lpRaf);
     if (this._lpCard) this._lpCard.remove();
-    if (this._vapiPoll) clearInterval(this._vapiPoll);
-    if (this._vapi && this._vapiLive) { try { this._vapi.stop(); } catch (e) {} }
+    clearInterval(this._silenceTimer);
+    if (this._onVapiReady) window.removeEventListener('denty-vapi-ready', this._onVapiReady);
+    // Only tear the call down if one is genuinely live. Listeners are removed and the microphone
+    // released here because the component is going away — never mid-connection.
+    if (this._vapi) {
+      try { this._vapi.removeAllListeners(); } catch (e) {}
+      if (this._vapiLive) { try { Promise.resolve(this._vapi.stop()).catch(() => {}); } catch (e) {} }
+    }
+    this.releaseMic();
   }
 
   animateCount(el) {
@@ -1523,7 +1702,11 @@ class Component extends DCLogic {
   // If the SDK hasn't loaded (offline preview), a simulated call plays instead. Never a raw error.
   startDemo() {
     const s = this.state;
-    if (s.toothy === 'live' || s.toothy === 'connecting') return;
+    // Two guards, not one: `toothy` covers the visible call states, `starting` covers the gap
+    // between the click and the first state change, where a fast double-click used to slip
+    // through and create a second call.
+    if (s.toothy === 'live' || s.toothy === 'connecting' || s.starting) return;
+    this.setState({ starting: true });
     // After the form is in, the gate lifts: let them call and test the receptionist right here.
     if (s.demoUsed && !s.formDone) {
       this.setState({ toothy: 'limited', bubble: "You've had your free call. Want one answering your practice's phone?", modal: 'booking' });
@@ -1541,12 +1724,47 @@ class Component extends DCLogic {
         this.track('demo_blocked', { by: 'ip' });
         return;
       }
-      this.setState({ bubble: 'Calling…' });
-      this.track('demo_start');
-      if (this._vapi) {
-        try { this._vapi.start(this.VAPI_ASSISTANT_ID); return; } catch (e) { console.error('Vapi start failed, simulating:', e); }
-      }
-      this._timers.push(setTimeout(() => this.goLive(), 1600));
+      // Configuration is checked before anything else: better an honest message than a call with
+      // no assistant on it.
+      const configError = this.vapiConfigError();
+      if (configError && this._vapi) { this.failCall(configError); return; }
+
+      this.setState({ bubble: 'Checking your microphone…' });
+      this.ensureMic().then(mic => {
+        if (this.state.toothy !== 'connecting') { this.releaseMic(); return; } // they navigated away
+        if (!mic.ok) {
+          this.setState({ starting: false });
+          this.failCall(mic.message);
+          this.track('demo_blocked', { by: 'mic', reason: mic.reason });
+          return;
+        }
+
+        this.setState({ bubble: 'Calling…' });
+        this.track('demo_start');
+
+        if (!this._vapi) { // SDK unavailable (offline preview): simulate rather than show an error
+          this._timers.push(setTimeout(() => this.goLive(), 1600));
+          return;
+        }
+
+        // start() is async and the assistant argument is optional. The old code called it inside
+        // a try/catch and returned immediately, so a rejected promise escaped the catch, the
+        // fallback never ran, and the UI sat on "Connecting…" forever. Both paths are handled now,
+        // and the assistant id is always passed explicitly.
+        let started;
+        try { started = this._vapi.start(this.VAPI_ASSISTANT_ID); }
+        catch (e) { this.vlog('start threw synchronously:', e); this.failCall("Couldn't start the call. Please try again."); return; }
+
+        Promise.resolve(started).then(call => {
+          // A null result means no call was created — never treat that as connected.
+          if (!call) { this.vlog('start resolved without a call'); this.failCall("Couldn't start the call. Please try again."); return; }
+          this.vlog('call created ·', call && call.id ? 'id received' : 'no id');
+          // Connected state is driven by the SDK's call-start event, never by start() resolving.
+        }).catch(e => {
+          this.vlog('start rejected:', e && (e.message || e));
+          this.failCall("Couldn't connect the call. Please try again.");
+        });
+      });
     });
   }
 
@@ -1576,7 +1794,8 @@ class Component extends DCLogic {
 
   goLive() {
     if (this.state.toothy !== 'connecting') return;
-    this.setState({ toothy: 'live', bubble: '' });
+    this.setState({ toothy: 'live', starting: false, bubble: '' });
+    this.watchMicLevel();
     this.claimDemo(); // the call is actually connected — only now does it count as their demo
     if (!this._reduced) this._yapTimer = setInterval(() => this.setState(st => ({ yapIdx: ((st.yapIdx || 0) + 1) % this.YAP_CYCLE.length })), 150);
     this._callTimer = setInterval(() => {
@@ -1588,10 +1807,57 @@ class Component extends DCLogic {
     }, 1000);
   }
 
+  // The reported Vapi failure is "the assistant received no customer audio". The SDK exposes the
+  // live input level, so we can notice that from the visitor's side and say so, instead of them
+  // talking into a dead microphone for sixty seconds and concluding the product does not work.
+  watchMicLevel() {
+    clearInterval(this._silenceTimer);
+    if (!this._vapi || typeof this._vapi.getLocalAudioLevel !== 'function') return;
+    let quiet = 0, heard = false;
+    this._silenceTimer = setInterval(() => {
+      if (this.state.toothy !== 'live') { clearInterval(this._silenceTimer); return; }
+      let level = 0;
+      try { level = this._vapi.getLocalAudioLevel() || 0; } catch (e) { return; }
+      if (level > 0.01) { heard = true; quiet = 0; if (this.state.micWarn) this.setState({ micWarn: false }); return; }
+      quiet++;
+      // Eight seconds of silence before we say anything: people pause, and nobody wants a warning
+      // for thinking. Only warn if we have never heard them at all.
+      if (quiet === 8 && !heard) {
+        this.vlog('no local audio detected after 8s — input may be muted or wrong device');
+        this.setState({ micWarn: true });
+      }
+    }, 1000);
+  }
+
   hangUp() {
     clearInterval(this._callTimer);
-    if (this._vapi && this._vapiLive) { try { this._vapi.stop(); return; } catch (e) {} } // call-end event finishes up
+    clearInterval(this._silenceTimer);
+    // stop() is async; the call-end listener performs the teardown once it has actually ended, so
+    // the microphone is released after the call rather than during it.
+    if (this._vapi && this._vapiLive) {
+      try { Promise.resolve(this._vapi.stop()).catch(() => {}); return; } catch (e) {}
+    }
+    this.releaseMic();
     this.finishDemo();
+  }
+
+  // Naming the actual control beats "check your browser settings". Once a visitor has denied the
+  // microphone, most browsers will not prompt again, so they have to be told where the switch is.
+  micInstructions() {
+    const ua = navigator.userAgent || '';
+    const ios = /iPad|iPhone|iPod/.test(ua);
+    if (/Firefox/.test(ua)) return 'Click the microphone icon in the address bar, remove the block, then reload the page and try again.';
+    if (ios) return 'Open Settings, then Safari, then Microphone, and allow this site. Then reload the page.';
+    if (/Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua)) return 'Open Safari, then Settings for This Website, set Microphone to Allow, then reload the page.';
+    if (/Android/.test(ua)) return 'Tap the lock icon beside the address bar, open Permissions, allow the microphone, then reload the page.';
+    return 'Click the lock or microphone icon at the left of the address bar, set the microphone to Allow, then reload the page.';
+  }
+
+  // Called from the mic-denied panel. Clears the error and runs the whole start path again against
+  // the same client instance, so no listeners are duplicated.
+  retryDemo() {
+    this.setState({ micState: 'unknown', micWarn: false, bubble: '' });
+    this.startDemo();
   }
 
   currentFrame() {
@@ -1866,10 +2132,16 @@ class Component extends DCLogic {
       bubbleOn: !!s.bubble, bubble: s.bubble,
       tLive: s.toothy === 'live', tEnded: s.toothy === 'ended',
       ringOn: s.toothy === 'live' || s.toothy === 'connecting',
+      // The mascot is not clickable while a call is being set up or is already running.
+      tBusy: s.starting || s.toothy === 'connecting' || s.toothy === 'live',
+      micBlocked: s.micState === 'denied',
+      micWarn: !!s.micWarn && s.toothy === 'live',
+      micHelp: this.micInstructions(),
       ringColor: s.remaining <= 10 && s.toothy === 'live' ? '#0F8B80' : '#5A6E86',
       ringOffset: Math.round(427 * (1 - s.remaining / total)),
       remaining: s.remaining,
       startDemo: () => this.startDemo(),
+      retryDemo: () => this.retryDemo(),
       endDemo: () => this.hangUp(),
       // faq
       faqs: faqData.map((f, i) => ({ ...f, open: s.faqOpen === i, icon: s.faqOpen === i ? '−' : '+', toggle: () => this.setState({ faqOpen: s.faqOpen === i ? -1 : i }) })),

@@ -3,7 +3,7 @@
 // integrations. No dependencies, no secrets, no database — safe to cache at the edge.
 // Human-readable equivalent: /llms.txt   Markup equivalent: JSON-LD in the homepage <head>.
 
-const SITE = 'https://digidental.vercel.app';
+const SITE = 'https://www.digidental.us';
 
 const siteInfo = {
   name: 'Digi Dental',

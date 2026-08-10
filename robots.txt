@@ -1,4 +1,4 @@
-# Digi Dental, https://digidental.vercel.app
+# Digi Dental, https://www.digidental.us
 # AI receptionist for dental practices.
 # Policy: open to search engines and AI assistants. We want to be quoted,
 # summarised and cited. Structured summary for LLMs: /llms.txt and /api/site-info
@@ -123,4 +123,4 @@ User-agent: Kagibot
 Allow: /
 
 # ---------------------------------------------------------------------------
-Sitemap: https://digidental.vercel.app/sitemap.xml
+Sitemap: https://www.digidental.us/sitemap.xml

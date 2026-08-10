@@ -208,6 +208,29 @@ Permanent fix: make the `digi_dental-VSL` bucket public and set `VIDEO_VSL_URL` 
 `VIDEO_DEMO_URL` to the public URLs. Interim fix: paste fresh signed URLs into those two
 env vars — no redeploy of the page needed either way.
 
+## Dashboard preview section
+The section between the FAQ and the final CTA shows four captures of the Vapi console the
+practice owner works in. It sits there deliberately: objections have just been answered and the
+price is known, so the last thing before the ask is evidence that a real system exists.
+
+The interaction is the supplied React accordion — one panel open, the others collapsed to
+labelled rails — **ported natively**. This site has no React build step, no Tailwind and no
+`components/ui` directory; it is a single static HTML file driven by the `dc-runtime` in
+`support.js`. Dropping in a `.tsx` component would require adding a bundler and restructuring the
+deployment, so the behaviour was reproduced in the existing architecture instead. (To use the
+component as written you would need `npx shadcn@latest init`, Tailwind and TypeScript, which
+means converting this page into a React app — a much larger change than the section warrants.)
+
+**On aspect ratios.** These are full-page captures whose dimensions are not known when the markup
+is written, so nothing assumes one. Each frame takes its ratio from the image's own
+`naturalWidth`/`naturalHeight` on load, and captures taller than roughly 1.2:1 scroll inside their
+frame rather than stretching the page. Verified against both a 1:4 and a 2.4:1 image: rendered
+height matches the natural ratio exactly, so nothing is cropped or letterboxed.
+
+**Images** are served through `/api/image?name=…` for the same reason as the videos: the supplied
+Supabase signed URLs expire **2027-08-10**. Set `IMAGE_*_URL` env vars, or make the bucket public,
+and the expiry stops mattering. The founder portrait uses the same route.
+
 ## Before launch checklist
 No `PLACEHOLDER` strings remain in rendered copy. What is still open, in priority order:
 

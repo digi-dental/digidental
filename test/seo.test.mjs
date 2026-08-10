@@ -105,6 +105,56 @@ let graph;
     mismatched[0] ? `first mismatch: "${norm(mismatched[0])}"` : 'all aligned');
 }
 
+// ---------------------------------------------------------------- pre-JS crawler view
+{
+  // These two rules are the only thing keeping the error-boundary markup and 17 unresolved
+  // template holes out of what a non-rendering crawler reads. They are safe precisely
+  // because `x-dc` / `sc-if` / `sc-for` are removed from the DOM on hydration — scoping to
+  // them is what makes the rules inert for real users. Lose the scope and they would start
+  // hiding live content.
+  check('crash branch is hidden pre-hydration', /x-dc sc-if\[value\*="crashed"\]\s*\{[^}]*display:\s*none/.test(html));
+  check('template holes are hidden pre-hydration', /x-dc \[data-dyn\]\s*\{[^}]*display:\s*none/.test(html));
+  check('loop templates are hidden pre-hydration', /x-dc sc-for\s*\{[^}]*display:\s*none/.test(html));
+
+  const dyn = (html.match(/data-dyn/g) || []).length;
+  const textHoles = [...html.matchAll(/>([^<>]*\{\{\s*[a-zA-Z0-9_]+\s*\}\}[^<>]*)</g)].length;
+  check('every non-loop text hole carries data-dyn', dyn >= textHoles, `${dyn} marks vs ${textHoles} holes`);
+
+  // The FAQ reaches non-rendering crawlers only through the <noscript> mirror. If it drifts
+  // from the schema, those crawlers read different text than Google does.
+  const ns = html.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? '';
+  const faqNode = graph.find(n => n['@type'] === 'FAQPage');
+  const decode = s => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+                       .replace(/&quot;/g, '"').replace(/&#x27;|&apos;/g, "'");
+  const dts = [...ns.matchAll(/<dt[^>]*>([\s\S]*?)<\/dt>/g)].map(m => decode(m[1]).trim());
+  const dds = [...ns.matchAll(/<dd[^>]*>([\s\S]*?)<\/dd>/g)].map(m => decode(m[1]).trim());
+  check('noscript FAQ mirror exists', dts.length > 0, `${dts.length} pairs`);
+  check('noscript mirror covers every schema question',
+    dts.length === (faqNode?.mainEntity.length ?? -1), `${dts.length} vs ${faqNode?.mainEntity.length}`);
+  const qBad = (faqNode?.mainEntity ?? []).filter((q, i) => q.name.trim() !== dts[i]);
+  const aBad = (faqNode?.mainEntity ?? []).filter((q, i) => q.acceptedAnswer.text.trim() !== dds[i]);
+  check('noscript questions match the schema exactly', qBad.length === 0, qBad[0]?.name || 'aligned');
+  check('noscript answers match the schema exactly', aBad.length === 0, aBad[0]?.name || 'aligned');
+}
+
+// ---------------------------------------------------------------- landmarks & interaction
+{
+  check('page declares a <main> landmark', (html.match(/<main[\s>]/g) || []).length === 1);
+  check('page declares a <nav> landmark', /<nav[\s>]/.test(html));
+  check('page declares a <footer> landmark', /<footer[\s>]/.test(html));
+
+  // A <footer> inside a <section> is that section's footer, not the page's, and yields no
+  // contentinfo landmark.
+  const beforeFooter = html.slice(0, html.indexOf('<footer'));
+  const depth = (beforeFooter.match(/<section\b/g) || []).length - (beforeFooter.match(/<\/section>/g) || []).length;
+  check('footer is not nested inside a section', depth === 0, `${depth} open <section> ancestors`);
+
+  // The dashboard panels were hover-driven, which re-selected every panel the cursor
+  // crossed while each was mid-transition.
+  check('dashboard panels are not hover-driven', !/onMouseEnter/.test(html),
+    /onMouseEnter/.test(html) ? 'onMouseEnter is back' : 'click only');
+}
+
 // ---------------------------------------------------------------- headings
 {
   const levels = [...html.matchAll(/<h([1-6])[\s>]/g)].map(m => Number(m[1]));

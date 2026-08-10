@@ -53,6 +53,35 @@
 <link rel="alternate" type="application/json" href="/api/site-info" title="Digi Dental site info (JSON)">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 
+<style>
+/* ============ Pre-JS view: what non-rendering crawlers actually read ============
+   Googlebot executes JavaScript. GPTBot, ClaudeBot and PerplexityBot largely do not —
+   they read the HTML as served. The dc-runtime keeps its content as real markup, so the
+   copy IS in the raw file, but two things pollute it before the runtime takes over:
+
+     1. <sc-if> is a directive, not a conditional at the HTML level. With no JS, EVERY
+        branch renders — so the error-boundary markup ("A momentary hiccup. This page had
+        trouble rendering.") was the first thing an AI crawler read on the page.
+     2. Unresolved {{ holes }} render as literal text, dropping 17 fragments of template
+        syntax into the extracted copy.
+
+   Both rules below are scoped to `x-dc` / `sc-if`, which the runtime REMOVES from the DOM
+   once it mounts. So these selectors can only ever match before hydration: they are
+   inert for anyone running JavaScript, and no rule here affects the rendered site. */
+
+/* The error boundary is not the page. Hide it until the runtime is driving. */
+x-dc sc-if[value*="crashed"] { display: none !important; }
+
+/* Dynamic values — call widget, calculator output, demo status, form state. Never
+   marketing copy, so hiding them costs a crawler nothing and removes the noise. */
+x-dc [data-dyn] { display: none !important; }
+
+/* Loop bodies are templates, not content: with no JS they render once with {{ f.q }}
+   style holes intact. The FAQ they stand in for is mirrored in <noscript> below, so
+   nothing is lost by hiding the unrendered template. */
+x-dc sc-for { display: none !important; }
+</style>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -468,7 +497,29 @@ input,select,button,textarea{font-family:inherit}
 }
 .dd-dash-panel:hover,.dd-dash-panel[aria-selected="true"]{border-color:#0F8B80;box-shadow:0 16px 40px rgba(10,26,47,0.12)}
 .dd-dash-panel:focus-visible{outline:2px solid #0F8B80;outline-offset:3px}
-.dd-dash-rail{display:none}
+
+/* Mobile: a vertical accordion. The rail is the always-visible header you tap; the body
+   below it opens. 0fr -> 1fr animates to the content's real height, which plain `height`
+   cannot do and `max-height` only fakes (a guessed ceiling makes the easing arrive early
+   and stutter). Same duration and curve as the desktop width transition. */
+.dd-dash-rail{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:18px 20px;text-align:left;
+  font-size:15px;font-weight:600;letter-spacing:0.01em;color:#0A1A2F
+}
+.dd-dash-rail::after{
+  content:'';flex:0 0 auto;width:10px;height:10px;margin-right:4px;
+  border-right:2px solid #0F8B80;border-bottom:2px solid #0F8B80;
+  transform:rotate(45deg) translateY(-3px);
+  transition:transform .55s cubic-bezier(.22,1,.36,1)
+}
+.dd-dash-panel[aria-selected="true"] .dd-dash-rail::after{transform:rotate(-135deg) translateY(2px)}
+.dd-dash-body{
+  display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows .55s cubic-bezier(.22,1,.36,1)
+}
+.dd-dash-panel[aria-selected="true"] .dd-dash-body{grid-template-rows:1fr}
+.dd-dash-inner{display:block;overflow:hidden;min-height:0}
 .dd-dash-frame{display:block;background:#0A1A2F;position:relative}
 .dd-dash-bar{display:flex;gap:6px;align-items:center;padding:10px 14px;background:#12263F;border-bottom:1px solid #22344E}
 .dd-dash-bar i{width:9px;height:9px;border-radius:50%;background:#3D4F66;display:block}
@@ -493,21 +544,26 @@ input,select,button,textarea{font-family:inherit}
   .dd-dash{flex-direction:row;align-items:stretch;gap:12px;height:600px}
   .dd-dash-panel{width:74px;flex:0 0 auto;transition:width .55s cubic-bezier(.22,1,.36,1),border-color .3s ease,box-shadow .3s ease}
   .dd-dash-panel[aria-selected="true"]{width:100%;flex:1 1 auto}
+  /* Desktop animates width, not height: hand the body back to normal flow so the grid
+     transition above cannot fight the width transition. */
+  .dd-dash-body{display:block;grid-template-rows:none;transition:none}
+  .dd-dash-inner{overflow:visible}
   .dd-dash-panel .dd-dash-frame,
   .dd-dash-panel .dd-dash-cap{opacity:0;transition:opacity .3s ease .1s;pointer-events:none}
   .dd-dash-panel[aria-selected="true"] .dd-dash-frame,
   .dd-dash-panel[aria-selected="true"] .dd-dash-cap{opacity:1;pointer-events:auto}
   .dd-dash-panel[aria-selected="true"] .dd-dash-rail{display:none}
   .dd-dash-rail{
-    display:block;position:absolute;inset:0;
+    position:absolute;inset:0;padding:0;
     writing-mode:vertical-rl;transform:rotate(180deg);
     display:flex;align-items:center;justify-content:center;
     font-size:14px;font-weight:600;letter-spacing:0.04em;color:#4A5C72;white-space:nowrap
   }
+  .dd-dash-rail::after{display:none}
   .dd-dash-scroll{max-height:496px}
 }
 @media (prefers-reduced-motion:reduce){
-  .dd-dash-panel{transition:none}
+  .dd-dash-panel,.dd-dash-body,.dd-dash-rail::after{transition:none}
 }
 .dd-founder-photo{width:100%;aspect-ratio:1;border-radius:24px;overflow:hidden;background:#12263F;flex-shrink:0}
 .dd-founder-photo img{width:100%;height:100%;object-fit:cover;display:block}
@@ -553,6 +609,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   </div>
 </nav>
 
+<main>
 <!-- ================= HERO ================= -->
 <header data-section="hero" style="background:#FAF9F6;padding:170px clamp(20px,4vw,48px) 150px;display:flex;flex-direction:column;align-items:center;text-align:center">
   <div class="dd-wrap dd-hero">
@@ -589,7 +646,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         </div>
         <div style="text-align:left">
           <div style="font-weight:600;font-size:15px">Incoming call</div>
-          <div style="font-size:13px;color:#5A6E86;font-variant-numeric:tabular-nums">{{ heroTag }}</div>
+          <div style="font-size:13px;color:#5A6E86;font-variant-numeric:tabular-nums" data-dyn="">{{ heroTag }}</div>
         </div>
       </div>
     </sc-if>
@@ -600,15 +657,15 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
             <div style="width:4px;height:100%;border-radius:2px;background:#0F8B80;transform-origin:bottom;animation:dd-bar 0.9s ease-in-out infinite;animation-delay:{{ bar.delay }}"></div>
           </sc-for>
         </div>
-        <div style="font-size:14px;line-height:1.6;color:#3D4F66;animation:dd-fadeup .6s cubic-bezier(.22,1,.36,1) both">{{ heroL1 }}</div>
-        <div style="font-size:14px;line-height:1.6;color:#0A1A2F;font-weight:500;margin-top:10px;animation:dd-fadeup .6s cubic-bezier(.22,1,.36,1) 1.4s both">{{ heroL2 }}</div>
+        <div style="font-size:14px;line-height:1.6;color:#3D4F66;animation:dd-fadeup .6s cubic-bezier(.22,1,.36,1) both" data-dyn="">{{ heroL1 }}</div>
+        <div style="font-size:14px;line-height:1.6;color:#0A1A2F;font-weight:500;margin-top:10px;animation:dd-fadeup .6s cubic-bezier(.22,1,.36,1) 1.4s both" data-dyn="">{{ heroL2 }}</div>
       </div>
     </sc-if>
     <sc-if value="{{ hp2 }}" hint-placeholder-val="{{ false }}">
       <div style="background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:24px 28px;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:flex;flex-direction:column;align-items:center;gap:12px;animation:dd-fadeup .5s cubic-bezier(.22,1,.36,1) both">
         <div style="width:44px;height:44px;border-radius:50%;background:#2F7D5A;display:flex;align-items:center;justify-content:center;color:#FAF9F6;font-size:20px;animation:dd-pop .5s cubic-bezier(.34,1.56,.64,1) both">✓</div>
-        <div style="font-weight:600;font-size:16px;font-variant-numeric:tabular-nums">{{ heroBooked }}</div>
-        <div style="font-size:13px;color:#5A6E86">{{ heroCap }}</div>
+        <div style="font-weight:600;font-size:16px;font-variant-numeric:tabular-nums" data-dyn="">{{ heroBooked }}</div>
+        <div style="font-size:13px;color:#5A6E86" data-dyn="">{{ heroCap }}</div>
       </div>
     </sc-if>
   </div>
@@ -771,17 +828,17 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <input type="range" min="50" max="3000" step="10" value="{{ calcValueN }}" onChange="{{ setCalcValue }}" onInput="{{ setCalcValue }}" aria-label="Average patient value slider" style="width:100%;accent-color:#0F8B80;cursor:pointer">
       </div>
 
-      <div style="border-top:1px solid #EEEAE0;padding-top:18px;font-size:13.5px;color:#5A6E86;line-height:1.6;font-variant-numeric:tabular-nums;text-wrap:pretty">That works out to roughly <strong style="color:#0A1A2F">{{ calcMissedWeek }}</strong> missed calls a week, or <strong style="color:#0A1A2F">{{ calcMissedYear }}</strong> a year.</div>
+      <div style="border-top:1px solid #EEEAE0;padding-top:18px;font-size:13.5px;color:#5A6E86;line-height:1.6;font-variant-numeric:tabular-nums;text-wrap:pretty">That works out to roughly <strong style="color:#0A1A2F" data-dyn="">{{ calcMissedWeek }}</strong> missed calls a week, or <strong style="color:#0A1A2F" data-dyn="">{{ calcMissedYear }}</strong> a year.</div>
     </div>
     <div class="dd-split-side" style="display:flex;flex-direction:column;align-items:center;gap:22px;width:100%">
       <div class="dd-center" style="display:flex;flex-wrap:wrap;justify-content:center;gap:26px clamp(22px,6vw,72px)">
         <div style="display:flex;flex-direction:column;gap:8px">
           <div style="font-size:14px;color:#5A6E86">New patients you never hear from</div>
-          <div style="font-family:'Fraunces',serif;font-size:clamp(2.3rem,5.4vw,3.4rem);font-weight:600;color:#0A1A2F;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">{{ lostPatients }}<span style="font-size:0.4em;font-weight:500;color:#8A93A1"> / year</span></div>
+          <div style="font-family:'Fraunces',serif;font-size:clamp(2.3rem,5.4vw,3.4rem);font-weight:600;color:#0A1A2F;font-variant-numeric:tabular-nums;letter-spacing:-0.02em" data-dyn="">{{ lostPatients }}<span style="font-size:0.4em;font-weight:500;color:#8A93A1"> / year</span></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px">
           <div style="font-size:14px;color:#5A6E86">Estimated revenue lost per year</div>
-          <div style="font-family:'Fraunces',serif;font-size:clamp(2.3rem,5.4vw,3.4rem);font-weight:600;color:#0F8B80;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">{{ lostYear }}</div>
+          <div style="font-family:'Fraunces',serif;font-size:clamp(2.3rem,5.4vw,3.4rem);font-weight:600;color:#0F8B80;font-variant-numeric:tabular-nums;letter-spacing:-0.02em" data-dyn="">{{ lostYear }}</div>
         </div>
       </div>
       <div style="font-size:15px;color:#0A1A2F;font-variant-numeric:tabular-nums">Cost of never missing another one: <strong>$2,000, once.</strong></div>
@@ -805,7 +862,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <!-- Speech bubble -->
     <div style="min-height:64px;display:flex;align-items:flex-end;justify-content:center">
       <sc-if value="{{ bubbleOn }}" hint-placeholder-val="{{ false }}">
-        <div role="status" style="background:#FAF9F6;color:#0A1A2F;border-radius:14px;padding:14px 20px;font-size:15px;line-height:1.5;max-width:380px;box-shadow:0 12px 32px rgba(0,0,0,0.35);animation:dd-fadeup .45s cubic-bezier(.22,1,.36,1) both">{{ bubble }}</div>
+        <div role="status" style="background:#FAF9F6;color:#0A1A2F;border-radius:14px;padding:14px 20px;font-size:15px;line-height:1.5;max-width:380px;box-shadow:0 12px 32px rgba(0,0,0,0.35);animation:dd-fadeup .45s cubic-bezier(.22,1,.36,1) both" data-dyn="">{{ bubble }}</div>
       </sc-if>
     </div>
     <!-- Toothy + countdown ring -->
@@ -825,7 +882,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <sc-if value="{{ micBlocked }}" hint-placeholder-val="{{ false }}">
       <div role="alert" style="background:rgba(179,48,12,0.12);border:1px solid rgba(240,134,90,0.5);color:#FAF9F6;border-radius:14px;padding:16px 18px;max-width:420px;margin-top:6px;text-align:left">
         <div style="font-weight:600;margin-bottom:6px">Your microphone is blocked</div>
-        <div style="font-size:14px;line-height:1.55;color:#D8E2E2">{{ micHelp }}</div>
+        <div style="font-size:14px;line-height:1.55;color:#D8E2E2" data-dyn="">{{ micHelp }}</div>
         <button onClick="{{ retryDemo }}" style="margin-top:12px;background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#0B6E66">Try again</button>
       </div>
     </sc-if>
@@ -841,7 +898,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
             <div style="width:4px;height:100%;border-radius:2px;background:#0F8B80;transform-origin:bottom;animation:dd-bar 0.8s ease-in-out infinite;animation-delay:{{ bar.delay }}"></div>
           </sc-for>
         </div>
-        <div style="font-size:15px;font-variant-numeric:tabular-nums;color:#B9C4D4">{{ remaining }}s remaining</div>
+        <div style="font-size:15px;font-variant-numeric:tabular-nums;color:#B9C4D4" data-dyn="">{{ remaining }}s remaining</div>
         <button onClick="{{ endDemo }}" style="background:none;border:none;color:#5A6E86;font-size:13px;cursor:pointer;text-decoration:underline">End the call</button>
       </div>
     </sc-if>
@@ -921,6 +978,31 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 <section id="faq" data-section="faq" style="background:#FFFFFF;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
   <div data-reveal="" style="width:100%;max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:8px">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0 0 40px;text-align:center">Questions owners ask</h2>
+    <noscript>
+      <!-- The FAQ above is rendered from faqData by the runtime, so a crawler that does not
+           execute JavaScript sees an empty loop. This mirror carries the identical text, kept
+           honest by test/seo.test.mjs which fails if the two ever diverge. -->
+      <dl style="max-width:820px;margin:24px auto 0;text-align:left">
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Is this HIPAA-compliant?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what&#x27;s needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We&#x27;ll walk you through exactly how data flows on your strategy call, and we&#x27;re happy to sign a BAA with the voice platform if your practice requires one.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Will patients know it&#x27;s AI?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Some ask. The voice is natural enough that most don&#x27;t. It never pretends to be human when asked directly. It says it&#x27;s the practice&#x27;s automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What does usage roughly cost monthly?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us, and nothing else is billed monthly unless you choose a care plan.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What if it mishears something, or books the wrong details?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">It confirms every detail that matters. Name, phone number, and appointment time are read back to the caller before anything is booked. If a caller needs something outside its script, it takes a message and flags it for your staff instead of guessing. And when something does slip through, it slips through where you can see it: the appointment sits in your calendar like any other, so your team fixes it in seconds and we tune the script so it doesn&#x27;t happen twice.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How is this different from an answering service?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list, and every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Does it replace my front desk?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">No. It catches what they physically can&#x27;t: after-hours calls, lunch rushes, the second line while they&#x27;re checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Will this work with Dentrix, Eaglesoft or Open Dental?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes. That is the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn&#x27;t, Denty still books into a calendar your team already lives in.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How fast is go-live?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Contracts, cancellation, and data?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">No long-term contract. The setup fee is one-time, and care plans cancel anytime: the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don&#x27;t receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we&#x27;ll have it in place before a single patient call is answered. Ask us to delete anything you&#x27;ve given us and it&#x27;s deleted.</dd>
+      </dl>
+    </noscript>
     <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="9">
       <div style="border-bottom:1px solid #EEEAE0">
         <button onClick="{{ f.toggle }}" aria-expanded="{{ f.open }}" style="width:100%;background:none;border:none;padding:22px 4px;display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;font-size:16.5px;font-weight:500;color:#0A1A2F;text-align:left">
@@ -960,10 +1042,12 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <button class="dd-dash-panel" role="tab" type="button"
                 data-dash="{{ shot.id }}"
                 aria-selected="{{ shot.active }}"
+                aria-expanded="{{ shot.active }}"
                 aria-label="{{ shot.title }}"
-                onClick="{{ shot.pick }}"
-                onMouseEnter="{{ shot.pick }}">
+                onClick="{{ shot.pick }}">
           <span class="dd-dash-rail" aria-hidden="true">{{ shot.title }}</span>
+          <span class="dd-dash-body">
+           <span class="dd-dash-inner">
           <span class="dd-dash-frame">
             <span class="dd-dash-bar" aria-hidden="true"><i></i><i></i><i></i></span>
             <span class="dd-dash-scroll">
@@ -974,6 +1058,8 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
           <span class="dd-dash-cap">
             <strong>{{ shot.title }}</strong>
             <span>{{ shot.note }}</span>
+          </span>
+           </span>
           </span>
         </button>
       </sc-for>
@@ -1041,7 +1127,11 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     </div>
   </div>
 
-  <footer style="border-top:1px solid #22344E;max-width:1080px;margin:0 auto;padding:64px clamp(20px,5vw,32px) 28px;display:flex;flex-direction:column;gap:44px">
+</section>
+</main>
+
+<footer style="background:#0A1A2F;color:#FAF9F6">
+  <div style="border-top:1px solid #22344E;max-width:1080px;margin:0 auto;padding:64px clamp(20px,5vw,32px) 28px;display:flex;flex-direction:column;gap:44px">
     <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:44px">
       <div style="display:flex;flex-direction:column;gap:14px;max-width:280px">
         <div style="display:flex;align-items:center;gap:10px">
@@ -1072,8 +1162,8 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       <div>© 2026 Digi Dental. Powered by Voice Infrastructure.</div>
       <div>Built by <a href="https://bennys-portfolio.vercel.app/" target="_blank" rel="noopener" style="color:#5A6E86" style-hover="color:#8A9BB5">Benny</a>, founder.</div>
     </div>
-  </footer>
-</section>
+  </div>
+</footer>
 
 <!-- ================= STICKY MOBILE CTA ================= -->
 <sc-if value="{{ showSticky }}" hint-placeholder-val="{{ false }}">
@@ -1142,22 +1232,22 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <sc-if value="{{ st6 }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center">
             <div style="width:52px;height:52px;border-radius:50%;background:#2F7D5A;color:#FAF9F6;display:flex;align-items:center;justify-content:center;font-size:24px;animation:dd-pop .55s cubic-bezier(.34,1.56,.64,1) both">✓</div>
-            <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:600">{{ qualifyTitle }}</div>
-            <p style="font-size:14.5px;line-height:1.65;color:#3D4F66;margin:0;max-width:400px;text-wrap:pretty">{{ qualifyLead }}{{ qualifyBody }}</p>
+            <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:600" data-dyn="">{{ qualifyTitle }}</div>
+            <p style="font-size:14.5px;line-height:1.65;color:#3D4F66;margin:0;max-width:400px;text-wrap:pretty" data-dyn="">{{ qualifyLead }}{{ qualifyBody }}</p>
             <a href="{{ calendlyUrl }}" target="_blank" rel="noopener" onClick="{{ trackCalendlyModal }}" style="display:inline-block;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:15px 32px;font-size:15px;font-weight:600;text-decoration:none;box-shadow:0 6px 18px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px)">Pick your strategy-call time now</a>
-            <div style="font-size:12.5px;color:#5A6E86">{{ sentNote }}</div>
+            <div style="font-size:12.5px;color:#5A6E86" data-dyn="">{{ sentNote }}</div>
             <a href="https://wa.me/351912859130" target="_blank" rel="noopener" style="font-size:14px">Prefer to text? WhatsApp us instead</a>
           </div>
         </sc-if>
         <!-- BUG-10: an invalid or empty field used to make Continue/Submit do nothing at all. -->
         <sc-if value="{{ hasFormError }}" hint-placeholder-val="{{ false }}">
-          <p role="alert" style="margin:0;font-size:14px;line-height:1.5;color:#B4453C">{{ formError }}</p>
+          <p role="alert" style="margin:0;font-size:14px;line-height:1.5;color:#B4453C" data-dyn="">{{ formError }}</p>
         </sc-if>
       </div>
       <sc-if value="{{ stNav }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:36px">
           <button onClick="{{ back }}" style="background:none;border:none;color:{{ backColor }};font-size:14px;cursor:pointer">← Back</button>
-          <button onClick="{{ next }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:13px 28px;font-size:15px;font-weight:600;cursor:pointer;animation:{{ nextAnim }}" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">{{ nextLabel }}</button>
+          <button onClick="{{ next }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:13px 28px;font-size:15px;font-weight:600;cursor:pointer;animation:{{ nextAnim }}" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)" data-dyn="">{{ nextLabel }}</button>
         </div>
       </sc-if>
     </div>

@@ -77,9 +77,28 @@ const siteInfo = {
     llmsTxt: `${SITE}/llms.txt`,
     sitemap: `${SITE}/sitemap.xml`,
     robots: `${SITE}/robots.txt`,
+    structuredData: `${SITE}/ (JSON-LD in <head>: Organization, WebSite, WebPage, Service, FAQPage, Person, VideoObject x2, ImageObject)`,
   },
 
-  pricesAsOf: '2026-07-24',
+  // Stated so an answer engine cites the domain rather than the deployment host it may
+  // have crawled the same bytes from.
+  canonicalUrl: `${SITE}/`,
+  areaServed: 'United States',
+
+  founder: {
+    name: 'Benny',
+    role: 'Founder',
+    note: 'Configures and launches each practice’s AI receptionist personally.',
+    linkedin: 'https://www.linkedin.com/in/ceobenny/',
+  },
+
+  notFor: [
+    'Patients seeking dental treatment — Digi Dental is a vendor to practices and provides no dental care, diagnosis or clinical advice.',
+    'Practices wanting self-serve software to configure themselves; every setup is done for the practice.',
+    'Replacing front-desk staff; it covers the calls a team physically cannot reach.',
+  ],
+
+  pricesAsOf: '2026-08-10',
 };
 
 export default function handler(req: any, res: any) {

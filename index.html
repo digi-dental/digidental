@@ -294,6 +294,58 @@ input,select,button,textarea{font-family:inherit}
 }
 /* Founder card: square portrait with the note overlapping it on desktop. */
 .dd-founder{display:flex;flex-direction:column;align-items:stretch;gap:0}
+/* ---- Dashboard accordion -------------------------------------------------
+   One panel open, the rest collapsed to a vertical labelled rail. Mobile stacks them
+   full-width, because a 60px rail on a phone is a nuisance rather than a feature.
+   `--ar` is written per panel from the image's natural size once it loads, so the frame
+   always matches the real screenshot and never crops it. */
+.dd-dash{display:flex;flex-direction:column;gap:14px;margin-top:38px}
+.dd-dash-panel{
+  position:relative;display:block;width:100%;text-align:left;padding:0;
+  background:#FFFFFF;border:1px solid #E8E4DA;border-radius:18px;overflow:hidden;
+  cursor:pointer;font:inherit;color:inherit;
+  box-shadow:0 10px 30px rgba(10,26,47,0.06);
+  transition:border-color .3s ease, box-shadow .3s ease;
+}
+.dd-dash-panel:hover,.dd-dash-panel[aria-selected="true"]{border-color:#0F8B80;box-shadow:0 16px 40px rgba(10,26,47,0.12)}
+.dd-dash-panel:focus-visible{outline:2px solid #0F8B80;outline-offset:3px}
+.dd-dash-rail{display:none}
+.dd-dash-frame{display:block;background:#0A1A2F;position:relative}
+.dd-dash-bar{display:flex;gap:6px;align-items:center;padding:10px 14px;background:#12263F;border-bottom:1px solid #22344E}
+.dd-dash-bar i{width:9px;height:9px;border-radius:50%;background:#3D4F66;display:block}
+.dd-dash-scroll{
+  display:block;width:100%;
+  /* Cap the visible height so a 5000px capture does not become the whole page, and let the
+     rest scroll inside the frame. The image is never scaled to fit or cropped. */
+  max-height:min(70vh,560px);overflow-y:auto;overflow-x:hidden;background:#0A1A2F;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin
+}
+.dd-dash-scroll img{display:block;width:100%;height:auto;border:0}
+.dd-dash-cap{display:block;padding:16px 20px;background:#FFFFFF}
+.dd-dash-cap strong{display:block;font-size:16px;color:#0A1A2F;font-weight:600;margin-bottom:4px}
+.dd-dash-cap span{display:block;font-size:14px;line-height:1.6;color:#4A5C72}
+
+@media (min-width:1000px){
+  /* Desktop: the accordion proper. Collapsed panels shrink to a rail with a rotated label. */
+  .dd-dash{flex-direction:row;align-items:stretch;gap:12px;height:600px}
+  .dd-dash-panel{width:74px;flex:0 0 auto;transition:width .55s cubic-bezier(.22,1,.36,1),border-color .3s ease,box-shadow .3s ease}
+  .dd-dash-panel[aria-selected="true"]{width:100%;flex:1 1 auto}
+  .dd-dash-panel .dd-dash-frame,
+  .dd-dash-panel .dd-dash-cap{opacity:0;transition:opacity .3s ease .1s;pointer-events:none}
+  .dd-dash-panel[aria-selected="true"] .dd-dash-frame,
+  .dd-dash-panel[aria-selected="true"] .dd-dash-cap{opacity:1;pointer-events:auto}
+  .dd-dash-panel[aria-selected="true"] .dd-dash-rail{display:none}
+  .dd-dash-rail{
+    display:block;position:absolute;inset:0;
+    writing-mode:vertical-rl;transform:rotate(180deg);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:600;letter-spacing:0.04em;color:#4A5C72;white-space:nowrap
+  }
+  .dd-dash-scroll{max-height:496px}
+}
+@media (prefers-reduced-motion:reduce){
+  .dd-dash-panel{transition:none}
+}
 .dd-founder-photo{width:100%;aspect-ratio:1;border-radius:24px;overflow:hidden;background:#12263F;flex-shrink:0}
 .dd-founder-photo img{width:100%;height:100%;object-fit:cover;display:block}
 .dd-founder-card{background:#FAF9F6;color:#0A1A2F;border-radius:24px;padding:clamp(24px,4vw,34px);box-shadow:0 30px 70px rgba(0,0,0,0.45);margin-top:-40px;position:relative;z-index:2}
@@ -719,6 +771,55 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   </div>
 </section>
 
+<!-- ================= 9b. THE DASHBOARD THEY GET =================
+     Placed between the FAQ and the final CTA on purpose: objections have just been answered, the
+     price is known, and the last thing before the ask is proof that a real system exists behind
+     the promise. Screenshots are the practice owner's own console.
+
+     The panels are an accordion — one open, the rest collapsed to labelled rails, exactly the
+     interaction from the supplied React component, ported natively (this site has no React
+     build step or Tailwind; see the note in the README).
+
+     On ratios: these are full-page captures and their true dimensions are not known ahead of
+     time, so nothing here assumes one. Each frame takes its aspect ratio from the image's own
+     naturalWidth/naturalHeight once it loads, and very tall captures scroll inside their frame.
+     No crop, no letterbox, whatever the screenshots turn out to be. -->
+<section data-section="dashboard" style="background:#FAF9F6;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+  <div data-reveal="" class="dd-wrap" style="max-width:1180px;margin:0 auto">
+    <div style="text-align:center;max-width:720px;margin:0 auto 14px">
+      <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#0F8B80;font-weight:600;margin-bottom:14px">What you actually get</div>
+      <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.9rem,4.2vw,3rem);line-height:1.12;letter-spacing:-0.025em;margin:0 0 18px;color:#0A1A2F;text-wrap:balance">Every call, in writing, in your own dashboard</h2>
+      <p style="font-size:17px;line-height:1.7;color:#4A5C72;margin:0 0 8px;text-wrap:pretty">You are not handing your phone line to something you cannot see. Every call the receptionist takes is recorded, transcribed and timed, and you can read any of them back. This is the real console, not a mock-up.</p>
+    </div>
+
+    <div class="dd-dash" role="tablist" aria-label="Dashboard previews">
+      <sc-for list="{{ dashShots }}" as="shot" hint-placeholder-count="4">
+        <button class="dd-dash-panel" role="tab" type="button"
+                data-dash="{{ shot.id }}"
+                aria-selected="{{ shot.active }}"
+                aria-label="{{ shot.title }}"
+                onClick="{{ shot.pick }}"
+                onMouseEnter="{{ shot.pick }}">
+          <span class="dd-dash-rail" aria-hidden="true">{{ shot.title }}</span>
+          <span class="dd-dash-frame">
+            <span class="dd-dash-bar" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="dd-dash-scroll">
+              <img src="{{ shot.src }}" alt="{{ shot.alt }}" loading="lazy" decoding="async"
+                   onLoad="{{ shot.sized }}">
+            </span>
+          </span>
+          <span class="dd-dash-cap">
+            <strong>{{ shot.title }}</strong>
+            <span>{{ shot.note }}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+
+    <p style="text-align:center;font-size:14px;color:#6B7A8D;margin:26px auto 0;max-width:620px">Screens from the live console. Tall captures scroll inside their frame, so nothing is cropped.</p>
+  </div>
+</section>
+
 <!-- ================= 10. FINAL + FOOTER ================= -->
 <section data-section="final" style="background:#0A1A2F;color:#FAF9F6;padding:160px clamp(20px,4vw,48px) 0">
   <div data-reveal="" style="width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;padding-bottom:90px">
@@ -1004,6 +1105,7 @@ class Component extends DCLogic {
     remaining: 60, bubble: '', demoUsed: false, sendState: null,
     // Voice demo plumbing. `starting` disables the button between the click and the first state
     // change; `micState` drives the permission panel; `micWarn` is the "we cannot hear you" hint.
+    dashActive: 0, // which dashboard screenshot is expanded
     starting: false, micState: 'unknown', // unknown | granted | denied | error
     micWarn: false, micDeviceId: null
   };
@@ -1017,6 +1119,15 @@ class Component extends DCLogic {
              new URLSearchParams(location.search).get('debug') === '1';
     } catch (e) { return false; }
   })();
+
+  // The practice owner's console, as four real captures. Served through /api/image so the page
+  // carries no expiring Supabase token; see api/image.ts.
+  DASH_SHOTS = [
+    { id: 'dash-metrics', title: 'Call volume', note: 'How many calls came in, when they came in, and how they ended.' },
+    { id: 'dash-call', title: 'A single call', note: 'The full transcript and recording of one conversation, start to finish.' },
+    { id: 'dash-logs', title: 'Call log', note: 'Every call the receptionist has taken, searchable, with its outcome.' },
+    { id: 'dash-assistant', title: 'Your setup', note: 'Exactly how your receptionist is configured, in plain view.' }
+  ];
 
   CALLERS = [
     { tag: 'New patient, 7:42 PM, after hours', l1: '\u201CHi, I chipped a tooth at dinner. Can I get in tomorrow?\u201D', l2: '\u201CDr. Patel has 2:00 PM Tuesday open. Shall I book it?\u201D', booked: 'Booked: Tuesday 2:00 PM', cap: 'Booked while the office was closed.' },
@@ -1046,7 +1157,10 @@ class Component extends DCLogic {
   SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_MWPe84PkAw7Zo1T_MMvlFg_ppAOL';
 
   CALENDLY_URL = 'https://calendly.com/digidental/digi-dental-inquiry';
-  FOUNDER_PHOTO = 'uploads/profile.jpg';
+  // Served through /api/image so the page never carries the Supabase signed token, which expires
+  // 2027-08-10. If uploads/profile.jpg is ever committed, point this back at it and the route
+  // stops mattering. The monogram remains the fallback if the image fails to load.
+  FOUNDER_PHOTO = '/api/image?name=profile';
 
   // Analytics (BUG-12). Events always go first-party to /api/event. Plausible and GA4 are
   // optional extras: set PLAUSIBLE_DOMAIN to the live domain to load Plausible automatically,
@@ -1853,6 +1967,30 @@ class Component extends DCLogic {
     return 'Click the lock or microphone icon at the left of the address bar, set the microphone to Allow, then reload the page.';
   }
 
+  // Opening a panel is a real interaction worth measuring: it tells us which part of the console
+  // practice owners actually want to see before they commit.
+  pickDash(i) {
+    if (this.state.dashActive === i) return;
+    this.setState({ dashActive: i });
+    const shot = this.DASH_SHOTS[i];
+    this.track('cta_click', { location: 'dashboard_' + (shot ? shot.id : i) });
+  }
+
+  // Give the frame the screenshot's own aspect ratio the moment it loads. These are full-page
+  // captures whose dimensions are not known when the markup is written, so measuring beats
+  // guessing: a fixed box would crop a tall capture, and a letterboxed one would waste half the
+  // panel on a wide one.
+  sizeDash(e) {
+    const img = e && (e.target || e.currentTarget);
+    if (!img || !img.naturalWidth || !img.naturalHeight) return;
+    const frame = img.closest ? img.closest('.dd-dash-frame') : null;
+    if (frame) frame.style.setProperty('--ar', (img.naturalWidth / img.naturalHeight).toFixed(4));
+    // A very tall capture scrolls inside its frame rather than stretching the page; a short one
+    // simply shows in full. Either way the whole image is reachable and none of it is cut off.
+    const scroller = img.parentElement;
+    if (scroller && img.naturalHeight / img.naturalWidth < 1.2) scroller.style.maxHeight = 'none';
+  }
+
   // Called from the mic-denied panel. Clears the error and runs the whole start path again against
   // the same client instance, so no listeners are duplicated.
   retryDemo() {
@@ -2168,6 +2306,16 @@ class Component extends DCLogic {
       trackCalendlyModal: () => this.track('calendly_click', { location: 'form_complete' }),
       trackCalendlyExit: () => this.track('calendly_click', { location: 'exit_intent' }),
       // Founder card: the portrait swaps itself for the monogram if the file is not there yet.
+      dashShots: this.DASH_SHOTS.map((d, i) => ({
+        id: d.id, title: d.title, note: d.note,
+        src: '/api/image?name=' + d.id,
+        alt: 'Digi Dental dashboard: ' + d.title.toLowerCase(),
+        active: s.dashActive === i,
+        pick: () => this.pickDash(i),
+        // Runs on the image's own load event, which is the only moment the true dimensions are
+        // known. Nothing in the layout assumes a ratio before this.
+        sized: e => this.sizeDash(e)
+      })),
       founderPhotoOn: !!s.founderPhotoOk,
       founderMonogramOn: !s.founderPhotoOk,
       trackFounderWhatsapp: () => this.track('cta_click', { location: 'founder_whatsapp' }),

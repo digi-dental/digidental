@@ -127,6 +127,65 @@ async function open({ js = true, viewport = { width: 1280, height: 900 } } = {})
   await ctx.close();
 }
 
+// ============================================================ stat count-up stability
+{
+  // The count grows the string as well as the number ("0" -> "8,000"), and the stat reads
+  // "$<count>–$10,000". On a phone that line fits one row early in the count and needs two
+  // by the end, so it re-wraps mid-animation and the block jumps. The fix holds the box open
+  // with a hidden copy of the final string and paints the running value over it, out of flow.
+  const { page, ctx, errors } = await open({ viewport: { width: 390, height: 844 } });
+  await page.evaluate(() => document.querySelector('[data-section="cost"]').scrollIntoView());
+
+  // Drive the shipped animateCount directly so the sampling window cannot miss the short
+  // low-digit phase, and measure offsetWidth rather than getBoundingClientRect: the stats sit
+  // inside a data-reveal block whose entrance transform inflates the visual rect and would
+  // masquerade as layout drift.
+  const samples = await page.evaluate(async () => {
+    const app = window.__ddRoot;
+    const spans = [...document.querySelectorAll('[data-count]')];
+    document.querySelector('[data-section="cost"]').scrollIntoView();
+    await new Promise(r => setTimeout(r, 60));
+    spans.forEach(s => { s.textContent = '0'; app.animateCount(s); });
+    const W = spans.map(() => new Set());
+    const R = spans.map(() => new Set());
+    const t0 = performance.now();
+    while (performance.now() - t0 < 3800) {
+      spans.forEach((s, i) => {
+        W[i].add(s.offsetWidth);                       // layout width, transform-independent
+        R[i].add(s.parentElement.getClientRects().length);  // line boxes the stat occupies
+      });
+      await new Promise(r => setTimeout(r, 25));
+    }
+    return spans.map((s, i) => ({
+      count: s.dataset.count,
+      widths: [...W[i]].sort((a, b) => a - b),
+      rows: [...R[i]].sort(),
+    }));
+  });
+
+  check('stat count-ups were sampled while running', samples.length === 4, `${samples.length} stats`);
+
+  // Before the fix this span went 23 -> 69 -> 101 -> 103px as the digits arrived. That 80px
+  // swing is what carried the line past the wrap threshold and back on a phone.
+  const drift = samples.filter(s => s.widths.length > 1);
+  check('mobile: animated number holds one fixed width', drift.length === 0,
+    drift.map(s => `${s.count}: ${s.widths.join('->')}px`).join(', ') || `pinned at ${samples.map(s => s.widths[0]).join('/')}px`);
+
+  const reflowed = samples.filter(s => s.rows.length > 1);
+  check('mobile: stat never changes line count mid-count', reflowed.length === 0,
+    reflowed.map(s => `${s.count}: ${s.rows.join('->')} rows`).join(', ') || 'no re-wrap');
+
+  const finals = await page.evaluate(() => [...document.querySelectorAll('[data-count]')]
+    .map(s => ({ want: Number(s.dataset.count).toLocaleString('en-US'), got: s.textContent, kids: s.children.length })));
+  const wrong = finals.filter(f => f.want !== f.got);
+  check('every count-up lands on its target value', wrong.length === 0,
+    wrong.map(f => `${f.got} != ${f.want}`).join(', ') || finals.map(f => f.got).join(', '));
+  check('helper spans are cleaned up when the count finishes', finals.every(f => f.kids === 0),
+    finals.map(f => f.kids).join(','));
+  check('count-up produced no errors', errors.length === 0, errors[0] || 'none');
+  await ctx.close();
+}
+
 // ============================================================ dashboard accordion
 const selOf = page => page.evaluate(() =>
   [...document.querySelectorAll('.dd-dash-panel')].map(e => e.getAttribute('aria-selected')).join(','));

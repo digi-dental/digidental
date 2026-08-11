@@ -337,3 +337,26 @@ No `PLACEHOLDER` strings remain in rendered copy. What is still open, in priorit
    your own words. No testimonials, client counts or usage numbers until they are real.
 7. **Statistics** were sourced June 2026 — refresh annually. Stat 4 is now labelled as our own
    arithmetic rather than an uncited external figure.
+
+## Stat count-up
+The four figures in `[data-section="cost"]` count up over 3.4s via `animateCount`.
+
+**The count grows the string, not just the number.** `"0"` → `"8,000"` is four
+characters wider, and the stat around it reads `$<count>–$10,000`. Measured, that
+span's layout width went **23 → 69 → 101 → 103px** during a single run. On a phone
+the line fits one row at the start of that swing and needs two by the end, so it
+re-wrapped mid-count and the block jumped — worse on Android, where Chrome re-runs
+font boosting whenever the layout changes.
+
+The fix holds the box open with a hidden copy of the **final** string and paints the
+running value over it, absolutely positioned so it contributes no width. Reserving
+with the real final glyphs rather than a measured pixel value keeps it exact when
+Fraunces finishes loading and the metrics change underneath, and it does not rely on
+the font carrying tabular figures. Width is now a single value for the whole run.
+
+Scoped to `max-width:900px`. Desktop columns are wide enough that the line never
+re-wraps, and there the number growing outward from centre is the nicer read.
+
+When measuring this, use `offsetWidth`, not `getBoundingClientRect()` — the stats sit
+in a `data-reveal` block whose entrance transform inflates the visual rect and looks
+exactly like layout drift.

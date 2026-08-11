@@ -2035,14 +2035,56 @@ class Component extends DCLogic {
   animateCount(el) {
     const end = parseFloat(el.dataset.count);
     const fmt = v => Math.round(v).toLocaleString('en-US');
-    if (this._reduced) { el.textContent = fmt(end); return; }
+    const final = fmt(end);
+    if (this._reduced) { el.textContent = final; return; }
+
+    // The count grows the STRING as well as the number: "0" -> "8,000" is four characters
+    // wider, and the stat around it reads "$<count>–$10,000". On a phone that whole line
+    // fits on one row at "$0–$10,000" and needs two at "$8,000–$10,000", so the line count
+    // flips partway through the count and the block jumps — worse on Android, where Chrome
+    // re-runs font boosting when the layout changes.
+    //
+    // Fix: keep the rendered width constant for the whole animation by drawing the
+    // characters not yet reached as hidden copies of the real ones. Identical glyphs in the
+    // identical font means the width is exact without measuring anything, so it stays
+    // correct when Fraunces finishes loading and swaps the metrics underneath us.
+    //
+    // Desktop columns are wide enough that the line never re-wraps, and there the number
+    // growing outward from centre is the nicer read, so this is scoped to narrow layouts.
+    const hold = window.matchMedia('(max-width:900px)').matches;
+    let live = null;
+    if (hold) {
+      // A hidden copy of the FINAL string holds the box open; the running value is painted
+      // over it, out of flow, so it cannot contribute width. Reserving with the real final
+      // glyphs rather than a measured pixel value means this stays exact when Fraunces
+      // finishes loading and the metrics change underneath us, and it does not depend on
+      // the font carrying tabular figures.
+      const ghost = document.createElement('span');
+      ghost.textContent = final;
+      ghost.style.visibility = 'hidden';
+      ghost.setAttribute('aria-hidden', 'true');
+      live = document.createElement('span');
+      live.style.cssText = 'position:absolute;left:0;right:0;top:0;text-align:center';
+      el.style.position = 'relative';
+      el.style.display = 'inline-block';
+      el.textContent = '';
+      el.append(ghost, live);
+    }
+    const paint = v => {
+      if (hold) live.textContent = v; else el.textContent = v;
+    };
+
     const t0 = performance.now(), dur = 3400;
     const step = t => {
       const p = Math.min(1, (t - t0) / dur);
-      el.textContent = fmt(end * (1 - Math.pow(1 - p, 3)));
+      paint(fmt(end * (1 - Math.pow(1 - p, 3))));
       if (p < 1) requestAnimationFrame(step);
+      else if (hold) {                          // collapse back to plain text
+        el.textContent = final;
+        el.style.position = ''; el.style.display = '';
+      }
     };
-    el.textContent = '0';
+    paint('0');
     requestAnimationFrame(step);
   }
 

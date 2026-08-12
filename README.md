@@ -360,3 +360,49 @@ re-wraps, and there the number growing outward from centre is the nicer read.
 When measuring this, use `offsetWidth`, not `getBoundingClientRect()` — the stats sit
 in a `data-reveal` block whose entrance transform inflates the visual rect and looks
 exactly like layout drift.
+
+## Security posture
+Findings closed from the security audit, and what each one actually prevented:
+
+- **Client IP.** Every IP-keyed control read `x-forwarded-for[0]`. A proxy chain *prepends*
+  the client's own value, so that element is whatever the caller typed — one header
+  bypassed the free-demo gate, the lead rate limit and the login throttle at once.
+  `lib/http.ts` prefers `x-vercel-forwarded-for` and otherwise takes the **last** hop.
+- **Demo gate.** Was check-then-insert, so two simultaneous requests both won. Migration
+  009 adds a unique index on `demo_sessions.ip_hash`; the claim is an upsert with
+  `ignoreDuplicates` and a returned row is the proof. The check now fails **closed** — an
+  outage costs one retry, not uncapped voice minutes — and the client distinguishes
+  `already_demoed` from `unavailable` so our outage never spends a visitor's free demo.
+- **Lead email.** Visitor fields were interpolated raw into the owner's inbox. All escaped,
+  plain-text part added, control characters stripped, malformed addresses rejected.
+- **Admin session.** 24 hours, and `ADMIN_SESSION_SECRET` is now **required** — no silent
+  fallback to signing with the password.
+- **CSP.** Shipped, and `npm run test:render` serves `vercel.json`'s real headers so it is
+  exercised rather than trusted. **`'unsafe-eval'` is load-bearing**: the dc-runtime compiles
+  each logic class from a string, and without it the page renders 259 characters and mounts
+  nothing. `unpkg` (React) and `jsdelivr` (voice SDK, GSAP) are both required in `script-src`.
+  `connect-src` is deliberately broad because the voice SDK negotiates WebRTC through hosts
+  chosen at call time.
+
+**Still open, and why:** the signed storage URLs in `api/image.ts` and `api/video.ts` stay
+until the buckets are public and `IMAGE_*_URL` / `VIDEO_*_URL` are set — emptying them now
+breaks every image and both videos. They are download-only and expire 2027-08-10;
+`npm run test:security` pins them to those two files so the count can only go down.
+
+## Conversion changes
+From the marketing audit. Every one is placement or framing — no commercial term moved.
+
+- The **split start** now leads the hero trust line. It was the strongest argument on the
+  page and lived in pricing, where anyone who bounced early never saw it.
+- The **live demo** is a real secondary button, not an underlined line of text.
+- One CTA name everywhere: "Claim your practice audit slot" is gone.
+- **Year-one cost** as a `<details>` in the pricing card, because owners annualise whatever
+  they are shown and a guess is always worse than the arithmetic.
+- The three objections that stop a decision — HIPAA, PMS, go-live — render inline under the
+  demo and the pricing card, from the **same `faqData`** as the FAQ section, so an answer
+  cannot say two different things in two places.
+- The founder card sells **accountability**, not endorsement. There is a
+  `SOCIAL PROOF SLOT` for real customer quotes: populate `SOCIAL_PROOF` and the section
+  renders itself, tracked as `data-section="social_proof"`. **Leave it empty until a real
+  practice agrees to be quoted** — the page's credibility rests on sourced numbers and a
+  live demo, and one invented quote undoes both.

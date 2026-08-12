@@ -11,6 +11,7 @@
 //      are different things: the visitor sees nothing, the operator sees everything.
 import { createClient } from '@supabase/supabase-js';
 import { createHash } from 'node:crypto';
+import { clientIp, safeProps, trimReferrer } from '../lib/http';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hctpvnqanwhxlmpmfmme.supabase.co',
@@ -72,6 +73,12 @@ export default async function handler(req: any, res: any) {
     if (typeof body === 'string') {
       if (body.length > MAX_BODY) return res.status(200).json({ ok: false });
       try { body = JSON.parse(body); } catch { return res.status(200).json({ ok: false }); }
+    } else if (body && typeof body === 'object') {
+      // The cap above only ever saw string bodies. When the platform pre-parses the JSON it
+      // arrives as an object and skipped the check entirely, so a bot could push megabytes of
+      // `props` straight into a jsonb column and bloat the table and its indices for free.
+      try { if (JSON.stringify(body).length > MAX_BODY) return res.status(200).json({ ok: false }); }
+      catch { return res.status(200).json({ ok: false }); }
     }
     const { event, props, sid, vid, path, ref, utm } = body || {};
     if (!event || !ALLOWED.has(String(event))) return res.status(200).json({ ok: false });
@@ -79,7 +86,7 @@ export default async function handler(req: any, res: any) {
     // Same one-way hash as the demo gate: enough to rate-limit and spot abuse, never enough to
     // identify anyone. Raw IPs are never stored. Note this is no longer used as visitor
     // identity — visitor_id is, because IPs both rotate and are shared.
-    const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+    const ip = clientIp(req);
     const ipHash = createHash('sha256').update(ip + (process.env.IP_HASH_SALT || '')).digest('hex');
 
     // Geography comes free from Vercel's edge headers, so no IP lookup and no third party.
@@ -92,7 +99,10 @@ export default async function handler(req: any, res: any) {
 
     // Referrer host is stored separately so the dashboard never has to parse a URL, and the
     // full referrer is kept for anything the host alone cannot answer.
-    const referrer = clean(ref, 300);
+    // Origin + path only. A full referrer can carry query parameters that are not ours to
+    // keep — calendar invite ids, reset tokens, session ids from older apps — and attribution
+    // has never needed anything past the path.
+    const referrer = trimReferrer(ref, 300) || null;
     let referrerHost: string | null = null;
     if (referrer) { try { referrerHost = new URL(referrer).hostname.replace(/^www\./, '').slice(0, 120); } catch { referrerHost = null; } }
 
@@ -103,7 +113,10 @@ export default async function handler(req: any, res: any) {
     const { error } = await supabase.from('site_events').insert({
       event: String(event).slice(0, 64),
       category: CATEGORY[String(event)] || 'BEHAVIOR',
-      props: props && typeof props === 'object' ? props : {},
+      // Flattened to a bounded, shallow shape rather than stored as sent: at most 12 keys,
+      // each value at most 120 chars. Our own events are far below that; anything above it
+      // is someone else's payload.
+      props: safeProps(props),
       visitor_id: clean(vid, 64),
       session_id: clean(sid, 64),
       ip_hash: ipHash,

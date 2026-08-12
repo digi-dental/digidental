@@ -8,7 +8,8 @@
     "resend": "^4.0.0"
   },
   "scripts": {
-    "test": "node test/seo.test.mjs && node test/render.test.mjs && node test/vapi-call.test.mjs",
+    "test": "node test/security.test.mjs && node test/seo.test.mjs && node test/render.test.mjs && node test/vapi-call.test.mjs",
+    "test:security": "node test/security.test.mjs",
     "test:seo": "node test/seo.test.mjs",
     "test:render": "node test/render.test.mjs",
     "test:vapi": "node test/vapi-call.test.mjs"

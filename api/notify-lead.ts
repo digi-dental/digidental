@@ -3,6 +3,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { createHash } from 'node:crypto';
+import { clientIp, escHtml, clean, looksLikeEmail } from '../lib/http';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hctpvnqanwhxlmpmfmme.supabase.co',
@@ -34,7 +35,9 @@ function rateLimited(key: string) {
   return recent.length > RATE_MAX;
 }
 
-const str = (v: unknown, max = 200) => (v == null ? null : String(v).slice(0, max));
+// Truncates AND strips control characters: those corrupt mail headers and the dashboard's
+// rendering, and they are never present in a real practice name.
+const str = (v: unknown, max = 200) => (v == null ? null : (clean(v, max) || null));
 
 export default async function handler(req: any, res: any) {
   try {
@@ -53,7 +56,7 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ ok: true }); // look identical to success so bots don't learn
     }
 
-    const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+    const ip = clientIp(req);
     const ipHash = createHash('sha256').update(ip + (process.env.IP_HASH_SALT || '')).digest('hex');
     if (rateLimited(ipHash)) return res.status(429).json({ ok: false });
 
@@ -67,6 +70,16 @@ export default async function handler(req: any, res: any) {
     const u = (utm && typeof utm === 'object') ? utm : {};
     let referrerHost: string | null = null;
     if (ref) { try { referrerHost = new URL(String(ref)).hostname.replace(/^www\./, '').slice(0, 120); } catch { referrerHost = null; } }
+
+    // A form submission with a malformed address is a bot or a typo, and either way the
+    // notification it triggers is unactionable. Checked only for `form`: a demo_call or
+    // exit_intent lead legitimately arrives with no contact details at all, and rejecting
+    // those would throw away real signal. Migration 009 enforces the same shape at the
+    // database level, so this is the friendly failure rather than the only one.
+    if (source === 'form' && email && !looksLikeEmail(email)) {
+      console.warn('[notify-lead] rejected malformed email on form submission');
+      return res.status(200).json({ ok: false });
+    }
 
     // The columns every version of this table has had. Attribution is added on top.
     const core = {
@@ -112,22 +125,54 @@ export default async function handler(req: any, res: any) {
     const contactable = !!(email || phone);
     if (source === 'exit_intent' && !contactable) return res.status(200).json({ ok: true });
 
+    // Every field below is visitor-supplied and reaches the founder's inbox. Interpolated raw,
+    // a lead named `<a href="https://evil.example">Confirm your slot</a>` rendered as a working
+    // link inside a message he trusts. Mail clients do not run scripts, but a trusted inbox is
+    // exactly where a convincing link does its damage.
+    const f = {
+      name: escHtml(str(name) || '—'),
+      practice: escHtml(str(practice_name) || '—'),
+      email: escHtml(str(email, 320) || '—'),
+      phone: escHtml(str(phone, 40) || '—'),
+      country: escHtml(str(country, 80) || '—'),
+      volume: escHtml(str(monthly_call_volume, 40) || '—'),
+      locations: escHtml(str(locations, 20) || '—'),
+    };
     const qualified = ['200–500', '500–1,000', '1,000+'].includes(monthly_call_volume) || parseInt(locations, 10) > 1;
+    const fit = qualified ? 'Fit (volume or multi-location)' : 'Smaller practice';
     const leadSummaryHtml = `
       <h2>Digi Dental — new ${source === 'demo_call' ? 'demo call' : 'lead'}</h2>
-      <p><strong>Name:</strong> ${str(name) || '—'}<br>
-      <strong>Practice:</strong> ${str(practice_name) || '—'}<br>
-      <strong>Email:</strong> ${str(email, 320) || '—'} &nbsp; <strong>Phone:</strong> ${str(phone, 40) || '—'}<br>
-      <strong>Country:</strong> ${str(country, 80) || '—'} &nbsp; <strong>Calls/mo:</strong> ${str(monthly_call_volume, 40) || '—'} &nbsp; <strong>Locations:</strong> ${str(locations, 20) || '—'}<br>
-      <strong>Source:</strong> ${source} &nbsp; <strong>At:</strong> ${new Date().toISOString()}<br>
-      <strong>Qualification:</strong> ${qualified ? 'Fit (volume or multi-location)' : 'Smaller practice'}</p>
+      <p><strong>Name:</strong> ${f.name}<br>
+      <strong>Practice:</strong> ${f.practice}<br>
+      <strong>Email:</strong> ${f.email} &nbsp; <strong>Phone:</strong> ${f.phone}<br>
+      <strong>Country:</strong> ${f.country} &nbsp; <strong>Calls/mo:</strong> ${f.volume} &nbsp; <strong>Locations:</strong> ${f.locations}<br>
+      <strong>Source:</strong> ${escHtml(source)} &nbsp; <strong>At:</strong> ${new Date().toISOString()}<br>
+      <strong>Qualification:</strong> ${fit}</p>
       ${source === 'demo_call' ? '<p>They just finished a live demo call on the site — call them back today.</p>' : ''}`;
+
+    // A plain-text alternative, so the message is still readable and still safe if the HTML
+    // part is ever mishandled or the escaping above regresses.
+    const leadSummaryText = [
+      `Digi Dental - new ${source === 'demo_call' ? 'demo call' : 'lead'}`,
+      `Name:      ${str(name) || '-'}`,
+      `Practice:  ${str(practice_name) || '-'}`,
+      `Email:     ${str(email, 320) || '-'}`,
+      `Phone:     ${str(phone, 40) || '-'}`,
+      `Country:   ${str(country, 80) || '-'}`,
+      `Calls/mo:  ${str(monthly_call_volume, 40) || '-'}`,
+      `Locations: ${str(locations, 20) || '-'}`,
+      `Source:    ${source}`,
+      `At:        ${new Date().toISOString()}`,
+      `Fit:       ${fit}`,
+      source === 'demo_call' ? '\nThey just finished a live demo call on the site - call them back today.' : '',
+    ].join('\n');
 
     await resend.emails.send({
       from: FROM,
       to: process.env.NOTIFY_EMAIL_TO || 'bennysworkspace@gmail.com',
       subject: source === 'demo_call' ? 'Digi Dental: demo call completed' : `New Digi Dental lead: ${practice_name || name || 'unnamed'} (${monthly_call_volume || '?'} calls/mo)`,
       html: leadSummaryHtml,
+      text: leadSummaryText,
     });
     return res.status(200).json({ ok: true });
   } catch {

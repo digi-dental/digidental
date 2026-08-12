@@ -622,10 +622,9 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <p style="font-size:17px;line-height:1.65;color:#3D4F66;max-width:740px;margin:0;text-wrap:pretty">A 24/7 human-sounding AI receptionist that answers every call and writes appointments straight into your calendar, set up entirely for you.</p>
     <div class="dd-hero-cta" style="display:flex;flex-direction:column;align-items:center;gap:14px">
       <button onClick="{{ openBookingHero }}" data-cta="hero" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(10,26,47,0.2)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
-      <div style="font-size:13px;color:#5A6E86;font-variant-numeric:tabular-nums;line-height:1.6;text-wrap:pretty">A free 20-minute call, no pressure. $2,000 one-time setup, and most practices are live within a week.</div>
+      <button onClick="{{ scrollToToothy }}" data-cta="hero_demo_button" aria-label="Hear the AI receptionist live, a 60 second demo" style="background:none;color:#0F8B80;border:1.5px solid #0F8B80;border-radius:12px;padding:16px 30px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;transition:background-color .25s,color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;color:#FAF9F6;transform:translateY(-2px)">Hear it live — 60-second demo</button>
+      <div style="font-size:13px;color:#5A6E86;font-variant-numeric:tabular-nums;line-height:1.6;text-wrap:pretty">A free 20-minute call, no pressure. Start for $1,000 — the rest is due only once we book a real patient into your calendar within 14 days. If we don’t, you don’t owe it.</div>
       <div class="dd-hero-links" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px">
-        <a href="#demo" onClick="{{ scrollToToothy }}" data-cta="hero_demo" style="font-size:15px;color:#0F8B80;background:none;border:none;cursor:pointer">Or talk to the AI yourself ↓</a>
-        <span aria-hidden="true" style="color:#D8D2C4">·</span>
         <a href="https://wa.me/351912859130" target="_blank" rel="noopener" onClick="{{ trackWhatsappHero }}" data-cta="hero_whatsapp" style="font-size:15px;color:#0F8B80">Prefer to talk? WhatsApp us</a>
       </div>
     </div>
@@ -858,7 +857,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 <section id="demo" data-toothy="" data-section="demo" style="background:#0A1A2F;padding:160px clamp(20px,4vw,48px);color:#FAF9F6;border-top:1px solid #EEEAE0">
   <div style="width:100%;max-width:900px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center">
     <p style="font-family:'Fraunces',serif;font-size:clamp(1.8rem,4.2vw,2.7rem);line-height:1.4;margin:0;text-wrap:balance;color:#FAF9F6">“Don't take anyone's word for it. Talk to the receptionist yourself.”</p>
-    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.3rem,2.8vw,1.7rem);letter-spacing:-0.02em;margin:0;text-wrap:balance;color:#8A9BB5">Meet the receptionist. Right now.</h2>
+    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.3rem,2.8vw,1.7rem);letter-spacing:-0.02em;margin:0;text-wrap:balance;color:#8A9BB5">Your phone rings. This answers it. Hear exactly what your patients will hear.</h2>
     <!-- Speech bubble -->
     <div style="min-height:64px;display:flex;align-items:flex-end;justify-content:center">
       <sc-if value="{{ bubbleOn }}" hint-placeholder-val="{{ false }}">
@@ -925,6 +924,16 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       </ul>
     </div>
   </div>
+    <!-- M-6: the three objections that stop a decision, answered where the decision is made
+         rather than only at the bottom of the page. Same source as the FAQ section. -->
+    <div style="max-width:720px;margin:36px auto 0;text-align:left">
+      <sc-for list="{{ faqTop }}" as="ft" hint-placeholder-count="3">
+        <details style="border-top:1px solid #22344E;padding:14px 0">
+          <summary style="cursor:pointer;font-size:15px;font-weight:600;color:#FAF9F6;list-style:none">{{ ft.q }}</summary>
+          <p style="margin:10px 0 0;font-size:14px;line-height:1.7;color:#B9C4D4">{{ ft.a }}</p>
+        </details>
+      </sc-for>
+    </div>
 </section>
 
 <!-- ================= 8. PRICING ================= -->
@@ -960,14 +969,38 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
           <div style="font-size:13px;color:#5A6E86;line-height:1.6;text-wrap:pretty">What you're paying for is the ongoing service, not the integration. Optional, no minimum term, cancel anytime. Skip the plan entirely and Google Calendar setup is still included with your setup fee, and your receptionist keeps answering either way.</div>
         </div>
       </div>
+      <!-- M-5: owners annualise whatever they are shown. Better they read our arithmetic than
+           invent their own. Every figure here appears elsewhere on the page already. -->
+      <details style="margin-top:22px;border-top:1px solid #EEEAE0;padding-top:18px">
+        <summary style="cursor:pointer;font-size:14px;font-weight:600;color:#0A1A2F;list-style:none">What year one actually costs</summary>
+        <div style="font-size:14px;line-height:1.75;color:#4A5C72;margin-top:12px;font-variant-numeric:tabular-nums">
+          $2,000 setup, once — or $1,000 up front on the split start. Then voice usage on your own
+          account, at cost: roughly $60–$150 a month for a practice handling 300 answered calls.
+          A care plan is optional at $149 or $299 a month.
+          <br><br>
+          Without a care plan that is about <strong>$250–$350 a month equivalent across year one</strong>,
+          and year two costs only the usage. With the PMS plan it is nearer $460–$550. No markup on
+          usage, and nothing else bills monthly.
+        </div>
+      </details>
+
       <!-- Risk reversal: this is the load-bearing line of the pricing section, not a footnote. -->
       <div style="background:#0A1A2F;color:#FAF9F6;border-radius:16px;padding:clamp(22px,3.5vw,30px);display:flex;flex-direction:column;gap:10px;text-align:center">
         <div style="font-family:'Fraunces',serif;font-size:clamp(1.25rem,2.8vw,1.6rem);font-weight:600;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;text-wrap:balance">Start for $1,000. The rest is on us until it works.</div>
         <p style="margin:0;font-size:15px;line-height:1.65;color:#B9C4D4;max-width:520px;margin-inline:auto;text-wrap:pretty;font-variant-numeric:tabular-nums">You pay the remaining $1,000 only once Denty books a real patient into your calendar, inside the first 14 days of go-live. If it doesn't, you don't. That's how sure we are.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:14px">
-        <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" onClick="{{ trackCalendlyPricing }}" data-cta="pricing" style="display:block;text-align:center;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:17px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Claim your practice audit slot</a>
+        <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" onClick="{{ trackCalendlyPricing }}" data-cta="pricing" style="display:block;text-align:center;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:17px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</a>
         <div style="font-size:12.5px;color:#8A93A1;line-height:1.6;text-align:center;font-variant-numeric:tabular-nums">Free 20-minute call. Ask about the split start on it. No paperwork, just say the word.</div>
+        <!-- M-6: the same three objections, answered at the moment the price is read. -->
+        <div style="max-width:640px;margin:26px auto 0;text-align:left">
+          <sc-for list="{{ faqTop }}" as="ft" hint-placeholder-count="3">
+            <details style="border-top:1px solid #EEEAE0;padding:14px 0">
+              <summary style="cursor:pointer;font-size:15px;font-weight:600;color:#0A1A2F;list-style:none">{{ ft.q }}</summary>
+              <p style="margin:10px 0 0;font-size:14px;line-height:1.7;color:#4A5C72">{{ ft.a }}</p>
+            </details>
+          </sc-for>
+        </div>
       </div>
       <div ref="{{ glareRef }}" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;opacity:0.15;border-radius:24px"></div>
     </div>
@@ -1090,6 +1123,34 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   </div>
 
   <!-- ================= FOUNDER ================= -->
+  <!-- ============================ SOCIAL PROOF SLOT ============================
+       For REAL customer quotes only. Populate this.SOCIAL_PROOF in the logic class with
+       { quote, name, practice, metric } entries and the section renders itself; leave it
+       empty and nothing appears at all.
+
+       Do not fill this with anything invented. A dental owner spending $2,000 is asking
+       "who else has this?", and a fabricated answer is worth less than no answer — the
+       page's credibility is currently built on sourced numbers and a live demo, and one
+       fake quote would undo both.
+
+       It is a tracked section (data-section="social_proof"), so once real quotes land,
+       rpc_sections shows its reach and exit rate against its neighbours. ==================== -->
+  <sc-if value="{{ hasSocialProof }}" hint-placeholder-val="{{ false }}">
+    <section data-section="social_proof" style="background:#FAF9F6;padding:120px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+      <div data-reveal="" class="dd-wrap" style="max-width:1080px;margin:0 auto;text-align:center">
+        <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#0F8B80;font-weight:600;margin-bottom:14px">From practices running it</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:24px;margin-top:32px;text-align:left">
+          <sc-for list="{{ socialProof }}" as="sp" hint-placeholder-count="2">
+            <figure style="margin:0;background:#FFFFFF;border:1px solid #E8E4DA;border-radius:18px;padding:28px;box-shadow:0 10px 30px rgba(10,26,47,0.06)">
+              <blockquote style="margin:0;font-size:17px;line-height:1.7;color:#0A1A2F">{{ sp.quote }}</blockquote>
+              <figcaption style="margin-top:18px;font-size:14px;color:#4A5C72">{{ sp.name }} · {{ sp.practice }}</figcaption>
+            </figure>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
   <!-- Portrait + overlapping note, adapted from the profile-card pattern into this page's
        own markup and palette. BENNY: the photo is uploads/profile.jpg. Until that file
        exists the card falls back to the monogram automatically, so nothing ever renders broken. -->
@@ -1108,7 +1169,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
           <div style="font-family:'Fraunces',serif;font-size:clamp(1.4rem,2.6vw,1.75rem);font-weight:600;letter-spacing:-0.02em;color:#0A1A2F">Built by Benny</div>
           <div style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#8A93A1;margin-top:6px">Founder, Digi Dental</div>
         </div>
-        <p style="margin:0 0 24px;font-size:15.5px;line-height:1.75;color:#3D4F66;text-wrap:pretty">Digi Dental is a one-person shop, on purpose. I build and tune every receptionist myself: your script, your insurance list, your calendar. When something needs changing you message me, not a support queue. The demo above is the same system I would configure for your practice, which is why I would rather you try it than take my word for it.</p>
+        <p style="margin:0 0 24px;font-size:15.5px;line-height:1.75;color:#3D4F66;text-wrap:pretty">Digi Dental is a one-person shop, on purpose. I build and tune every receptionist myself: your script, your insurance list, your calendar. When something needs changing you message me, not a support queue. The demo above is the same system I would configure for your practice, which is why I would rather you try it than take my word for it. Every setup is done personally, by me. If the receptionist under-delivers, you know exactly who to call — and the number is right here.</p>
         <div style="display:flex;flex-wrap:wrap;gap:12px">
           <a href="https://wa.me/351912859130" target="_blank" rel="noopener" onClick="{{ trackFounderWhatsapp }}" aria-label="WhatsApp Benny" title="WhatsApp" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="#FAF9F6" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.87 9.87 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.25-4.35c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.83 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.2-8.24 8.2Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07s.89 2.4 1.02 2.56c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.22-.17-.47-.29Z"></path></svg>
@@ -1381,6 +1442,11 @@ class Component extends DCLogic {
     { id: 'dash-logs', title: 'Call log', note: 'Every call the receptionist has taken, searchable, with its outcome.' },
     { id: 'dash-assistant', title: 'Your setup', note: 'Exactly how your receptionist is configured, in plain view.' }
   ];
+
+  // Real customer quotes only — see the SOCIAL PROOF SLOT comment in the markup. While this is
+  // empty the section does not render at all, which is the correct state until a practice
+  // agrees to be quoted. Add entries as { quote, name, practice }.
+  SOCIAL_PROOF = [];
 
   CALLERS = [
     { tag: 'New patient, 7:42 PM, after hours', l1: '\u201CHi, I chipped a tooth at dinner. Can I get in tomorrow?\u201D', l2: '\u201CDr. Patel has 2:00 PM Tuesday open. Shall I book it?\u201D', booked: 'Booked: Tuesday 2:00 PM', cap: 'Booked while the office was closed.' },
@@ -2124,9 +2190,16 @@ class Component extends DCLogic {
     }
     const total = this.props.demoSeconds ?? 60;
     this.setState({ toothy: 'connecting', bubble: 'Connecting…', remaining: total });
-    this.gateDemo().then(approved => {
+    this.gateDemo().then(gate => {
       if (this.state.toothy !== 'connecting') return; // visitor navigated away mid-check
-      if (!approved) {
+      if (!gate.ok && gate.reason !== 'already_demoed') {
+        // Our own gate could not answer. Refuse this attempt so an outage cannot uncap voice
+        // spend, but leave no mark on the visitor — they get a retry, not a spent demo.
+        this.failCall("We couldn't start the demo just now. Give it a moment and try again.");
+        this.track('demo_blocked', { by: gate.reason || 'unavailable' });
+        return;
+      }
+      if (!gate.ok) {
         try { localStorage.setItem('dd_demo_used', '1'); } catch (e) {}
         this.setState({ toothy: 'limited', demoUsed: true, modal: 'booking',
           bubble: "Looks like this line already had its free call. Want one answering your practice's phone?" });
@@ -2179,25 +2252,40 @@ class Component extends DCLogic {
 
   // BUG-2: the only gate used to be a localStorage flag any visitor could clear. The real check
   // lives in /api/demo-session (one call per hashed IP); localStorage stays as the instant,
-  // no-round-trip layer above it. Deliberately fails OPEN — a hot lead must never be turned
-  // away because our own endpoint hiccuped. Only an explicit 'already_demoed' blocks a call.
+  // no-round-trip layer above it.
+  //
+  // Returns { ok, reason } rather than a bare boolean, because the two ways a call can be
+  // refused need opposite handling. 'already_demoed' is the visitor's own second attempt and
+  // should stick. 'unavailable' means OUR lookup failed — blocking that attempt caps voice
+  // spend during an outage, but it must never mark the visitor as having used a demo they
+  // never got. A transport error still fails open: a hot lead is not turned away because our
+  // endpoint hiccuped.
   gateDemo() {
-    if (this.state.formDone) return Promise.resolve(true); // already a lead: let them keep testing
+    if (this.state.formDone) return Promise.resolve({ ok: true }); // already a lead: let them keep testing
     try {
       return fetch('/api/demo-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
         .then(r => (r.ok ? r.json() : null))
-        .then(j => !(j && j.approved === false && j.reason === 'already_demoed'))
-        .catch(() => true);
-    } catch (e) { return Promise.resolve(true); }
+        .then(j => {
+          if (!j) return { ok: true };
+          this._gateToken = j.token || '';
+          return j.approved === false ? { ok: false, reason: j.reason || 'blocked' } : { ok: true };
+        })
+        .catch(() => ({ ok: true }));
+    } catch (e) { return Promise.resolve({ ok: true }); }
   }
 
   // Spends the demo, once, at the moment the call connects — not when the button is clicked.
   // A denied microphone or a dropped connection therefore costs the visitor nothing.
+  // Carries the short-lived token minted by the check above, which ties this claim to a gate
+  // decision made seconds ago for the same IP.
   claimDemo() {
     if (this._claimed || this.state.formDone) return;
     this._claimed = true;
     try {
-      fetch('/api/demo-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ claim: true }), keepalive: true }).catch(() => {});
+      fetch('/api/demo-session', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ claim: true, token: this._gateToken || '' }), keepalive: true
+      }).catch(() => {});
     } catch (e) {}
   }
 
@@ -2577,6 +2665,9 @@ class Component extends DCLogic {
       retryDemo: () => this.retryDemo(),
       endDemo: () => this.hangUp(),
       // faq
+      // Indices into faqData, not copies of it: HIPAA, PMS compatibility, go-live speed.
+      // Editing an answer in one place changes it everywhere it appears.
+      faqTop: [0, 6, 7].map(i => faqData[i]).filter(Boolean).map(f => ({ q: f.q, a: f.a })),
       faqs: faqData.map((f, i) => ({ ...f, open: s.faqOpen === i, icon: s.faqOpen === i ? '−' : '+', toggle: () => this.setState({ faqOpen: s.faqOpen === i ? -1 : i }) })),
       // pricing card tilt
       tiltRef: el => { this._tiltEl = el; },
@@ -2601,6 +2692,8 @@ class Component extends DCLogic {
       trackCalendlyModal: () => this.track('calendly_click', { location: 'form_complete' }),
       trackCalendlyExit: () => this.track('calendly_click', { location: 'exit_intent' }),
       // Founder card: the portrait swaps itself for the monogram if the file is not there yet.
+      hasSocialProof: this.SOCIAL_PROOF.length > 0,
+      socialProof: this.SOCIAL_PROOF.map(sp => ({ quote: sp.quote, name: sp.name, practice: sp.practice })),
       dashShots: this.DASH_SHOTS.map((d, i) => ({
         id: d.id, title: d.title, note: d.note,
         src: '/api/image?name=' + d.id,

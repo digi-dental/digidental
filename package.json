@@ -12,7 +12,8 @@
     "test:security": "node test/security.test.mjs",
     "test:seo": "node test/seo.test.mjs",
     "test:render": "node test/render.test.mjs",
-    "test:vapi": "node test/vapi-call.test.mjs"
+    "test:vapi": "node test/vapi-call.test.mjs",
+    "seo:submit": "node scripts/ping-indexnow.mjs"
   },
   "devDependencies": {
     "playwright-core": "^1.49.0",

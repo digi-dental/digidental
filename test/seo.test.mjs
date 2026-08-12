@@ -96,6 +96,19 @@ let graph;
   const schemaQs = (faqNode?.mainEntity ?? []).map(q => q.name);
 
   check('FAQ questions found on the page', pageQs.length > 0, `${pageQs.length} on page`);
+
+  // Counting questions with a regex is not the same as the array being valid JavaScript.
+  // Appending an entry after one that had no trailing comma produced a faqData that still
+  // matched the regex 13 times while the whole logic class failed to evaluate and the page
+  // rendered nothing. Parse it for real.
+  let faqParsed = null, faqErr = '';
+  try { faqParsed = eval('[' + (html.match(/const faqData = \[([\s\S]*?)\n    \];/)?.[1] ?? '') + ']'); }
+  catch (e) { faqErr = e.message; }
+  check('faqData is valid JavaScript', Array.isArray(faqParsed) && faqParsed.length === pageQs.length,
+    faqErr || `${faqParsed?.length} entries`);
+  check('every faqData entry has a question and an answer',
+    Array.isArray(faqParsed) && faqParsed.every(f => f && f.q && f.a),
+    faqParsed ? `${faqParsed.filter(f => !f?.q || !f?.a).length} malformed` : 'unparsed');
   check('schema FAQ count matches the page', pageQs.length === schemaQs.length,
     `page ${pageQs.length} vs schema ${schemaQs.length}`);
 
@@ -153,6 +166,55 @@ let graph;
   // crossed while each was mid-transition.
   check('dashboard panels are not hover-driven', !/onMouseEnter/.test(html),
     /onMouseEnter/.test(html) ? 'onMouseEnter is back' : 'click only');
+}
+
+// ---------------------------------------------------------------- answer-engine surfaces
+{
+  // Three files describe the same business to machines. When they disagree, an answer engine
+  // quotes whichever it crawled last, and there is no error anywhere to notice.
+  const metros = ['Chandler', 'Gilbert', 'Tempe', 'Scottsdale', 'Paradise Valley', 'Phoenix', 'Mesa', 'Queen Creek'];
+  const missingInfo = metros.filter(m => !siteInfo.includes(m));
+  check('site-info lists the focus metros', missingInfo.length === 0, missingInfo.join(', ') || `${metros.length} metros`);
+  const missingLlms = metros.filter(m => !llms.includes(m));
+  check('llms.txt lists the same metros', missingLlms.length === 0, missingLlms.join(', ') || 'in sync');
+
+  for (const field of ['problemsSolved', 'commonGaps', 'evidence', 'focusAreas']) {
+    check(`site-info exposes ${field}`, new RegExp(`\\b${field}\\s*:`).test(siteInfo));
+  }
+  // Every statistic must carry its attribution, or it reads as our claim rather than a cited one.
+  const evidence = siteInfo.slice(siteInfo.indexOf('evidence:'), siteInfo.indexOf('pricesAsOf'));
+  const stats = (evidence.match(/stat:/g) || []).length;
+  const sources = (evidence.match(/source:/g) || []).length;
+  check('every evidence entry carries a source', stats > 0 && stats === sources, `${stats} stats, ${sources} sources`);
+
+  // The business is a vendor to practices. Typing it as a local business or a dentist tells
+  // Google it treats patients, which is false and muddies the entity.
+  const wrongTypes = ['LocalBusiness', 'ProfessionalService', 'Dentist', 'MedicalBusiness']
+    .filter(t => new RegExp(`"@type":\\s*"${t}"`).test(html));
+  check('business is not mistyped as a local practice', wrongTypes.length === 0, wrongTypes.join(', ') || 'vendor typing intact');
+
+  const org = graph.find(n => n['@type'] === 'Organization');
+  check('Organization has sameAs profiles', Array.isArray(org?.sameAs) && org.sameAs.length >= 3,
+    `${org?.sameAs?.length || 0} profiles`);
+  // sameAs means "another authoritative page about this entity". A click-to-chat deep link is
+  // not one, and Google ignores or distrusts the whole list when it contains junk.
+  const badSameAs = (org?.sameAs || []).filter(u => /wa\.me|mailto:|tel:/.test(u));
+  check('sameAs contains only profile URLs', badSameAs.length === 0, badSameAs.join(', ') || 'clean');
+  check('Organization declares a brand', org?.brand?.name === 'Digi Dental');
+}
+
+// ---------------------------------------------------------------- IndexNow
+{
+  const keyFiles = fs.readdirSync(ROOT).filter(f => /^[0-9a-f]{8,128}\.txt$/i.test(f));
+  check('an IndexNow key file exists at the root', keyFiles.length === 1, keyFiles.join(', ') || 'none');
+  if (keyFiles.length === 1) {
+    const name = keyFiles[0].replace(/\.txt$/i, '');
+    const body = fs.readFileSync(path.join(ROOT, keyFiles[0]), 'utf8').trim();
+    // IndexNow verifies ownership by fetching the file and comparing it to its own name.
+    check('key file contents match its filename', body === name, `${body.slice(0, 8)}… vs ${name.slice(0, 8)}…`);
+    check('robots.txt does not block the key file',
+      !new RegExp(`Disallow:\\s*/${name}`).test(robots) && !/^Disallow:\s*\/$/m.test(robots));
+  }
 }
 
 // ---------------------------------------------------------------- headings

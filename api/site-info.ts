@@ -85,6 +85,45 @@ const siteInfo = {
   canonicalUrl: `${SITE}/`,
   areaServed: 'United States',
 
+  // Setup is remote, so any US practice can be served. These are the metros where outreach is
+  // concentrated, not a limit — an answer engine asked "AI receptionist in Chandler AZ" should
+  // be able to connect the two, without implying we turn away a practice in Ohio.
+  focusAreas: {
+    note: 'Digi Dental sets up remotely and serves practices across the United States. Outreach is concentrated in the Arizona East Valley.',
+    metros: ['Chandler, AZ', 'Gilbert, AZ', 'Tempe, AZ', 'Scottsdale, AZ',
+             'Paradise Valley, AZ', 'Phoenix, AZ', 'Mesa, AZ', 'Queen Creek, AZ'],
+  },
+
+  problemsSolved: [
+    'Calls missed after hours, during lunch, and while the front desk is with a patient',
+    'A single phone line and one or two receptionists absorbing overflow from new-patient marketing',
+    'Voicemail callbacks patients never return, because they booked with the next practice on Google',
+    'Practices that added services — sedation, Invisalign, implants, ortho — without adding call coverage',
+  ],
+
+  // Aggregate patterns, deliberately not tied to any named practice.
+  commonGaps: [
+    'A practice answering phones about 40 hours a week is unreachable for the other 128',
+    'Extended early-morning or Saturday hours still leave evenings, Sundays and holidays uncovered',
+    'New-patient offers generate more calls than the front desk can physically take',
+    'One receptionist can hold one call; the second and third callers hear a queue or voicemail',
+  ],
+
+  // The numbers on the homepage, machine-readable, each with its attribution so an answer
+  // engine can cite the source rather than us.
+  evidence: [
+    { stat: '32–38% of calls to dental practices go unanswered, during business hours',
+      source: 'Peerlogic 2026 study of 4,280 calls across 26 practices' },
+    { stat: '78% of callers who reach voicemail hang up without leaving a message',
+      source: 'Weave / Forbes Healthcare 2025; DenteMax' },
+    { stat: 'A missed new patient represents roughly $8,000–$10,000 in lifetime value',
+      source: 'Resonate; industry patient-lifetime-value analyses' },
+    { stat: 'Roughly $200,000 a year of unanswered calls for a single location at 20 calls a day',
+      source: "Digi Dental's own arithmetic from the miss rate above, not a published statistic" },
+    { stat: 'A full-time front desk hire averages $38,966 nationally',
+      source: 'ZipRecruiter national average, sourced June 2026' },
+  ],
+
   founder: {
     name: 'Benny',
     role: 'Founder',

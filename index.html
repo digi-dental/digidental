@@ -2124,9 +2124,16 @@ class Component extends DCLogic {
     }
     const total = this.props.demoSeconds ?? 60;
     this.setState({ toothy: 'connecting', bubble: 'Connecting…', remaining: total });
-    this.gateDemo().then(approved => {
+    this.gateDemo().then(gate => {
       if (this.state.toothy !== 'connecting') return; // visitor navigated away mid-check
-      if (!approved) {
+      if (!gate.ok && gate.reason !== 'already_demoed') {
+        // Our own gate could not answer. Refuse this attempt so an outage cannot uncap voice
+        // spend, but leave no mark on the visitor — they get a retry, not a spent demo.
+        this.failCall("We couldn't start the demo just now. Give it a moment and try again.");
+        this.track('demo_blocked', { by: gate.reason || 'unavailable' });
+        return;
+      }
+      if (!gate.ok) {
         try { localStorage.setItem('dd_demo_used', '1'); } catch (e) {}
         this.setState({ toothy: 'limited', demoUsed: true, modal: 'booking',
           bubble: "Looks like this line already had its free call. Want one answering your practice's phone?" });
@@ -2179,25 +2186,40 @@ class Component extends DCLogic {
 
   // BUG-2: the only gate used to be a localStorage flag any visitor could clear. The real check
   // lives in /api/demo-session (one call per hashed IP); localStorage stays as the instant,
-  // no-round-trip layer above it. Deliberately fails OPEN — a hot lead must never be turned
-  // away because our own endpoint hiccuped. Only an explicit 'already_demoed' blocks a call.
+  // no-round-trip layer above it.
+  //
+  // Returns { ok, reason } rather than a bare boolean, because the two ways a call can be
+  // refused need opposite handling. 'already_demoed' is the visitor's own second attempt and
+  // should stick. 'unavailable' means OUR lookup failed — blocking that attempt caps voice
+  // spend during an outage, but it must never mark the visitor as having used a demo they
+  // never got. A transport error still fails open: a hot lead is not turned away because our
+  // endpoint hiccuped.
   gateDemo() {
-    if (this.state.formDone) return Promise.resolve(true); // already a lead: let them keep testing
+    if (this.state.formDone) return Promise.resolve({ ok: true }); // already a lead: let them keep testing
     try {
       return fetch('/api/demo-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
         .then(r => (r.ok ? r.json() : null))
-        .then(j => !(j && j.approved === false && j.reason === 'already_demoed'))
-        .catch(() => true);
-    } catch (e) { return Promise.resolve(true); }
+        .then(j => {
+          if (!j) return { ok: true };
+          this._gateToken = j.token || '';
+          return j.approved === false ? { ok: false, reason: j.reason || 'blocked' } : { ok: true };
+        })
+        .catch(() => ({ ok: true }));
+    } catch (e) { return Promise.resolve({ ok: true }); }
   }
 
   // Spends the demo, once, at the moment the call connects — not when the button is clicked.
   // A denied microphone or a dropped connection therefore costs the visitor nothing.
+  // Carries the short-lived token minted by the check above, which ties this claim to a gate
+  // decision made seconds ago for the same IP.
   claimDemo() {
     if (this._claimed || this.state.formDone) return;
     this._claimed = true;
     try {
-      fetch('/api/demo-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ claim: true }), keepalive: true }).catch(() => {});
+      fetch('/api/demo-session', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ claim: true, token: this._gateToken || '' }), keepalive: true
+      }).catch(() => {});
     } catch (e) {}
   }
 

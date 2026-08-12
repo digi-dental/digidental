@@ -16,7 +16,8 @@
 // The browser never holds a database credential and raw event rows never leave the server.
 // Requires the admin cookie set by /api/admin-login.
 import { createClient } from '@supabase/supabase-js';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { clientIp } from '../lib/http';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hctpvnqanwhxlmpmfmme.supabase.co',
@@ -27,7 +28,8 @@ const supabase = createClient(
 // should be long and random, and a password is neither. ADMIN_SESSION_SECRET is preferred;
 // ADMIN_PASSWORD remains the fallback so an existing deployment keeps working after this
 // change rather than logging everyone out on deploy.
-const signingSecret = () => process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || '';
+// Must match admin-login: ADMIN_SESSION_SECRET only, never the password.
+const signingSecret = () => process.env.ADMIN_SESSION_SECRET || '';
 
 // Bumping ADMIN_SESSION_VERSION invalidates every issued cookie at once, which is what you
 // want if a laptop goes missing. It is part of the signed payload, so it cannot be edited
@@ -67,14 +69,33 @@ async function rpc(name: string, args: Record<string, unknown>) {
   return { data, error: null };
 }
 
+// Cookie-gated, so this is a second line rather than the first: a leaked or stolen session
+// cookie should not also come with unlimited query volume against every analytics RPC. Same
+// hashed-IP key as the rest of the site, same in-memory ceiling — this is a lambda, not a
+// database, and a warm instance covering the common case is enough.
+const STATS_MAX = 120;
+const STATS_WINDOW_MS = 5 * 60 * 1000;
+const statsHits = new Map<string, number[]>();
+function statsRateLimited(key: string) {
+  const now = Date.now();
+  const recent = (statsHits.get(key) || []).filter(t => now - t < STATS_WINDOW_MS);
+  recent.push(now);
+  statsHits.set(key, recent);
+  if (statsHits.size > 5000) statsHits.clear();
+  return recent.length > STATS_MAX;
+}
+
 export default async function handler(req: any, res: any) {
   try {
     if (!signingSecret()) {
-      return res.status(503).json({ error: 'Dashboard is not configured. Set ADMIN_PASSWORD in the hosting dashboard.' });
+      return res.status(503).json({ error: 'Dashboard is not configured. Set ADMIN_PASSWORD and ADMIN_SESSION_SECRET in the hosting dashboard.' });
     }
     if (!verifyAdminCookie(String(req.headers.cookie || ''))) {
       return res.status(401).json({ error: 'Not signed in.' });
     }
+
+    const ipHash = createHash('sha256').update(clientIp(req) + (process.env.IP_HASH_SALT || '')).digest('hex');
+    if (statsRateLimited(ipHash)) return res.status(429).json({ error: 'Too many requests. Slow down.' });
 
     const q = req.query || {};
     const days = intParam(q.days, 30, 1, 365);

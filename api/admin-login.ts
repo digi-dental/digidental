@@ -19,20 +19,25 @@
 // dashboard refuses to load rather than falling open.
 import { createClient } from '@supabase/supabase-js';
 import { createHmac, timingSafeEqual, createHash } from 'node:crypto';
+import { clientIp } from '../lib/http';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hctpvnqanwhxlmpmfmme.supabase.co',
   (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)!
 );
 
-// Default 7 days. Set ADMIN_SESSION_HOURS to tighten it (24 is a reasonable choice for a
-// dashboard holding customer contact details).
-const SESSION_MS = Math.max(1, parseInt(process.env.ADMIN_SESSION_HOURS || '168', 10) || 168) * 3600 * 1000;
+// 24 hours by default. This dashboard lists customer names, emails and phone numbers, and a
+// week-long cookie means a laptop left on a train stays signed in for six more days. Raise it
+// with ADMIN_SESSION_HOURS if the daily login becomes the reason nobody checks the numbers.
+const SESSION_MS = Math.max(1, parseInt(process.env.ADMIN_SESSION_HOURS || '24', 10) || 24) * 3600 * 1000;
 
 const ATTEMPT_MAX = 8;
 const ATTEMPT_WINDOW_MIN = 15;
 
-const signingSecret = () => process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || '';
+// No fallback to ADMIN_PASSWORD. A signing key should be long and random; a password someone
+// types is neither, and reusing it meant the cookie's integrity rested on password entropy and
+// could only be rotated by changing the password itself.
+const signingSecret = () => process.env.ADMIN_SESSION_SECRET || '';
 const sessionVersion = () => process.env.ADMIN_SESSION_VERSION || '1';
 
 function sameSecret(a: string, b: string) {
@@ -81,6 +86,13 @@ export default async function handler(req: any, res: any) {
   try {
     const password = process.env.ADMIN_PASSWORD;
     if (!password) return res.status(503).json({ ok: false, error: 'ADMIN_PASSWORD is not set on the server.' });
+    // Refuse to mint a cookie we cannot sign properly. Previously this silently fell back to
+    // signing with the password, so a deployment that never set a signing key still issued
+    // sessions — with the weakest possible key and no way to rotate it independently.
+    if (!signingSecret()) {
+      console.error('[admin-login] ADMIN_SESSION_SECRET is not set; refusing to issue a session');
+      return res.status(503).json({ ok: false, error: 'ADMIN_SESSION_SECRET is not set on the server. Generate one with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"' });
+    }
     if (req.method !== 'POST') return res.status(405).json({ ok: false });
 
     let body = req.body;
@@ -92,7 +104,7 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ ok: true });
     }
 
-    const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+    const ip = clientIp(req);
     const ipHash = createHash('sha256').update(ip + (process.env.IP_HASH_SALT || '')).digest('hex');
 
     if (await tooManyAttempts(ipHash)) {

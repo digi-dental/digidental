@@ -20,17 +20,33 @@ const CHROME = process.env.DD_CHROME || '/opt/pw-browsers/chromium-1194/chrome-l
 const PORT = 8271;
 const SPRITE = fs.readFileSync(path.join(ROOT, 'uploads/denty_neutral.png'));
 
+// Serve the SAME response headers production does. A Content-Security-Policy that blocks a
+// script the page needs fails silently in a plain static server and catastrophically in
+// production, so the policy is exercised here rather than trusted.
+const VERCEL = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+function headersFor(urlPath) {
+  const out = {};
+  for (const rule of VERCEL.headers || []) {
+    let re;
+    try { re = new RegExp('^' + rule.source.replace(/\/\(\.\*\)$/, '(?:/.*)?') + '$'); }
+    catch { continue; }
+    if (re.test(urlPath)) for (const h of rule.headers) out[h.key] = h.value;
+  }
+  return out;
+}
+
 const server = http.createServer((req, res) => {
   const u = decodeURIComponent(req.url.split('?')[0]);
+  const extra = headersFor(u);
   // Stand in for the storage redirect so the panels have real images to size themselves to.
-  if (u.startsWith('/api/image')) { res.writeHead(200, { 'Content-Type': 'image/png' }); return res.end(SPRITE); }
-  if (u.startsWith('/api/')) { res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end('{"ok":true}'); }
+  if (u.startsWith('/api/image')) { res.writeHead(200, { ...extra, 'Content-Type': 'image/png' }); return res.end(SPRITE); }
+  if (u.startsWith('/api/')) { res.writeHead(200, { ...extra, 'Content-Type': 'application/json' }); return res.end('{"ok":true}'); }
   const f = path.join(ROOT, u === '/' ? 'index.html' : u);
   if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end('nf'); }
   const ext = path.extname(f);
   const type = ext === '.html' ? 'text/html' : ext === '.js' ? 'text/javascript'
     : ext === '.png' ? 'image/png' : 'text/plain';
-  res.writeHead(200, { 'Content-Type': type });
+  res.writeHead(200, { ...extra, 'Content-Type': type });
   res.end(fs.readFileSync(f));
 });
 await new Promise(r => server.listen(PORT, r));
@@ -47,7 +63,9 @@ async function open({ js = true, viewport = { width: 1280, height: 900 } } = {})
   const ctx = await browser.newContext({ javaScriptEnabled: js, viewport });
   const page = await ctx.newPage();
   const errors = [];
+  const csp = [];
   page.on('pageerror', e => errors.push(String(e.message)));
+  page.on('console', m => { const t = m.text(); if (/Content Security Policy|Refused to/i.test(t)) csp.push(t); });
   if (js) {
     await page.route('**/unpkg.com/**', route => {
       const url = route.request().url();
@@ -64,7 +82,7 @@ async function open({ js = true, viewport = { width: 1280, height: 900 } } = {})
     await page.waitForFunction(() => !!window.__ddRoot, { timeout: 15000 }).catch(() => {});
     await page.waitForTimeout(1600);
   }
-  return { page, ctx, errors };
+  return { page, ctx, errors, csp };
 }
 
 // ============================================================ the no-JavaScript view
@@ -105,7 +123,7 @@ async function open({ js = true, viewport = { width: 1280, height: 900 } } = {})
 
 // ============================================================ landmarks after hydration
 {
-  const { page, ctx, errors } = await open();
+  const { page, ctx, errors, csp } = await open();
   const lm = await page.evaluate(() => ({
     main: document.querySelectorAll('main').length,
     nav: document.querySelectorAll('nav').length,
@@ -124,6 +142,14 @@ async function open({ js = true, viewport = { width: 1280, height: 900 } } = {})
   const overflow = await page.evaluate(() =>
     document.documentElement.scrollWidth - document.documentElement.clientWidth);
   check('no horizontal overflow on desktop', overflow <= 0, `${overflow}px`);
+
+  // The test server replays vercel.json's real headers, so the CSP is enforced here exactly as
+  // in production. This caught a policy that blanked the entire page: the dc-runtime compiles
+  // each logic class from a string, so without 'unsafe-eval' nothing mounts at all.
+  const blocked = csp.filter(m => !/fonts\.googleapis/.test(m));
+  check('no CSP violations under the production policy', blocked.length === 0, blocked[0]?.slice(0, 140) || 'clean');
+  check('app actually mounted under CSP', lm.main === 1 && lm.sections === 9,
+    `main ${lm.main}, sections ${lm.sections}`);
   await ctx.close();
 }
 

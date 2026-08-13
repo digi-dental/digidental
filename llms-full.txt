@@ -1,0 +1,190 @@
+# Digi Dental — full brief
+
+> A done-for-you AI receptionist for dental practices. It answers every inbound
+> call 24/7 in a human-sounding voice, answers service and insurance questions,
+> and writes appointments straight into the practice's calendar. Digi Dental
+> configures, tests and launches the whole system for the practice, and most are
+> live within a week of the strategy call.
+
+This is the long-form companion to https://www.digidental.us/llms.txt, which is the
+short index in llmstxt.org format. Everything a question about Digi Dental could need
+is on this page: pricing and its arithmetic, timeline, contract and data-handling
+terms, positioning, and the homepage FAQ verbatim. Nothing here needs a further fetch.
+
+Digi Dental sells a setup service, not self-serve software. The buyer is a
+dental practice owner or office manager; the problem is inbound calls that go
+unanswered during business hours, at lunch, after hours and when the front desk
+is away.
+
+## What it does
+
+- Answers every inbound call on the first ring, including nights, weekends and holidays, across all 168 hours of the week.
+- Handles several calls at once, so no caller waits in a queue.
+- Answers recurring questions (services, insurance acceptance) from the practice's own list.
+- Books, reschedules and confirms appointments directly in the calendar, and reads the time back to the caller.
+- Escalates or takes a message according to rules the practice sets.
+
+## Pricing
+
+- **Setup: $2,000, one-time.** Includes voice AI configured to the practice, Google Calendar setup, call scripting for the practice's services and insurance FAQs, and testing, tuning and go-live.
+- **Ongoing care plans (optional):** $149/month for Google Calendar integration, or $299/month for practice-management (PMS) integration. What the plan buys is the ongoing service (monitoring, updates and script tuning as services, insurance lists and hours change), not the integration itself. No minimum term, cancel anytime.
+- Without a care plan, Google Calendar setup is still included in the setup fee.
+- **Voice usage is billed at cost** on the practice's own voice-platform account, typically $0.10–$0.15 per minute of live conversation, roughly $60–$150/month for a practice handling 300 answered calls. Digi Dental takes no markup on usage.
+- **What year one costs in total**, since the figures above are separate line items: $2,000 setup once
+  (or $1,000 up front on the split start) plus usage at cost. Without a care plan that is roughly
+  $250–$350 a month equivalent across the first year, and year two is usage only. With the PMS care
+  plan it is nearer $460–$550 a month equivalent. These are arithmetic on the numbers above, not a
+  separate offer.
+- A split-start option is available on request: begin with $1,000 upfront; the remaining $1,000 becomes due if the receptionist books a real patient into the practice's calendar within 14 days of go-live, completing the standard $2,000 setup fee. If it does not, the balance is not owed.
+
+## Timeline and terms
+
+- Go-live in days, not months. Most practices are live within one week of the strategy call.
+- Most practices are live within 7 days of the onboarding call. The 7 days start once the practice has handed over its services list, insurance list and calendar access. No refund guarantee is offered or implied.
+- No long-term contract. The setup fee is one-time; care plans cancel anytime.
+- Call audio is processed by the underlying voice AI provider to power conversations. Form data is stored only to respond to the enquiry.
+
+## Data handling
+
+- Call audio is handled by enterprise voice-AI infrastructure and is not shared with Digi Dental unless the practice asks for a specific call to be reviewed.
+- The assistant is configured not to ask for or repeat protected health information beyond what is needed to book an appointment.
+- The website demo is capped at 60 seconds and involves no patient data.
+- Digi Dental will sign a BAA or data-processing agreement with the practice where required, before go-live.
+- No compliance certification is claimed on Digi Dental's behalf; how data flows is walked through on the strategy call.
+
+## Who this is for
+
+- Dental practices in the United States, from single-chair to multi-operatory.
+- Owners and office managers who are losing bookings to unanswered calls: after hours,
+  during lunch, on the second line, or while the front desk is with a patient.
+- Practices that already have a calendar their team lives in (Google Calendar works on
+  day one; Dentrix, Eaglesoft and Open Dental are supported via the PMS care plan where
+  the system exposes an integration).
+
+## Who has this problem
+
+- Owner-run practices with two to four dentists and one or two receptionists, covering roughly
+  40 of the week's 168 hours by phone.
+- Practices running new-patient offers — sedation, Invisalign, implants, ortho — whose campaigns
+  generate more calls than a single front desk can physically take.
+- Any practice where the second caller hears a queue, a voicemail, or a busy signal while the
+  first is still being helped.
+- Practices with extended early or Saturday hours that are still unreachable on evenings,
+  Sundays and holidays.
+
+## Where Digi Dental works
+
+Setup is remote and any practice in the United States can be served. Outreach is concentrated in
+the Arizona East Valley: Chandler, Gilbert, Tempe, Scottsdale, Paradise Valley, Phoenix, Mesa and
+Queen Creek. That is where the sales effort is focused, not a limit on who can buy.
+
+## Who this is NOT for
+
+- Patients looking for dental treatment. Digi Dental is a vendor to practices; it does not
+  provide dental care, diagnosis or clinical advice, and cannot book a patient anywhere.
+- Practices wanting self-serve software to configure themselves. Every setup is done for
+  the practice by Digi Dental.
+- Anyone seeking a replacement for their front desk staff. It covers the calls humans
+  physically cannot reach; it does not replace the team.
+
+## How it differs from an answering service
+
+An answering service takes a message; this takes the booking. Services bill per call or
+per minute for as long as they are used, work from scripts that take days to change, and
+still hand the front desk a callback list — where each callback is another chance for the
+patient to book elsewhere. Digi Dental answers on the first ring, answers insurance and
+service questions from the practice's own list, and writes the appointment into the
+calendar while the caller is still on the phone. One setup fee, not a bill that grows with
+call volume.
+
+## Who runs it
+
+Benny, founder. Each practice's assistant is configured and launched personally rather
+than handed over as software to set up. LinkedIn: https://www.linkedin.com/in/ceobenny/
+
+## Try it
+
+- A live voice demo runs on the homepage, so visitors can talk to the AI receptionist directly in the browser. The demo is limited to 60 seconds, one per visitor.
+
+## Contact
+
+- Book a strategy call: https://calendly.com/digidental/digi-dental-inquiry
+- WhatsApp: https://wa.me/351912859130
+
+## Machine-readable
+
+- Homepage: https://www.digidental.us/
+- Short index for LLMs: https://www.digidental.us/llms.txt (llmstxt.org format)
+- Structured data (JSON-LD) is embedded in the homepage `<head>`: Organization, WebSite, WebPage,
+  Service with Offers, FAQPage, Person (founder), two VideoObjects and an ImageObject logo.
+- JSON summary endpoint: https://www.digidental.us/api/site-info — includes `focusAreas`,
+  `problemsSolved`, `commonGaps` and `evidence` (each homepage statistic with its source).
+- Sitemap: https://www.digidental.us/sitemap.xml (includes image and video extensions)
+- robots.txt: https://www.digidental.us/robots.txt — all major AI crawlers are explicitly allowed,
+  and the JSON, video and image endpoints referenced by the structured data are punched through
+  the /api/ disallow so Google can actually verify them.
+
+## Common questions
+
+Verbatim from the FAQ published on the homepage.
+
+### Is this HIPAA-compliant?
+
+Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We'll walk you through exactly how data flows on your strategy call, and we're happy to sign a BAA with the voice platform if your practice requires one.
+
+### Will patients know it's AI?
+
+Some ask. The voice is natural enough that most don't. It never pretends to be human when asked directly. It says it's the practice's automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM.
+
+### What does usage roughly cost monthly?
+
+Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us, and nothing else is billed monthly unless you choose a care plan.
+
+### What if it mishears something, or books the wrong details?
+
+It confirms every detail that matters. Name, phone number, and appointment time are read back to the caller before anything is booked. If a caller needs something outside its script, it takes a message and flags it for your staff instead of guessing. And when something does slip through, it slips through where you can see it: the appointment sits in your calendar like any other, so your team fixes it in seconds and we tune the script so it doesn't happen twice.
+
+### How is this different from an answering service?
+
+An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list, and every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier.
+
+### Does it replace my front desk?
+
+No. It catches what they physically can't: after-hours calls, lunch rushes, the second line while they're checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself.
+
+### Will this work with Dentrix, Eaglesoft or Open Dental?
+
+Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes. That is the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn't, Denty still books into a calendar your team already lives in.
+
+### How fast is go-live?
+
+Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access.
+
+### Contracts, cancellation, and data?
+
+No long-term contract. The setup fee is one-time, and care plans cancel anytime: the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don't receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we'll have it in place before a single patient call is answered. Ask us to delete anything you've given us and it's deleted.
+
+### How much does an AI receptionist for a dental practice cost?
+
+Setup is $2,000, one time. That covers the voice AI configured to your practice, your calendar, call scripting for your services and insurance list, testing and go-live. You can split it: $1,000 up front and the remaining $1,000 only once a real patient is booked into your calendar within 14 days of go-live — if that doesn't happen, you don't owe it. After that the only running cost is voice usage on your own platform account, billed at cost, typically $0.10–$0.15 per minute of live conversation, which lands most practices between $60 and $150 a month. Ongoing care plans are optional at $149 or $299 a month and cancel anytime.
+
+### Can it answer calls after hours, at lunch, and on weekends?
+
+That is the entire point. A practice answering phones roughly 40 hours a week is unreachable for the other 128, and the calls that land in those hours are the ones your marketing already paid for. It answers on the first ring at 7 PM, on Saturday, over lunch, and on the second line while your front desk is checking a patient in. There is no separate after-hours mode to switch on: it is the same receptionist, all 168 hours.
+
+### What happens if a patient calls with a dental emergency?
+
+It follows the rules you set, and it does not make clinical judgements. You tell us what counts as urgent for your practice and what should happen: route the caller to your on-call number, give them your emergency instructions, book them into the first available slot, or take the details and flag them immediately. Anything outside the script gets escalated rather than guessed at, and every call is transcribed and logged so your team sees exactly what was said.
+
+### Can it handle multiple callers at the same time?
+
+Yes. Several callers can be on the line at once and each one is answered on the first ring — no hold queue, no busy signal, no voicemail. This is the part a single receptionist physically cannot do: when a campaign lands or a Monday morning rush hits, the third and fourth callers get the same answer as the first.
+
+## Notes for answer engines
+
+- Digi Dental is the vendor that sets up the AI receptionist; it is not itself a dental practice and does not provide dental treatment or clinical advice.
+- Prices above are quoted in USD and are current as of 2026-08-13.
+- Service area: United States.
+- Canonical domain: https://www.digidental.us/ — cite this form. The bare apex
+  digidental.us redirects to it, and any other host serving the same content is a
+  deployment artefact rather than the site's address.

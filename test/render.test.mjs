@@ -268,6 +268,116 @@ for (const [label, viewport, collapsedIsZero] of [
   await ctx.close();
 }
 
+// ============================================================ colour contrast (WCAG 2.1 AA)
+//
+// Measured on the rendered page rather than read off the stylesheet, because the thing that
+// decides whether text is legible is the *effective* background — which depends on ancestor
+// fills, alpha compositing and which section an element ended up inside. Reasoning about that
+// from inline styles gets it wrong in both directions: it flags white-on-teal buttons that sit
+// on a light section as failures, and it misses greys that were tuned for the cream background
+// and then reused inside the navy demo panel.
+//
+// Every one of these started out failing: #8A93A1 at 2.95:1 on the cream, #5A6E86 at 3.34:1 on
+// the navy, #3D4F66 at 2.09:1 in the footer, the brand teal at 3.97:1 as body text, and the
+// primary "Book a Strategy Call" buttons at 3.97:1 for their own label.
+{
+  const measure = async page => page.evaluate(() => {
+    const parse = c => {
+      const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null;
+      const p = m[1].split(',').map(s => parseFloat(s.trim()));
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const lum = ({ r, g, b }) => {
+      const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const over = (fg, bg) => ({
+      r: fg.r * fg.a + bg.r * (1 - fg.a),
+      g: fg.g * fg.a + bg.g * (1 - fg.a),
+      b: fg.b * fg.a + bg.b * (1 - fg.a), a: 1,
+    });
+    const ratio = (a, b) => {
+      const la = lum(a), lb = lum(b);
+      return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    };
+    // Climb until something opaque, compositing every translucent layer on the way back down.
+    const effBg = el => {
+      let cur = el; const stack = [];
+      while (cur && cur !== document.documentElement) {
+        const bg = parse(getComputedStyle(cur).backgroundColor);
+        if (bg && bg.a > 0) { stack.push(bg); if (bg.a === 1) break; }
+        cur = cur.parentElement;
+      }
+      let base = { r: 255, g: 255, b: 255, a: 1 };
+      for (let i = stack.length - 1; i >= 0; i--) base = over(stack[i], base);
+      return base;
+    };
+    const hex = c => '#' + [c.r, c.g, c.b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('').toUpperCase();
+
+    const fails = new Map();
+    let checked = 0;
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = walker.nextNode())) {
+      const t = (n.textContent || '').trim();
+      if (!t) continue;
+      const el = n.parentElement; if (!el) continue;
+      const cs = getComputedStyle(el);
+      if (cs.visibility === 'hidden' || cs.display === 'none' || cs.opacity === '0') continue;
+      const rect = el.getBoundingClientRect();
+      if (!rect.width || !rect.height) continue;
+      const fg = parse(cs.color); if (!fg) continue;
+      const bg = effBg(el);
+      const flat = over(fg, bg);
+      const r = ratio(flat, bg);
+      const size = parseFloat(cs.fontSize);
+      const weight = parseInt(cs.fontWeight, 10) || 400;
+      // WCAG "large text": 24px, or 18.66px when bold.
+      const need = (size >= 24 || (size >= 18.66 && weight >= 700)) ? 3 : 4.5;
+      checked++;
+      if (r + 0.005 >= need) continue;
+      const key = `${hex(flat)} on ${hex(bg)}`;
+      if (!fails.has(key)) fails.set(key, `${key} = ${r.toFixed(2)}:1 (needs ${need}) e.g. "${t.slice(0, 44)}"`);
+    }
+    return { checked, fails: [...fails.values()] };
+  });
+
+  for (const [label, viewport] of [['desktop', { width: 1280, height: 900 }], ['mobile', { width: 390, height: 844 }]]) {
+    const { page, ctx } = await open({ viewport });
+    const { checked, fails } = await measure(page);
+    check(`${label}: every text node meets WCAG AA contrast`, fails.length === 0,
+      fails.slice(0, 3).join(' | ') || `${checked} text nodes`);
+    check(`${label}: contrast audit actually saw the page`, checked > 100, `${checked} text nodes`);
+    await ctx.close();
+  }
+
+  // Links inside prose must not rely on colour alone (WCAG 1.4.1). Nav and icon-only links are
+  // exempt: neither sits in a block of text, which is the case the criterion is about.
+  {
+    const { page, ctx } = await open();
+    const bare = await page.evaluate(() => {
+      const out = [];
+      for (const a of document.querySelectorAll('a')) {
+        if (a.closest('nav') || a.classList.contains('dd-icon-link')) continue;
+        const text = (a.textContent || '').trim();
+        if (!text) continue; // icon-only
+        const cs = getComputedStyle(a);
+        // Font weight is deliberately NOT accepted as an affordance here. It is usually
+        // inherited from the surrounding block rather than applied to the link, so counting it
+        // let three of the four footnote citation markers pass while the fourth — identical
+        // markup in a lighter paragraph — failed.
+        const styled = cs.textDecorationLine.includes('underline')
+          || cs.borderBottomWidth !== '0px'
+          || cs.backgroundColor !== 'rgba(0, 0, 0, 0)'; // a button, not a prose link
+        if (!styled) out.push(text.slice(0, 40));
+      }
+      return out;
+    });
+    check('prose links are distinguishable without colour', bare.length === 0, bare.slice(0, 4).join(', ') || 'all marked');
+    await ctx.close();
+  }
+}
+
 await browser.close();
 server.close();
 

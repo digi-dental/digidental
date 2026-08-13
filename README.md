@@ -25,11 +25,55 @@ canonical, robots, hreflang, Open Graph/Twitter, and a JSON-LD `@graph` of nine
 nodes — Organization, WebSite, WebPage, Service with offers, FAQPage, Person
 (founder, an E-E-A-T signal), two VideoObjects and an ImageObject logo.
 
-Supporting files served from the root: `robots.txt` (search engines + ~20 named
+Supporting files served from the root: `robots.txt` (search engines + ~35 named
 AI crawlers, points at the sitemap), `sitemap.xml` (with image **and video**
 extensions — the `<video>` elements are client-rendered, so the clips would
-otherwise be undiscoverable), `llms.txt` (plain-text summary for LLMs, including
-the full FAQ verbatim), `og-image.png` (social card), and `/api/site-info` (JSON).
+otherwise be undiscoverable), `llms.txt` (llmstxt.org index) and `llms-full.txt`
+(the long brief, including the full FAQ verbatim), `og-image.png` (social card),
+and `/api/site-info` (JSON).
+
+### robots.txt groups do not inherit
+A robots.txt group does **not** inherit from `User-agent: *`. The moment a crawler
+finds a group naming it, that group becomes the only one it obeys (RFC 9309 §2.2.1).
+
+This file used to give every named bot a bare `Allow: /` and keep the admin and API
+disallows in the wildcard group alone. The effect was the exact opposite of how it
+read: Googlebot, GPTBot, ClaudeBot, PerplexityBot and every other named agent were
+being told `/admin.html` and the whole API were fair game, while only *unnamed*
+crawlers were restricted. The tests asserting "robots.txt keeps the admin page out"
+passed throughout, because they only ever looked at the wildcard group.
+
+Every group now repeats the same rule set in full. Multiple `User-agent` lines
+stacked before one rule block form a single group that applies to all of them, which
+is what keeps the repetition manageable. **If you add a rule, add it to all three
+groups** — `test:seo` parses the file into real groups and fails if one drifts.
+
+Three `/api/` paths are deliberately punched through the `/api/` disallow:
+
+| Path | Why it must stay crawlable |
+| --- | --- |
+| `/api/site-info` | The JSON summary answer engines are meant to read |
+| `/api/video` | The `<video:content_loc>` in `sitemap.xml` and the `contentUrl` on both VideoObject nodes. Blocked, Google cannot verify either clip and silently drops both video rich results |
+| `/api/image` | The founder portrait behind the Person node and the ImageObject logo |
+
+The `Allow:` lines are ordered before the competing `Disallow:` so first-match-wins
+parsers reach the same verdict as RFC 9309's longest-match ones. A test pins that too.
+
+### llms.txt and llms-full.txt
+`llms.txt` follows the [llmstxt.org](https://llmstxt.org) format: one H1, a blockquote
+summary, free prose, then H2 sections whose bodies are **markdown link lists**. The
+previous version had the H1 and the blockquote but every H2 held prose bullets, which
+is why validators reported it as invalid.
+
+Deep content moved to `llms-full.txt`, the conventional companion file — pricing
+arithmetic, timeline, data handling, positioning and the verbatim FAQ. `llms.txt`
+still carries pricing and the metro list inline in its prose block, because plenty of
+crawlers read the index and never follow a link.
+
+`test:seo` validates the format (single H1, blockquote, every section a link list,
+absolute URLs, own-domain links resolving to files that exist) and checks the two
+files cross-reference each other and quote the same setup fee as `index.html` and
+`api/site-info.ts`.
 
 ### What a non-rendering crawler sees
 Googlebot executes JavaScript. **GPTBot, ClaudeBot and PerplexityBot largely do not.**
@@ -281,12 +325,67 @@ keys, no visitor identifiers.
 **Tests.** `npm test` drives the real page in headless Chromium with the SDK and microphone
 stubbed: missing assistant id, permission failures, duplicate clicks, listener reuse and cleanup.
 
-## Videos
-Both clips are served through `/api/video?clip=vsl|demo`, so the page carries no expiring
-token. The signed URLs hardcoded as a fallback in `api/video.ts` **expire 2027-07-24**.
-Permanent fix: make the `digi_dental-VSL` bucket public and set `VIDEO_VSL_URL` /
-`VIDEO_DEMO_URL` to the public URLs. Interim fix: paste fresh signed URLs into those two
-env vars — no redeploy of the page needed either way.
+## Videos and images (Supabase storage)
+Both clips are served through `/api/video?clip=vsl|demo` and the portrait and console
+captures through `/api/image?name=…`, so the page carries no expiring token.
+
+Each route picks its target in this order:
+
+1. The env var (`VIDEO_VSL_URL`, `VIDEO_DEMO_URL`, `IMAGE_PROFILE_URL`, …), if set.
+2. **The bucket's public URL, if the bucket is public.** Probed with one `HEAD` per warm
+   lambda rather than configured, so the day a bucket is flipped to public these routes
+   start using never-expiring URLs on their own, with no env var and no redeploy.
+3. The hardcoded signed URL, as a fallback. Those tokens expire **2027-07-24** (vsl),
+   **2027-08-07** (demo) and **2027-08-10** (images).
+
+### Both buckets are still private — do this
+`digi_dental-VSL` and `Images` are both private, which is the root of every media
+fragility on the site: signed URLs that expire, and no image transformations (Supabase
+only offers those on public buckets, so the `srcset` on the founder photo currently
+resolves every variant to the same full-size original).
+
+Deleting the three unused clips first, then flipping both buckets, is a two-minute job
+that has to happen outside this repo — Supabase blocks deletion via SQL on purpose
+(`storage.protect_delete()`), and the Storage API needs a service-role key:
+
+```bash
+export SUPABASE_URL=https://hctpvnqanwhxlmpmfmme.supabase.co
+export SRK=<service-role key from Supabase → Settings → API>
+
+# 1. Remove the three clips that are not used anywhere on the site.
+for f in "Digi%20Dental.mp4" "digi_dental.mp4" "vid-testimonials.mp4"; do
+  curl -X DELETE "$SUPABASE_URL/storage/v1/object/digi_dental-VSL/$f" \
+       -H "Authorization: Bearer $SRK"
+done
+
+# 2. Make both buckets public.
+for b in "digi_dental-VSL" "Images"; do
+  curl -X PUT "$SUPABASE_URL/storage/v1/bucket/$b" \
+       -H "Authorization: Bearer $SRK" -H "Content-Type: application/json" \
+       -d '{"public": true}'
+done
+```
+
+Or just do it in the dashboard: Storage → bucket → ⋯ → *Make public*, after deleting the
+three files. Nothing in this repo needs changing afterwards — the routes detect it.
+
+### Video weight and region
+The project lives in **ap-southeast-2 (Sydney)** and each clip is roughly **50 MB**. For a
+US dental audience that is a long way to stream from, and it is the most likely cause of
+the `net::ERR_CONNECTION_FAILED` entries in the PageSpeed run — a cross-Pacific range
+request on a throttled mobile profile times out and the browser reports it as a connection
+failure rather than a slow one.
+
+Nothing here fixes that, because the fix is not a code change. In rough order of value:
+
+1. **Transcode the clips.** ~50 MB is 5–10× larger than a marketing video needs to be.
+   H.264 at a sane bitrate, or AV1, would cut it hard with no visible loss.
+2. **Put video on a video host** — Cloudflare Stream, Mux or Bunny. Adaptive bitrate and
+   global edge delivery, which is what a 50 MB hero clip actually wants.
+3. **Move the Supabase project to a US region**, which helps the API calls too.
+
+The players use `preload="metadata"`, so only the moov atom is fetched on page load — the
+50 MB is not on the critical path either way.
 
 ## Dashboard preview section
 The section between the FAQ and the final CTA shows four captures of the Vapi console the
@@ -360,6 +459,121 @@ re-wraps, and there the number growing outward from centre is the nicer read.
 When measuring this, use `offsetWidth`, not `getBoundingClientRect()` — the stats sit
 in a `data-reveal` block whose entrance transform inflates the visual rect and looks
 exactly like layout drift.
+
+## Performance and Core Web Vitals
+The page renders client-side, so the critical path is
+`HTML → support.js → React UMD from unpkg → first paint`. Left alone that is three
+serial round trips before a single pixel of content.
+
+**The fonts and preconnects were in the wrong place.** They lived in the `<helmet>`
+block, which the runtime injects into `<head>` only *after* React has mounted. A
+preconnect that fires after hydration has missed the entire window it exists to
+optimise, and the Google Fonts stylesheet had not started downloading by the time
+there was text to paint. Both are static `<head>` tags now. This was most of the 4s
+mobile LCP.
+
+Also in the static head, in order:
+
+- `preconnect` to `unpkg.com`, `fonts.googleapis.com`, `fonts.gstatic.com` (three, under
+  the four-origin rule of thumb).
+- `preload as=script` for the two React UMD bundles, so they download **in parallel with
+  `support.js`** instead of after it. Their `src`, `integrity` and `crossorigin` must stay
+  byte-identical to `REACT_URL` / `REACT_SRI` / `REACT_DOM_URL` / `REACT_DOM_SRI` in
+  `support.js` — if they drift the preload is a wasted download, and nothing warns you.
+- A ~10-line critical CSS block (page background, colour, font stack) so the first frame
+  is the right colour rather than a white flash.
+
+`support.js` stays **synchronous**, deliberately. It kicks off the React fetch at parse
+time and calls `hideRawTemplate()` immediately; `defer` would delay both and flash the raw
+template.
+
+### The voice SDK is no longer in the initial load
+`@vapi-ai/web` pulls in `daily-js` — 67 KiB, ~58 KiB of it unused — on a page where most
+visitors never press the demo button. It used to be an eager `import` in the helmet block.
+It is now fetched on the first credible signal that a call is coming: the `#demo` section
+entering the viewport (400px rootMargin) or `requestIdleCallback`, whichever lands first.
+`startDemo()` awaits the same promise, so clicking before the warm-up finished waits for
+the download rather than silently getting the simulated call.
+
+### Caching
+| Path | Policy | Note |
+| --- | --- | --- |
+| `/uploads/*` | `max-age=31536000, immutable` | **Rename a sprite to change it.** These URLs are not content-hashed, so an edit in place will not reach anyone who has already loaded the page |
+| `/support.js` | `max-age=31536000, immutable` | Safe only because the URL carries `?v=<sha256 prefix>` |
+| favicons | `max-age=2592000` | 30 days; browsers refetch these rarely anyway |
+| `/`, `/index.html` | `max-age=0, s-maxage=3600` | Always revalidated, edge-cached |
+
+`index.html` loads `./support.js?v=ae4f0ac844` — the first 10 hex of its sha256. That is
+what makes the `immutable` header safe. Nothing recomputes it at request time, so it *can*
+drift: **`test:seo` recomputes the hash and fails if it disagrees with the file on disk.**
+After rebuilding `support.js`, run `npm test` and paste in the hash it reports.
+
+### Responsive images
+`profile.jpg` is a 1775×1775 original never displayed above 470 CSS px — PageSpeed put
+~412 KiB of that down as pure waste. `/api/image` now accepts `?w=` and `?fmt=` and hands
+off to Supabase's transformation endpoint, and the founder photo and the four console
+captures carry `srcset`/`sizes`. **This only starts saving bytes once the `Images` bucket
+is public** (transformations require it) — until then every variant redirects to the same
+original, which costs nothing extra.
+
+The existence probe for the founder photo carries the same `srcset` and `sizes` as the
+element it is probing for, so the check and the render share one download instead of two.
+
+### Known, not done
+- **`support.js` is unminified** (~5.7 KiB of the reported saving). It is a generated
+  bundle (`dc-runtime`) in a project with no build step, so a committed minified copy would
+  drift from its source on the next regeneration. Brotli at the edge already recovers most
+  of it. Revisit if a build step ever lands.
+- **Non-composited animation.** The PageSpeed note about "32 animated elements using
+  `filter`" is a misread: those are `backdrop-filter` on the fixed nav and the modal
+  scrims, which are static values, not animations. The genuinely non-composited animation
+  is `dd-shimmer` (animates `background-position`) and the nav's `transition: background`.
+  Both are small and localised; changing them would alter the design for a marginal gain.
+- **Video captions.** See below.
+
+## Accessibility
+Contrast is measured, not eyeballed. `test:render` walks every text node on the rendered
+page, resolves the *effective* background by climbing ancestors and compositing alpha, and
+asserts WCAG AA (4.5:1, or 3:1 for large text) at both desktop and mobile widths — 215 and
+213 nodes respectively.
+
+Reasoning about this from the stylesheet gets it wrong in both directions, which is why it
+is a rendering test. What it caught:
+
+| Was | Ratio | Now |
+| --- | --- | --- |
+| `#3D4F66` on navy (footer legal) | 2.09:1 | `#7C8CA6` |
+| `#8A93A1` on cream / white (26 uses) | 2.95 / 3.10:1 | `#68717F` |
+| `#5A6E86` on navy | 3.34:1 | `#8A9BB5` |
+| `#0F8B80` teal as body text on light | 3.97:1 | `#0B6E66` |
+| `#FAF9F6` on `#0F8B80` — **every primary CTA** | 3.97:1 | fill darkened to `#0B6E66`, hover to `#095B54` |
+| `#0F8B80` teal as text on navy | 4.18:1 | `#3FBFA9` |
+
+Links are underlined by default rather than on hover — colour alone was the only thing
+marking "Privacy" or "Benny" as links (WCAG 1.4.1). Every CTA already declared
+`text-decoration:none` inline and an inline style beats the rule, so the buttons stayed
+clean without needing an exception list. Nav and icon-only links (`.dd-icon-link`) opt out:
+neither sits inside a block of text, which is the case 1.4.1 is about. A test enforces it,
+and deliberately does **not** accept font-weight as an affordance — weight is usually
+inherited from the surrounding block rather than applied to the link, and counting it let
+three of the five footnote citation markers pass while identical markup in a lighter
+paragraph failed.
+
+ARIA was already in good shape and is unchanged: `aria-expanded` + `aria-selected` on the
+FAQ and dashboard panels, `role="dialog"` + `aria-modal` + focus handling on all four
+modals, `role="alert"` / `role="status"` on the live regions.
+
+### Video captions — outstanding
+Both `<video>` elements still lack `<track kind="captions">`. This is the one audit item
+left undone, and deliberately so: captions have to match the audio, and there is no
+transcript for `digidental-vsl.mp4` or `denty-live.mp4` anywhere in the repo. Shipping a
+plausible-looking `.vtt` would satisfy Lighthouse while actively misinforming the deaf and
+hard-of-hearing visitors the feature exists for, which is worse than not having it.
+
+To close it: transcribe both clips (Whisper, or the Vapi call transcript for `denty-live`),
+drop `captions/<clip>.en.vtt` in the repo, and add
+`<track src="/captions/digidental-vsl.en.vtt" kind="captions" srclang="en" label="English">`
+inside each `<video>`.
 
 ## Security posture
 Findings closed from the security audit, and what each one actually prevented:

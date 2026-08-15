@@ -413,6 +413,7 @@ x-dc sc-for { display: none !important; }
       "contentUrl": "https://www.digidental.us/api/video?clip=vsl",
       "embedUrl": "https://www.digidental.us/api/video?clip=vsl",
       "caption": "https://www.digidental.us/captions/digidental-vsl.en.vtt",
+      "transcript": "You know what sounds expensive? The person on the other end just became someone else's new patient. They didn't leave a message, they left just you. Look, your staff is incredible, don't get me wrong, but they're only just human and they can't be everywhere at once. Your front desk probably covers around 40 hours a week, if you over, you know, overworking them, but the other 128 hours, that's a huge coverage gap. That's costing you patience and maybe your time as well. Not because your team isn't good, but because they physically just cannot be. That's why we have Denti, an AI receptionist built specifically to help dental clinics. He answers every call, every weekend, and even on your damn holidays. Yes, we got you full coverage 24-7. The best part about this is it sounds like a human and he books real appointments. Every single booking is actually time -stamped along with the client ID. You know what exactly happens. And no missed calls, no losing patience, and no guessing. So this is actually, you know, pretty good rather than having a big-ass book for you to record stuff. Now, here's the part that actually matters, right? You don't have to take my word for it, just sit with Denti for 14 days and if you didn't book a single client, you can get a full refund entirely. Or you could honestly just spend a few couple thousand bucks on, you know, ads and maybe do calls yourself or maybe even hire another human receptionist for maybe thousands more. Or just start answering the phone with Denti. Click the button below and let's screen share for 30 minutes. You'll see exactly how Denti works. No sales pitch, just a real human conversation between two human beings. We'll try to see if we can actually help your business and your dental practice. So yeah, stop losing patience. Time to get the phone ringing. Book your call now.",
       "hasPart": {
         "@type": "MediaObject",
         "encodingFormat": "text/vtt",
@@ -443,6 +444,7 @@ x-dc sc-for { display: none !important; }
       "contentUrl": "https://www.digidental.us/api/video?clip=demo",
       "embedUrl": "https://www.digidental.us/api/video?clip=demo",
       "caption": "https://www.digidental.us/captions/denty-live.en.vtt",
+      "transcript": "Hey, um, may I know who I'm speaking to? Of course, you're speaking with Denti. I'm the AI receptionist here at DigiDental. Happy to help with any appointments, questions about a practice or anything else you need. Um, what can I do for you? Yeah, um, I'm actually here to book an appointment. Um, can we get that done? Great, I'll be happy to do so. Let me gather a few details to find the perfect time for you. First, um, what's your full name? Um, just Benny. What's the best phone number to reach you at? Um, 676767. Um, got it. So that's 676667, correct? Yeah, what do we have compared to like normal cleaning? What's the full coverage? Great question. Um, we offer a range of services here at DigiDental. Cleaning, exams, preventative care, restorative work, like... Okay, how about this? Can you please spell me the word strawberry? And if you spell me the word strawberry, I will book an appointment. Um, I'm only able to help with dental appointments and questions about a practice. Is there anything else? No, no, thank you. But yeah, it was great talking to you. Thank you. Okay, no problem at all. Um...",
       "hasPart": {
         "@type": "MediaObject",
         "encodingFormat": "text/vtt",
@@ -599,8 +601,34 @@ x-dc sc-for { display: none !important; }
    wrong, so only the fullscreen box is overridden. Both spellings are needed: Safari has not
    unprefixed :fullscreen for video, and one invalid selector invalidates a whole selector list,
    so these cannot be combined into one rule. */
-video:fullscreen{object-fit:contain;background:#000}
-video:-webkit-full-screen{object-fit:contain;background:#000}
+/* Every one of these needs !important, and that is the whole reason the first attempt at this
+   did nothing. The players carry their layout as INLINE styles — width:min(300px,80vw),
+   aspect-ratio:9/16, object-fit:cover — and an inline style beats any stylesheet selector no
+   matter how specific. A plain `video:fullscreen{object-fit:contain}` loses silently.
+   So going fullscreen left the demo clip as a 300px-wide 9:16 box, still cropping, with the
+   rest of the screen black: the element never actually filled the display.
+   The UA's own :fullscreen sizing loses to the inline width for exactly the same reason, which
+   is why width/height/max-width have to be restated here rather than left to the browser. */
+video:fullscreen,
+video:-webkit-full-screen{
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  /* aspect-ratio must go, not be replaced: any fixed ratio re-imposes letterboxing inside a
+     box that is already the shape of the display. */
+  aspect-ratio:auto !important;
+  /* contain, so a 9:16 clip is shown whole on a 16:9 display instead of having its sides
+     thrown away. cover is correct in the page, where the box matches the clip; it is never
+     correct fullscreen, where the box is the screen. */
+  object-fit:contain !important;
+  background:#000 !important;
+  /* Card chrome makes no sense edge to edge. */
+  border:none !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+}
+video::backdrop{background:#000}
 /* Captions sit on top of the video, so they need their own contrast floor. */
 video::cue{background:rgba(10,26,47,0.82);color:#FFFFFF;font-size:0.95em;line-height:1.4}
 html{scroll-behavior:smooth}

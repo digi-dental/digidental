@@ -268,6 +268,60 @@ for (const [label, viewport, collapsedIsZero] of [
   await ctx.close();
 }
 
+// ============================================================ fullscreen video
+//
+// Measured in real fullscreen, not read off the stylesheet. The first attempt at this shipped a
+// `video:fullscreen{object-fit:contain}` rule that never applied: the players carry width,
+// aspect-ratio and object-fit as INLINE styles, and an inline style beats any selector without
+// !important. The rule was present, correct-looking, and did nothing — which a "does the CSS
+// exist" test would have happily confirmed. Only the computed style in the fullscreen state
+// tells the truth.
+{
+  const { page, ctx, errors } = await open();
+  for (const [label, clip] of [['demo (9:16)', 'demo_recording'], ['hero (16:9)', 'vsl']]) {
+    const got = await page.evaluate(async (c) => {
+      const v = document.querySelector(`video[data-clip="${c}"]`);
+      if (!v) return { err: 'video not found' };
+      v.scrollIntoView();
+      try {
+        // requestFullscreen needs a user gesture; Chromium accepts a trusted click dispatched
+        // by the driver, so trigger it from inside a click handler on the element.
+        await new Promise((resolve, reject) => {
+          const onClick = () => { v.requestFullscreen().then(resolve, reject); };
+          v.addEventListener('click', onClick, { once: true });
+          v.click();
+        });
+      } catch (e) { return { err: 'requestFullscreen rejected: ' + e.message }; }
+      await new Promise(r => setTimeout(r, 250));
+      const cs = getComputedStyle(v);
+      const out = {
+        fs: document.fullscreenElement === v,
+        objectFit: cs.objectFit,
+        aspectRatio: cs.aspectRatio,
+        w: Math.round(v.getBoundingClientRect().width),
+        h: Math.round(v.getBoundingClientRect().height),
+        screenW: window.innerWidth, screenH: window.innerHeight,
+      };
+      await document.exitFullscreen().catch(() => {});
+      await new Promise(r => setTimeout(r, 150));
+      out.afterFit = getComputedStyle(v).objectFit; // must return to cover in the page
+      return out;
+    }, clip);
+
+    if (got.err) { check(`${label}: entered fullscreen`, false, got.err); continue; }
+    check(`${label}: entered fullscreen`, got.fs === true);
+    check(`${label}: is not cropped in fullscreen`, got.objectFit === 'contain', got.objectFit);
+    check(`${label}: drops its fixed aspect ratio in fullscreen`, got.aspectRatio === 'auto', got.aspectRatio);
+    // The actual regression: the element stayed 300px wide because of its inline width.
+    check(`${label}: fills the screen in fullscreen`,
+      got.w >= got.screenW - 2 && got.h >= got.screenH - 2,
+      `${got.w}x${got.h} in ${got.screenW}x${got.screenH}`);
+    check(`${label}: goes back to filling its card on exit`, got.afterFit === 'cover', got.afterFit);
+  }
+  check('fullscreen produced no page errors', errors.length === 0, errors[0] || 'none');
+  await ctx.close();
+}
+
 // ============================================================ colour contrast (WCAG 2.1 AA)
 //
 // Measured on the rendered page rather than read off the stylesheet, because the thing that

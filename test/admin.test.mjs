@@ -123,7 +123,33 @@ await page.evaluate(() => {
 await page.waitForTimeout(300);
 
 const leadRows = await page.evaluate(() => [...document.querySelectorAll('#leadTable tbody tr')].map(r => r.innerText));
-const signalRows = await page.evaluate(() => [...document.querySelectorAll('#signalTable tbody tr')].map(r => r.innerText));
+
+// Nothing blank may be on screen when the Leads page opens. The signal rows have no name,
+// email or phone on them — that is what makes them not leads — so they live behind a closed
+// disclosure. `offsetParent === null` is the check that they are genuinely not rendered, rather
+// than merely styled small.
+const signalsHiddenByDefault = await page.evaluate(() => {
+  const t = document.getElementById('signalTable');
+  const wrap = document.getElementById('signalWrap');
+  // Chromium keeps layout boxes for closed <details> (content-visibility:hidden), so
+  // offsetParent still resolves. checkVisibility() is the one that accounts for it, with a
+  // zero-height fallback for engines that lack it.
+  const rendered = typeof t.checkVisibility === 'function'
+    ? t.checkVisibility({ contentVisibilityAuto: true, visibilityProperty: true, opacityProperty: true })
+    : t.getBoundingClientRect().height > 0;
+  return { collapsed: !wrap.open, notRendered: !rendered, countShown: document.getElementById('signalCount').textContent };
+});
+check('no blank rows are visible when the Leads page opens',
+  signalsHiddenByDefault.collapsed && signalsHiddenByDefault.notRendered,
+  JSON.stringify(signalsHiddenByDefault));
+check('the signal count is still surfaced without opening it',
+  signalsHiddenByDefault.countShown === '3', signalsHiddenByDefault.countShown);
+
+// textContent, not innerText: the rows are inside a collapsed <details> and innerText returns
+// '' for anything not being rendered.
+await page.evaluate(() => { document.getElementById('signalWrap').open = true; });
+await page.waitForTimeout(120);
+const signalRows = await page.evaluate(() => [...document.querySelectorAll('#signalTable tbody tr')].map(r => r.textContent));
 
 check('only contactable leads are listed as leads', leadRows.length === 1, `${leadRows.length} rows`);
 check('the qualified lead shows its full detail',
@@ -205,6 +231,116 @@ if (exported) {
       .every(k => k in (exported.datasets.leads_contactable[0] || {})));
   check('exported signals are labelled, not silently dropped',
     (exported.datasets.lead_signals_no_contact_details || []).length === 3);
+}
+
+// ---------------------------------------------------------------- theme
+{
+  const before = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+  await page.click('#themeBtn');
+  const afterOne = await page.evaluate(() => ({
+    attr: document.documentElement.getAttribute('data-theme'),
+    stored: localStorage.getItem('dd_admin_theme'),
+    bg: getComputedStyle(document.body).backgroundColor,
+  }));
+  check('the theme toggle switches theme', afterOne.attr === 'dark' || afterOne.attr === 'light',
+    `${before || '(os)'} -> ${afterOne.attr}`);
+  check('the choice is remembered', afterOne.stored === afterOne.attr, afterOne.stored);
+
+  await page.click('#themeBtn');
+  const afterTwo = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+  check('toggling again goes back', afterTwo !== afterOne.attr, `${afterOne.attr} -> ${afterTwo}`);
+}
+
+// ---------------------------------------------------------------- contrast, both themes
+// The dashboard gained a dark palette, and a palette nobody measured is a palette that fails
+// somewhere. Same walker the public site uses: resolve the effective background by climbing
+// ancestors and compositing alpha, then check WCAG AA on every visible text node.
+{
+  const measure = () => page.evaluate(() => {
+    // The dashboard's tokens are oklch(), and Chromium serialises computed colours in the space
+    // they were authored in — so getComputedStyle().color hands back "oklch(0.216 0.047 256)",
+    // not "rgb(...)". A plain rgb regex rejects every one of them and the audit silently
+    // measures nothing. Canvas is the normaliser: assigning any CSS colour to fillStyle and
+    // reading it back returns hex or rgba, whatever the input space was.
+    // Reading fillStyle back is not enough — Chromium round-trips "oklch(...)" unchanged,
+    // preserving the authored colour space. Painting one pixel and reading it back forces the
+    // actual conversion to sRGB, which is what the eye sees and what WCAG is defined against.
+    // This also handles color-mix() and anything else the tokens grow into later.
+    const cvEl = document.createElement('canvas');
+    cvEl.width = cvEl.height = 1;
+    const cv = cvEl.getContext('2d', { willReadFrequently: true });
+    const parse = c => {
+      if (!c) return null;
+      const fast = c.match(/^rgba?\(([^)]+)\)$/);
+      if (fast) {
+        const p = fast[1].split(/[,\s/]+/).filter(Boolean).map(parseFloat);
+        return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+      }
+      cv.clearRect(0, 0, 1, 1);
+      cv.fillStyle = c;
+      cv.fillRect(0, 0, 1, 1);
+      const d = cv.getImageData(0, 0, 1, 1).data;
+      return { r: d[0], g: d[1], b: d[2], a: d[3] / 255 };
+    };
+    const lum = ({ r, g, b }) => {
+      const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const over = (fg, bg) => ({
+      r: fg.r * fg.a + bg.r * (1 - fg.a), g: fg.g * fg.a + bg.g * (1 - fg.a),
+      b: fg.b * fg.a + bg.b * (1 - fg.a), a: 1,
+    });
+    const ratio = (a, b) => {
+      const la = lum(a), lb = lum(b);
+      return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    };
+    const effBg = el => {
+      let cur = el; const stack = [];
+      while (cur && cur !== document.documentElement) {
+        const bg = parse(getComputedStyle(cur).backgroundColor);
+        if (bg && bg.a > 0) { stack.push(bg); if (bg.a === 1) break; }
+        cur = cur.parentElement;
+      }
+      let base = parse(getComputedStyle(document.documentElement).backgroundColor) || { r: 255, g: 255, b: 255, a: 1 };
+      if (base.a < 1) base = { r: 255, g: 255, b: 255, a: 1 };
+      for (let i = stack.length - 1; i >= 0; i--) base = over(stack[i], base);
+      return base;
+    };
+    const hex = c => '#' + [c.r, c.g, c.b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('').toUpperCase();
+    const fails = new Map();
+    let checked = 0;
+
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = walker.nextNode())) {
+      const t = (n.textContent || '').trim(); if (!t) continue;
+      const el = n.parentElement; if (!el) continue;
+      if (el.closest('[hidden]') || el.closest('details:not([open])')) continue;
+      const cs = getComputedStyle(el);
+      if (cs.visibility === 'hidden' || cs.display === 'none' || cs.opacity === '0') continue;
+      const rect = el.getBoundingClientRect(); if (!rect.width || !rect.height) continue;
+      const fg = parse(cs.color); if (!fg) continue;
+      const bg = effBg(el);
+      const flat = over(fg, bg);
+      const r = ratio(flat, bg);
+      const size = parseFloat(cs.fontSize), weight = parseInt(cs.fontWeight, 10) || 400;
+      const need = (size >= 24 || (size >= 18.66 && weight >= 700)) ? 3 : 4.5;
+      checked++;
+      if (r + 0.005 >= need) continue;
+      const key = `${hex(flat)} on ${hex(bg)}`;
+      if (!fails.has(key)) fails.set(key, `${key} = ${r.toFixed(2)}:1 (needs ${need}) e.g. "${t.slice(0, 34)}"`);
+    }
+    return { checked, fails: [...fails.values()] };
+  });
+
+  for (const theme of ['light', 'dark']) {
+    await page.evaluate(t => document.documentElement.setAttribute('data-theme', t), theme);
+    await page.waitForTimeout(150);
+    const { checked, fails } = await measure();
+    check(`${theme}: every text node meets WCAG AA contrast`, fails.length === 0,
+      fails.slice(0, 3).join(' | ') || `${checked} text nodes`);
+    check(`${theme}: contrast audit saw the page`, checked > 60, `${checked} text nodes`);
+  }
 }
 
 check('no errors after exercising the page', errors.length === 0, errors[0] || 'none');

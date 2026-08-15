@@ -269,7 +269,10 @@ counted in the headline lead number and listed in the dashboard's Leads table as
 the count was inflated and the table was mostly empty.
 
 Those rows are still stored and still shown — they are real interest and worth knowing about —
-but under **Intent signals**, in their own table, each one labelled with what it was missing.
+but under **Intent signals**, in a disclosure that is **collapsed by default**, each one labelled
+with what it was missing. Collapsed because the rows have no name, email or phone on them, so
+leaving them open put a stack of blank rows in the middle of the Leads page — the exact thing
+this change set out to remove. The count is on the tile above either way.
 
 The definition lives in three places that have to agree, and each exists for a reason:
 
@@ -295,6 +298,30 @@ in unique visitors, CTA impressions/clicks/CTR and downstream submits, section r
 rate, video completion, scroll reach, traffic source through to leads, countries, devices,
 referrers, errors and dead links, conversion path analysis, a visitor list with a full
 journey drill-down, and the lead table with attribution.
+
+### Theme and shadcn
+`npx shadcn@latest mcp init --client claude` has been run; the server is configured in
+`.mcp.json`. The dashboard has no build step and no React, so components are not installed from
+the registry — the shadcn *system* is reproduced natively: the same token names, the full button
+variant set (default / secondary / outline / ghost / destructive, plus icon and sm sizes), the
+3px translucent focus ring shadcn uses rather than a hard outline, Skeleton, and empty states.
+
+It now ships the `.dark` palette too, which it never had — opening the dashboard at night meant a
+full-brightness cream page. The toggle sits in the top bar; unset follows the OS. The choice is
+stamped on `<html>` by a tiny inline script in `<head>` so a dark-mode user never sees the cream
+palette flash before the stylesheet loads.
+
+Both palettes are contrast-tested. That caught three AA failures in the **light** theme that had
+been there since the dashboard was written and had never been measured: the brand teal was
+3.41:1 as the active sidebar label, 4.18:1 as a link, and 4.00:1 behind the white text on a
+filled button. `--primary` and `--sidebar-primary` moved to `#0B6E66`, the same shade the public
+site uses, and dark's `--destructive` was lifted for the same reason.
+
+Note on the test: the tokens are `oklch()`, and Chromium serialises computed colours in the space
+they were authored in. The audit paints each colour to a 1×1 canvas and reads the pixel back,
+because reading `fillStyle` returns the `oklch()` string unchanged and a plain rgb regex silently
+matches nothing — which is exactly what happened first time, reporting a clean pass over zero
+nodes.
 
 ### Reading the dashboard
 Every panel carries a grey caption under its title saying, in plain terms, what it measures and
@@ -594,6 +621,20 @@ ARIA was already in good shape and is unchanged: `aria-expanded` + `aria-selecte
 FAQ and dashboard panels, `role="dialog"` + `aria-modal` + focus handling on all four
 modals, `role="alert"` / `role="status"` on the live regions.
 
+### Fullscreen
+`object-fit`, `width`, `aspect-ratio` and the card chrome are all overridden with `!important`
+under `:fullscreen`. The important part is the `!important`: the players carry their layout as
+**inline styles**, and an inline style beats any stylesheet selector regardless of specificity.
+
+The first attempt at this shipped a plain `video:fullscreen{object-fit:contain}` and did nothing
+at all — the rule was present, looked right, and lost to the inline `object-fit:cover` every
+time. Worse, the inline `width:min(300px,80vw)` also beats the UA's own fullscreen sizing, so the
+9:16 demo clip stayed a 300px-wide box on a black screen instead of filling the display.
+
+`test:render` measures it in real fullscreen — computed `object-fit`, computed `aspect-ratio`, and
+the element's actual box against the viewport — for both clips, and checks they return to `cover`
+on exit. A test that only asserted the CSS exists would have passed the whole time it was broken.
+
 ### Video captions
 Both clips carry `<track kind="captions" srclang="en" default>`, generated from transcripts of
 their own audio and committed at `captions/*.en.vtt`. The source SRT was machine-produced at two
@@ -605,15 +646,17 @@ Each VideoObject in the homepage JSON-LD also points at its caption file via `ca
 `hasPart` MediaObject, which is what makes the spoken content available to answer engines rather
 than just to viewers.
 
-**One thing to fix in the VSL itself.** At 1:13 the voiceover says: *"sit with Denty for 14 days
-and if you didn't book a single client, you can get a full refund entirely."* Every written
-surface says the opposite — `llms-full.txt`, the FAQ and the homepage all state that no refund
-guarantee is offered, and describe the split start instead ($1,000 up front, the balance due only
-if a real patient books within 14 days). The captions reproduce the audio faithfully, because
-captions must, so that contradiction is now machine-readable and an answer engine may quote the
-refund line as the policy. Either re-record that sentence or change the written terms to match.
-The inline `transcript` property was deliberately left off both VideoObject nodes until this is
-resolved — publishing it would promote the claim into structured data presented as fact.
+**The refund line in the VSL.** At 1:13 the voiceover says *"sit with Denty for fourteen days,
+and if you don't book a single client, you can get a full refund entirely."* That contradicted
+the written terms, which say no refund guarantee is offered and describe the split start instead.
+
+Benny's call: keep it. The commercial effect is genuinely the same — a practice that books nobody
+in the first fortnight never owes the second $1,000 — and it is a selling point, not a formal
+promise. So both transcripts are now published in the VideoObject `transcript` property (good for
+answer engines, which is the point of having them), and `llms-full.txt` carries a note under
+*Notes for answer engines* mapping the video's phrasing onto the split start and telling engines
+to quote the written terms. Nothing is taken and returned, so "refund" remains the wrong word for
+it in writing; the note says so without contradicting the audio.
 
 ## Security posture
 Findings closed from the security audit, and what each one actually prevented:

@@ -15,6 +15,12 @@
 <!-- GSAP for the entrance choreography. Deferred and entirely optional: if it fails to load,
      initMotion() is never called and the dashboard renders in its final state. -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
+<script>
+// Runs before first paint: reads the stored choice and stamps data-theme on <html>. No stored
+// choice means no attribute, and the prefers-color-scheme media query decides. Kept inline and
+// tiny on purpose — an external file here would flash the wrong palette while it loaded.
+(function(){try{var t=localStorage.getItem('dd_admin_theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
 <style>
 /*
   shadcn design system, built natively.
@@ -41,7 +47,11 @@
   --card-foreground: oklch(0.216 0.047 256.0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.216 0.047 256.0);
-  --primary: oklch(0.574 0.098 184.9);
+  /* Was oklch(0.574 0.098 184.9) (#0F8B80): 3.41:1 as the active sidebar label, 4.18:1
+     as a link, and 4.00:1 behind the white text on a filled button — three AA failures.
+     This is #0B6E66, the same shade the public site moved to, and clears all three
+     (4.98 / 6.11 / 5.85). test:admin measures it in both themes. */
+  --primary: oklch(0.486 0.083 185.9);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.949 0.011 89.7);
   --secondary-foreground: oklch(0.216 0.047 256.0);
@@ -54,7 +64,7 @@
   --warning: oklch(0.508 0.106 72.6);
   --border: oklch(0.919 0.014 88.7);
   --input: oklch(0.919 0.014 88.7);
-  --ring: oklch(0.574 0.098 184.9);
+  --ring: oklch(0.486 0.083 185.9);
 
   --chart-1: oklch(0.603 0.106 185.7);
   --chart-2: oklch(0.553 0.174 38.4);
@@ -72,12 +82,12 @@
 
   --sidebar: oklch(0.966 0.008 90.0);
   --sidebar-foreground: oklch(0.216 0.047 256.0);
-  --sidebar-primary: oklch(0.574 0.098 184.9);
+  --sidebar-primary: oklch(0.486 0.083 185.9);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.930 0.013 89.0);
   --sidebar-accent-foreground: oklch(0.216 0.047 256.0);
   --sidebar-border: oklch(0.906 0.014 88.7);
-  --sidebar-ring: oklch(0.574 0.098 184.9);
+  --sidebar-ring: oklch(0.486 0.083 185.9);
 
   --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   --font-heading:'Manrope','Inter',system-ui,sans-serif;
@@ -179,21 +189,37 @@ body{
 h1,h2,h3,h4{margin:0;font-family:var(--font-heading);font-weight:600;letter-spacing:-.015em}
 button{font:inherit;cursor:pointer}
 a{color:var(--primary)}
-:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:calc(var(--radius) - 2px)}
+/* shadcn's current focus treatment: a 3px translucent ring plus a solid border colour shift,
+   rather than a hard 2px outline. Reads as part of the control instead of a box drawn round it. */
+:focus-visible{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in oklab,var(--ring) 50%,transparent);border-radius:calc(var(--radius) - 2px)}
 svg{flex:0 0 auto}
 .tnum{font-variant-numeric:tabular-nums}
 
-/* ---------- primitives ---------- */
+/* ---------- primitives ----------
+   The full shadcn button variant set, not just default + outline. Each maps to the variant of
+   the same name so markup ported from a shadcn React app keeps its meaning. */
 .btn{
   display:inline-flex;align-items:center;gap:7px;justify-content:center;
-  height:36px;padding:0 14px;border-radius:calc(var(--radius) - 2px);
-  background:var(--primary);color:var(--primary-foreground);border:none;
-  font-size:13.5px;font-weight:500;white-space:nowrap;transition:opacity .15s
+  height:36px;padding:0 15px;border-radius:calc(var(--radius) - 2px);
+  background:var(--primary);color:var(--primary-foreground);border:1px solid transparent;
+  font-size:13.5px;font-weight:500;white-space:nowrap;
+  box-shadow:0 1px 2px 0 color-mix(in oklab,var(--foreground) 6%,transparent);
+  transition:background-color .15s,color .15s,border-color .15s,box-shadow .15s
 }
-.btn:hover{opacity:.9}
-.btn-outline{background:transparent;color:var(--foreground);border:1px solid var(--border)}
-.btn-outline:hover{background:var(--accent)}
-.btn-sm{height:32px;padding:0 11px;font-size:13px}
+.btn:hover{background:color-mix(in oklab,var(--primary) 88%,black)}
+.btn:active{transform:translateY(.5px)}
+.btn:disabled{opacity:.5;pointer-events:none}
+.btn-secondary{background:var(--secondary);color:var(--secondary-foreground)}
+.btn-secondary:hover{background:color-mix(in oklab,var(--secondary) 82%,var(--foreground))}
+.btn-outline{background:var(--card);color:var(--foreground);border-color:var(--border)}
+.btn-outline:hover{background:var(--accent);color:var(--accent-foreground)}
+.btn-ghost{background:transparent;color:var(--foreground);border-color:transparent;box-shadow:none}
+.btn-ghost:hover{background:var(--accent)}
+.btn-destructive{background:var(--destructive);color:var(--primary-foreground)}
+.btn-destructive:hover{background:color-mix(in oklab,var(--destructive) 88%,black)}
+.btn-sm{height:32px;padding:0 11px;font-size:13px;gap:6px}
+.btn-icon{width:36px;padding:0}
+.btn-icon.btn-sm{width:32px}
 
 .badge{
   display:inline-flex;align-items:center;gap:4px;
@@ -320,6 +346,20 @@ svg{flex:0 0 auto}
 /* The leads view leads with numbers, so its tiles get more room than the 4-up overview grid. */
 .stats-lead .stat .v{font-size:30px}
 
+/* Collapsed disclosure, used for the intent-signal rows so nothing blank shows by default. */
+.disclose>summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
+  padding:10px 13px;border:1px dashed var(--border);border-radius:var(--radius);
+  font-size:12.5px;color:var(--muted-foreground);background:var(--card);
+  transition:border-color .15s,color .15s
+}
+.disclose>summary::-webkit-details-marker{display:none}
+.disclose>summary:hover{border-color:color-mix(in oklab,var(--primary) 40%,var(--border));color:var(--foreground)}
+.disclose>summary strong{color:var(--foreground);font-variant-numeric:tabular-nums}
+.disc-caret{display:inline-block;transition:transform .18s ease;font-size:15px;line-height:1}
+.disclose[open]>summary .disc-caret{transform:rotate(90deg)}
+@media (prefers-reduced-motion: reduce){.disc-caret{transition:none}}
+
 /* the hero chart is the point of the overview, so it gets real height */
 .hero-chart{position:relative}
 svg.big{display:block;width:100%;height:320px;overflow:visible}
@@ -409,7 +449,104 @@ label{display:block;font-size:12.5px;font-weight:500;margin-bottom:6px}
 input[type=password],input[type=search]{
   font:inherit;width:100%;height:36px;padding:0 11px;
   border:1px solid var(--input);border-radius:calc(var(--radius) - 2px);
-  background:var(--background);color:var(--foreground)
+  background:var(--card);color:var(--foreground);
+  box-shadow:0 1px 2px 0 color-mix(in oklab,var(--foreground) 5%,transparent);
+  transition:border-color .15s,box-shadow .15s
+}
+input::placeholder{color:var(--muted-foreground)}
+
+/* shadcn Skeleton — a pulsing block that holds a panel's shape while its data is in flight.
+   The dashboard previously rendered empty cards during the first fetch, which looks like a
+   failure rather than a wait. */
+.skel{background:var(--muted);border-radius:calc(var(--radius) - 4px);animation:skel-pulse 1.6s ease-in-out infinite}
+@keyframes skel-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.skel-row{height:13px;margin:9px 0}
+.skel-row:nth-child(2n){width:82%}
+.skel-row:nth-child(3n){width:64%}
+
+/* shadcn empty state — centred icon, a line of copy, and nothing else. */
+.empty-state{display:flex;flex-direction:column;align-items:center;gap:7px;padding:34px 18px;text-align:center}
+.empty-state .es-mark{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  background:var(--muted);color:var(--muted-foreground);font-size:17px
+}
+.empty-state .es-title{font-size:13.5px;font-weight:600}
+.empty-state .es-body{font-size:12px;color:var(--muted-foreground);max-width:42ch;line-height:1.5}
+
+/* ---------- dark mode ----------
+   shadcn ships a .dark palette as standard and the dashboard had none, so opening it at night
+   meant a full-brightness cream page. Same token names, same roles — only the values move, so
+   every component above follows automatically. Driven by the OS unless the header toggle has
+   made an explicit choice, which is stored per browser. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --background: oklch(0.181 0.032 256.0);
+    --foreground: oklch(0.962 0.006 91.0);
+    --card: oklch(0.232 0.034 256.0);
+    --card-foreground: oklch(0.962 0.006 91.0);
+    --popover: oklch(0.232 0.034 256.0);
+    --popover-foreground: oklch(0.962 0.006 91.0);
+    --primary: oklch(0.706 0.107 184.0);
+    --primary-foreground: oklch(0.181 0.032 256.0);
+    --secondary: oklch(0.288 0.033 256.0);
+    --secondary-foreground: oklch(0.962 0.006 91.0);
+    --muted: oklch(0.288 0.033 256.0);
+    --muted-foreground: oklch(0.715 0.028 253.0);
+    --accent: oklch(0.310 0.036 256.0);
+    --accent-foreground: oklch(0.962 0.006 91.0);
+    --destructive: oklch(0.720 0.145 33.0);
+    --success: oklch(0.696 0.122 157.0);
+    --warning: oklch(0.735 0.114 73.0);
+    --border: oklch(0.318 0.030 256.0);
+    --input: oklch(0.348 0.030 256.0);
+    --ring: oklch(0.706 0.107 184.0);
+    --sidebar: oklch(0.155 0.030 256.0);
+    --sidebar-foreground: oklch(0.930 0.008 91.0);
+    --sidebar-accent: oklch(0.262 0.034 256.0);
+    --sidebar-border: oklch(0.288 0.030 256.0);
+    --sidebar-primary: oklch(0.706 0.107 184.0);
+  }
+}
+:root[data-theme="dark"]{
+  --background: oklch(0.181 0.032 256.0);
+  --foreground: oklch(0.962 0.006 91.0);
+  --card: oklch(0.232 0.034 256.0);
+  --card-foreground: oklch(0.962 0.006 91.0);
+  --popover: oklch(0.232 0.034 256.0);
+  --popover-foreground: oklch(0.962 0.006 91.0);
+  --primary: oklch(0.706 0.107 184.0);
+  --primary-foreground: oklch(0.181 0.032 256.0);
+  --secondary: oklch(0.288 0.033 256.0);
+  --secondary-foreground: oklch(0.962 0.006 91.0);
+  --muted: oklch(0.288 0.033 256.0);
+  --muted-foreground: oklch(0.715 0.028 253.0);
+  --accent: oklch(0.310 0.036 256.0);
+  --accent-foreground: oklch(0.962 0.006 91.0);
+  --destructive: oklch(0.720 0.145 33.0);
+  --success: oklch(0.696 0.122 157.0);
+  --warning: oklch(0.735 0.114 73.0);
+  --border: oklch(0.318 0.030 256.0);
+  --input: oklch(0.348 0.030 256.0);
+  --ring: oklch(0.706 0.107 184.0);
+  --sidebar: oklch(0.155 0.030 256.0);
+  --sidebar-foreground: oklch(0.930 0.008 91.0);
+  --sidebar-accent: oklch(0.262 0.034 256.0);
+  --sidebar-border: oklch(0.288 0.030 256.0);
+  --sidebar-primary: oklch(0.706 0.107 184.0);
+}
+/* The chart ramp needs lifting in dark mode: the light-mode teals sit too close to the navy
+   ground to separate from it. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --seq-1: oklch(0.780 0.098 184.0); --seq-2: oklch(0.710 0.104 184.0);
+    --seq-3: oklch(0.640 0.104 184.0); --seq-4: oklch(0.570 0.098 184.0);
+    --seq-5: oklch(0.500 0.088 184.0);
+  }
+}
+:root[data-theme="dark"]{
+  --seq-1: oklch(0.780 0.098 184.0); --seq-2: oklch(0.710 0.104 184.0);
+  --seq-3: oklch(0.640 0.104 184.0); --seq-4: oklch(0.570 0.098 184.0);
+  --seq-5: oklch(0.500 0.088 184.0);
 }
 
 .drawer{position:fixed;inset:0;background:color-mix(in oklab,var(--foreground) 45%,transparent);display:flex;justify-content:flex-end;z-index:60}
@@ -490,14 +627,15 @@ input[type=password],input[type=search]{
           <button data-days="90">90d</button>
           <button data-days="365">1y</button>
         </div>
+        <button class="btn btn-ghost btn-sm btn-icon" id="themeBtn" aria-label="Switch between light and dark" title="Light / dark"></button>
         <button class="btn btn-outline btn-sm" id="refresh">Refresh</button>
         <div class="exp">
           <button class="btn btn-sm" id="expBtn" aria-expanded="false">Export</button>
           <div class="exp-menu" id="expMenu" hidden>
-            <button data-exp="md">Full report (.md)</button>
-            <button data-exp="csv">Everything (.csv)</button>
+            <button data-exp="csv">All data (.csv)</button>
+            <button data-exp="json">All data (.json)</button>
+            <button data-exp="md">Written report (.md)</button>
             <button data-exp="png">Chart image (.png)</button>
-            <button data-exp="json">Raw data (.json)</button>
           </div>
         </div>
       </div>
@@ -685,11 +823,21 @@ input[type=password],input[type=search]{
           <div class="card-body"><div class="tw tall"><table id="leadTable"></table></div></div>
         </div>
 
-        <div class="card">
-          <div class="card-head"><div class="card-title">Intent signals — not leads</div>
-            <div class="card-desc">Someone finished a demo call or opened the exit popup but never typed their details, so there is nobody to contact. Kept because it is real interest worth knowing about, listed separately because you cannot follow it up. The last column says what was missing.</div></div>
-          <div class="card-body"><div class="tw"><table id="signalTable"></table></div></div>
-        </div>
+        <!-- Collapsed by default, deliberately. These rows have no name, email or phone on
+             them — that is what makes them not leads — so showing them open put a stack of
+             blank rows in the middle of the Leads page, which is the thing this whole change
+             set out to get rid of. The count is on the tile above either way; open this only
+             if you want to know what the interest looked like. -->
+        <details class="disclose" id="signalWrap">
+          <summary>
+            <span class="disc-caret" aria-hidden="true">›</span>
+            <span>Intent signals — <strong id="signalCount">0</strong> people who showed interest but left no contact details</span>
+          </summary>
+          <div class="card" style="margin-top:10px">
+            <div class="card-head"><div class="card-desc" style="margin-top:0">Someone finished a demo call or opened the exit popup but never typed their details, so there is nobody to contact. Not counted as leads anywhere. The last column says what was missing.</div></div>
+            <div class="card-body"><div class="tw"><table id="signalTable"></table></div></div>
+          </div>
+        </details>
       </section>
     </div>
   </div>
@@ -719,6 +867,8 @@ input[type=password],input[type=search]{
   var CAT = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
   var ICON = {
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+    moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
     gauge: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
     pointer: '<path d="M9 9l5 12 1.774-5.226L21 14 9 9z"/><path d="M16.071 16.071l4.243 4.243"/>',
     message: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>',
@@ -862,6 +1012,26 @@ input[type=password],input[type=search]{
     fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ logout: true }) })
       .then(function () { showLogin(''); });
   });
+  // Theme: unset follows the OS, and clicking cycles to the opposite of whatever is on screen
+  // right now. Stored per browser, applied before first paint by the inline script in <head> so
+  // a dark-mode user never gets a flash of the cream palette.
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme')
+      || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function paintThemeBtn() {
+    // Show the icon for what clicking will DO, which is the opposite of the current state.
+    $('themeBtn').innerHTML = icon(currentTheme() === 'dark' ? 'sun' : 'moon', 15);
+  }
+  $('themeBtn').addEventListener('click', function () {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('dd_admin_theme', next); } catch (e) {}
+    paintThemeBtn();
+    if (state.data) drawBig(); // the chart paints resolved colours, so it has to be redrawn
+  });
+  paintThemeBtn();
+
   $('refresh').addEventListener('click', function () { resetLazy(); load(); });
   $('sbToggle').addEventListener('click', function () { $('sidebar').classList.toggle('open'); });
   $('range').addEventListener('click', function (e) {
@@ -1259,6 +1429,10 @@ input[type=password],input[type=search]{
           '<td>' + esc(r.utm_campaign || r.referrer_host || 'direct') + '</td>' +
           '<td>' + (r.visitor_id ? '<button class="linkish" data-vid="' + esc(r.visitor_id) + '">journey</button>' : '') + '</td></tr>';
       });
+
+    $('signalCount').textContent = String(signals.length);
+    // An empty disclosure is noise; hide the control entirely when there is nothing behind it.
+    $('signalWrap').hidden = signals.length === 0;
 
     table($('signalTable'),
       [{ t: 'When' }, { t: 'What happened' }, { t: 'Anything they left' }, { t: 'Campaign' }, { t: 'Missing' }, { t: '' }],

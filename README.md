@@ -98,7 +98,7 @@ crawler-readable copy, zero template syntax, all nine Q&As.**
 True SSR would need a build step or a server framework; this is the progressive-
 enhancement equivalent for a single static file.
 
-**`npm run test:seo` guards all of it.** 55 static checks: one canonical origin
+**`npm run test:seo` guards all of it.** 88 static checks: one canonical origin
 across every file, no dangling JSON-LD `@id`s, the FAQ schema matching the FAQ
 the visitor actually sees, one `<h1>` with no skipped levels, every `<img>` with
 alt and reserved layout space, complete OG/Twitter cards with `og:image`
@@ -258,6 +258,36 @@ All of it happens in Postgres, in the functions created by `006`. `/api/stats` j
 them and returns the result, so the payload stays small no matter how many events exist.
 Adding a panel means adding a function, not looping in JavaScript.
 
+## What counts as a lead
+A lead is **someone you could pick up the phone and call**: name, email and phone all present
+and non-blank, with a plausible email, and not a bot.
+
+This needed saying out loud because the `leads` table takes three sources and only one of them
+carries contact details. A completed demo call or a dismissed exit-intent popup inserts a row
+with name, email and phone all null — the visitor never typed anything. Those rows were being
+counted in the headline lead number and listed in the dashboard's Leads table as blank rows, so
+the count was inflated and the table was mostly empty.
+
+Those rows are still stored and still shown — they are real interest and worth knowing about —
+but under **Intent signals**, in their own table, each one labelled with what it was missing.
+
+The definition lives in three places that have to agree, and each exists for a reason:
+
+| Where | Why it is there |
+| --- | --- |
+| `supabase/migrations/010_qualified_leads.sql` | `leads.is_qualified`, a stored generated column. The authority, and indexable |
+| `api/stats.ts` (`classifyLead`) | Prefers the column, falls back to computing it. This is what makes the dashboard correct on a database where 010 has not been applied yet |
+| `admin.html` (`qualified`) | Last line of defence, so an older API build cannot put a blank row back in the leads list |
+
+**The booking form now requires a phone number.** The field existed but was optional, so most
+submissions arrived without one and would not have qualified. `PHONE_RE` accepts anything
+containing a digit: practices write numbers a dozen different ways, and rejecting an unusual
+format loses a real buyer, which is a far worse failure than letting a typo through.
+
+`npm run test:admin` drives the real dashboard against a stubbed API and pins all of it,
+including the cases a plain null check misses — a whitespace-only phone, an email that is
+present but malformed.
+
 ## Admin dashboard
 `/admin.html` is a private traffic dashboard built to answer 24 specific business questions;
 each panel is labelled with the ones it covers. Visitors and returning visitors, the funnel
@@ -265,6 +295,25 @@ in unique visitors, CTA impressions/clicks/CTR and downstream submits, section r
 rate, video completion, scroll reach, traffic source through to leads, countries, devices,
 referrers, errors and dead links, conversion path analysis, a visitor list with a full
 journey drill-down, and the lead table with attribution.
+
+### Reading the dashboard
+Every panel carries a grey caption under its title saying, in plain terms, what it measures and
+what a good or bad number looks like. `test:admin` asserts that no panel ships without one, so
+a new chart cannot arrive unexplained.
+
+### Export
+The **Export** button in the top bar produces the whole dashboard as Markdown, CSV or JSON, and
+the chart alone as PNG. The Leads view has its own **Export leads** button for just the call
+list.
+
+The click log, the 12-month audit, the visitor list and the city/region breakdowns are loaded
+lazily, only when their tab is opened. That meant an export taken straight after signing in
+silently omitted all of them, and the file's contents depended on which tabs you happened to
+have clicked — not something anyone would think to check. Every export now fetches whatever is
+missing first. CSV and JSON contain exactly the same datasets under the same names.
+
+Changing the date range clears all the lazy caches together, so an export cannot mix a 7-day
+click log into a 90-day report.
 
 - **Set `ADMIN_PASSWORD`** in Vercel → Settings → Environment Variables. Until it is set,
   `/api/stats` and `/api/admin-login` return 503 and the dashboard shows nothing. It never
@@ -338,36 +387,21 @@ Each route picks its target in this order:
 3. The hardcoded signed URL, as a fallback. Those tokens expire **2027-07-24** (vsl),
    **2027-08-07** (demo) and **2027-08-10** (images).
 
-### Both buckets are still private — do this
-`digi_dental-VSL` and `Images` are both private, which is the root of every media
-fragility on the site: signed URLs that expire, and no image transformations (Supabase
-only offers those on public buckets, so the `srcset` on the founder photo currently
-resolves every variant to the same full-size original).
+### Buckets are public
+Both `digi_dental-VSL` and `Images` were made public on 2026-08-15. That removes the token-expiry
+class of bug entirely and turns on Supabase image transformations, so the `srcset` on the founder
+photo and the console captures now serve genuinely smaller files rather than redirecting every
+variant to the same original.
 
-Deleting the three unused clips first, then flipping both buckets, is a two-minute job
-that has to happen outside this repo — Supabase blocks deletion via SQL on purpose
-(`storage.protect_delete()`), and the Storage API needs a service-role key:
+The signed URLs stay in the code as a third fallback. They cost nothing while unused and they are
+what keeps the site up if a bucket is ever flipped back.
 
-```bash
-export SUPABASE_URL=https://hctpvnqanwhxlmpmfmme.supabase.co
-export SRK=<service-role key from Supabase → Settings → API>
-
-# 1. Remove the three clips that are not used anywhere on the site.
-for f in "Digi%20Dental.mp4" "digi_dental.mp4" "vid-testimonials.mp4"; do
-  curl -X DELETE "$SUPABASE_URL/storage/v1/object/digi_dental-VSL/$f" \
-       -H "Authorization: Bearer $SRK"
-done
-
-# 2. Make both buckets public.
-for b in "digi_dental-VSL" "Images"; do
-  curl -X PUT "$SUPABASE_URL/storage/v1/bucket/$b" \
-       -H "Authorization: Bearer $SRK" -H "Content-Type: application/json" \
-       -d '{"public": true}'
-done
-```
-
-Or just do it in the dashboard: Storage → bucket → ⋯ → *Make public*, after deleting the
-three files. Nothing in this repo needs changing afterwards — the routes detect it.
+Three unused clips are still in `digi_dental-VSL` and are now publicly reachable by anyone who
+guesses the URL: `Digi Dental.mp4`, `digi_dental.mp4` and `vid-testimonials.mp4`. They are
+unlisted marketing footage, not sensitive, but they serve no purpose — delete them from
+Storage → `digi_dental-VSL` when convenient. Supabase blocks deletion via SQL
+(`storage.protect_delete()`), so it has to be the dashboard or the Storage API with a
+service-role key.
 
 ### Video weight and region
 The project lives in **ap-southeast-2 (Sydney)** and each clip is roughly **50 MB**. For a
@@ -524,12 +558,9 @@ element it is probing for, so the check and the render share one download instea
   bundle (`dc-runtime`) in a project with no build step, so a committed minified copy would
   drift from its source on the next regeneration. Brotli at the edge already recovers most
   of it. Revisit if a build step ever lands.
-- **Non-composited animation.** The PageSpeed note about "32 animated elements using
-  `filter`" is a misread: those are `backdrop-filter` on the fixed nav and the modal
-  scrims, which are static values, not animations. The genuinely non-composited animation
-  is `dd-shimmer` (animates `background-position`) and the nav's `transition: background`.
-  Both are small and localised; changing them would alter the design for a marginal gain.
-- **Video captions.** See below.
+- ~~**Non-composited animation.**~~ Fixed — see below. The first pass through this audit
+  dismissed it as a misread of `backdrop-filter`. That was wrong: the scroll reveal really was
+  transitioning `filter` on 32 elements.
 
 ## Accessibility
 Contrast is measured, not eyeballed. `test:render` walks every text node on the rendered
@@ -563,17 +594,26 @@ ARIA was already in good shape and is unchanged: `aria-expanded` + `aria-selecte
 FAQ and dashboard panels, `role="dialog"` + `aria-modal` + focus handling on all four
 modals, `role="alert"` / `role="status"` on the live regions.
 
-### Video captions — outstanding
-Both `<video>` elements still lack `<track kind="captions">`. This is the one audit item
-left undone, and deliberately so: captions have to match the audio, and there is no
-transcript for `digidental-vsl.mp4` or `denty-live.mp4` anywhere in the repo. Shipping a
-plausible-looking `.vtt` would satisfy Lighthouse while actively misinforming the deaf and
-hard-of-hearing visitors the feature exists for, which is worse than not having it.
+### Video captions
+Both clips carry `<track kind="captions" srclang="en" default>`, generated from transcripts of
+their own audio and committed at `captions/*.en.vtt`. The source SRT was machine-produced at two
+to four words per cue, which is unreadable as captions; `scripts/srt-to-vtt.mjs` merges cues to a
+readable length, breaks on sentence ends, wraps to at most two lines, and strips the transcription
+service's watermark. Re-run it if either clip is re-cut.
 
-To close it: transcribe both clips (Whisper, or the Vapi call transcript for `denty-live`),
-drop `captions/<clip>.en.vtt` in the repo, and add
-`<track src="/captions/digidental-vsl.en.vtt" kind="captions" srclang="en" label="English">`
-inside each `<video>`.
+Each VideoObject in the homepage JSON-LD also points at its caption file via `caption` and a
+`hasPart` MediaObject, which is what makes the spoken content available to answer engines rather
+than just to viewers.
+
+**One thing to fix in the VSL itself.** At 1:13 the voiceover says: *"sit with Denty for 14 days
+and if you didn't book a single client, you can get a full refund entirely."* Every written
+surface says the opposite — `llms-full.txt`, the FAQ and the homepage all state that no refund
+guarantee is offered, and describe the split start instead ($1,000 up front, the balance due only
+if a real patient books within 14 days). The captions reproduce the audio faithfully, because
+captions must, so that contradiction is now machine-readable and an answer engine may quote the
+refund line as the policy. Either re-record that sentence or change the written terms to match.
+The inline `transcript` property was deliberately left off both VideoObject nodes until this is
+resolved — publishing it would promote the claim into structured data presented as fact.
 
 ## Security posture
 Findings closed from the security audit, and what each one actually prevented:

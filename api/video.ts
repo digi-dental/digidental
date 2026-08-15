@@ -3,20 +3,36 @@
 // expiring token. `<video src="/api/video?clip=vsl">` → 302 to wherever the file
 // actually lives; the browser follows the redirect and does its own range requests.
 //
-// BUG-4 background: the two clips used to be embedded as Supabase signed URLs with a
-// 365-day expiry (tokens below expire 2027-07-24). When they lapse, both players break.
-// This route makes the fix an environment-variable change instead of a code change:
+// This URL is also the <video:content_loc> in sitemap.xml and the contentUrl/embedUrl on
+// both VideoObject nodes in the homepage JSON-LD, so it has to keep resolving for video
+// rich results to survive. robots.txt allows /api/video through the /api/ disallow for
+// exactly that reason.
 //
-//   Preferred fix (permanent): make the `digi_dental-VSL` bucket public in Supabase, then
-//   set VIDEO_VSL_URL / VIDEO_DEMO_URL to the public /object/public/... URLs. Public URLs
-//   never expire and this route stops mattering.
+// ---------------------------------------------------------------------------
+// How a target is chosen, in order
+// ---------------------------------------------------------------------------
+//   1. VIDEO_VSL_URL / VIDEO_DEMO_URL, if set. Always wins — the manual override.
+//   2. The bucket's public URL, if the bucket is public. Probed once per warm lambda
+//      (see resolvePublic) rather than configured, so the day the bucket is flipped to
+//      public this route starts using a never-expiring URL on its own.
+//   3. The signed URL below, as a fallback.
 //
-//   Interim fix: mint fresh signed URLs and set the same two env vars in
-//   Vercel → Settings → Environment Variables. No redeploy of the page required.
+// Step 2 is what makes this self-healing in both directions. The two clips were
+// originally embedded as Supabase signed URLs with a 365-day expiry; when a token lapses
+// the player just breaks, and the previous version of this file needed someone to notice
+// and set an env var. Now a public bucket is detected and preferred automatically, and a
+// dead signed URL stops being the only thing standing between the site and a black box.
 //
-// The hardcoded values below are the current signed URLs, kept only as a fallback so the
-// site keeps working until the env vars are set. The hero clip's token expires 2027-07-24
+// The hardcoded signed URLs are the last resort. The hero clip's token expires 2027-07-24
 // and the demo clip's (denty-live.mp4) expires 2027-08-07.
+
+const PROJECT = 'hctpvnqanwhxlmpmfmme';
+const BUCKET = 'digi_dental-VSL';
+
+const OBJECT: Record<string, string> = {
+  vsl: 'digidental-vsl.mp4',
+  demo: 'denty-live.mp4',
+};
 
 const FALLBACK: Record<string, string> = {
   vsl: 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/sign/digi_dental-VSL/digidental-vsl.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjgzNDRkYS1mNzlkLTQ5MzAtOWNhZC1hOTk1NzYzYzhmN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkaWdpX2RlbnRhbC1WU0wvZGlnaWRlbnRhbC12c2wubXA0Iiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NDkxNDUyNCwiZXhwIjoxODE2NDUwNTI0fQ.TWFTOKvssrZSkX1AcpxPX_Rp0a1Xt3aIqrxW_EzT-1s',
@@ -25,14 +41,46 @@ const FALLBACK: Record<string, string> = {
 
 const ENV_VAR: Record<string, string> = { vsl: 'VIDEO_VSL_URL', demo: 'VIDEO_DEMO_URL' };
 
-export default function handler(req: any, res: any) {
+function publicUrl(clip: string): string {
+  const base = (process.env.SUPABASE_URL || `https://${PROJECT}.supabase.co`).replace(/\/+$/, '');
+  // encodeURIComponent per segment: bucket and object names contain characters (spaces,
+  // uppercase) that must survive intact, and encodeURI would leave some of them raw.
+  return `${base}/storage/v1/object/public/${encodeURIComponent(BUCKET)}/${encodeURIComponent(OBJECT[clip])}`;
+}
+
+// Memoised per lambda instance. A warm container answers from memory; a cold one spends one
+// HEAD before its first redirect, and the route is edge-cached for an hour on top of that,
+// so this costs close to nothing in practice.
+const publicCheck: Record<string, Promise<boolean>> = {};
+
+function resolvePublic(clip: string): Promise<boolean> {
+  if (!publicCheck[clip]) {
+    publicCheck[clip] = (async () => {
+      try {
+        const ctl = new AbortController();
+        const t = setTimeout(() => ctl.abort(), 2500); // never make a visitor wait on this
+        const r = await fetch(publicUrl(clip), { method: 'HEAD', signal: ctl.signal });
+        clearTimeout(t);
+        return r.ok;
+      } catch {
+        return false; // private bucket, network blip, or timeout — fall through to signed
+      }
+    })();
+  }
+  return publicCheck[clip];
+}
+
+export default async function handler(req: any, res: any) {
   const clip = String((req.query && req.query.clip) || 'vsl').toLowerCase();
   if (!Object.prototype.hasOwnProperty.call(FALLBACK, clip)) {
     return res.status(404).json({ error: 'Unknown clip. Use ?clip=vsl or ?clip=demo.' });
   }
-  const target = process.env[ENV_VAR[clip]] || FALLBACK[clip];
-  // Short edge cache: long enough to be cheap, short enough that swapping the env var
-  // takes effect the same day without a purge.
+
+  let target = process.env[ENV_VAR[clip]];
+  if (!target) target = (await resolvePublic(clip)) ? publicUrl(clip) : FALLBACK[clip];
+
+  // Short edge cache: long enough to be cheap, short enough that swapping the env var — or
+  // making the bucket public — takes effect the same day without a purge.
   res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
   res.setHeader('Location', target);
   return res.status(302).end();

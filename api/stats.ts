@@ -58,6 +58,36 @@ const intParam = (v: unknown, def: number, min: number, max: number) => {
   return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : def;
 };
 
+// ---------------------------------------------------------------------------
+// What counts as a lead
+// ---------------------------------------------------------------------------
+// The `leads` table takes three sources and only one of them carries contact details. A
+// completed demo call or a dismissed exit-intent popup inserts a row with name, email and
+// phone all null — the visitor never typed anything. Those are real intent signals worth
+// keeping, but they are not leads: there is nobody to ring. They were being counted in the
+// headline and listed as blank rows in the dashboard's Leads table.
+//
+// A lead is a row you could actually pick up the phone and call.
+//
+// This is computed here as well as in the database (migration 010 adds a generated column) so
+// the dashboard is correct on a deployment where that migration has not been applied yet. The
+// database column wins when present; this is the fallback, and the two definitions must agree.
+const LOOSE_EMAIL = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+const filled = (v: unknown) => typeof v === 'string' && v.trim() !== '';
+
+function classifyLead(row: any) {
+  const has_name = filled(row?.name);
+  const has_email = filled(row?.email);
+  const has_phone = filled(row?.phone);
+  // Prefer the generated column when migration 010 has run: it is the authority, and it also
+  // accounts for is_bot, which rpc_leads already filters out but which may reappear if the
+  // query changes.
+  const is_qualified = typeof row?.is_qualified === 'boolean'
+    ? row.is_qualified
+    : (has_name && has_phone && has_email && LOOSE_EMAIL.test(String(row.email).trim()));
+  return { ...row, has_name, has_email, has_phone, is_qualified };
+}
+
 // Every RPC is called the same way, and a failure in one panel must not blank the whole
 // dashboard — an empty section with a logged reason beats a 500 page.
 async function rpc(name: string, args: Record<string, unknown>) {
@@ -169,7 +199,9 @@ export default async function handler(req: any, res: any) {
       rpc('rpc_breakdown', { days, dim: 'referrer' }),
       rpc('rpc_errors', { days }),
       rpc('rpc_conversion_paths', { days }),
-      rpc('rpc_leads', { days, lim: 100 }),
+      // 500, not 100: the list is now split into leads and signals, and a window where signals
+      // outnumber leads would otherwise push real leads off the end of the page.
+      rpc('rpc_leads', { days, lim: 500 }),
       rpc('rpc_contact', { days }),
       rpc('rpc_click_totals', { days }),
       rpc('rpc_clicks', { days, lim: 40 }),
@@ -185,12 +217,29 @@ export default async function handler(req: any, res: any) {
       .map(r => r.error).filter(Boolean) as string[];
     const distinctFailures = Array.from(new Set(failures));
 
+    // Split the lead rows into the ones worth calling and the ones that are only a signal, and
+    // correct the headline count. rpc_overview still reports every non-bot row as a "lead";
+    // overriding it here keeps the definition in one place rather than duplicating a large SQL
+    // function in a migration purely to change one tally. See migration 010 for the rationale.
+    const allLeads = ((leads.data as any[]) || []).map(classifyLead);
+    const qualifiedLeads = allLeads.filter(l => l.is_qualified);
+    const leadSignals = allLeads.filter(l => !l.is_qualified);
+    const overviewData: Record<string, any> = { ...(overview.data || {}) };
+    overviewData.leads = qualifiedLeads.length;
+    overviewData.lead_signals = leadSignals.length;
+    overviewData.leads_all = allLeads.length;
+    // Why each signal fell short, so the dashboard can explain itself rather than just hiding
+    // rows the owner remembers seeing.
+    overviewData.leads_missing_phone = allLeads.filter(l => !l.has_phone).length;
+    overviewData.leads_missing_email = allLeads.filter(l => !l.has_email).length;
+    overviewData.leads_missing_name = allLeads.filter(l => !l.has_name).length;
+
     return res.status(200).json({
       range_days: days,
       generated_at: new Date().toISOString(),
       degraded: distinctFailures.length > 0 ? distinctFailures : null,
       degraded_count: failures.length || undefined,
-      overview: overview.data || {},
+      overview: overviewData,
       funnel: funnel.data || [],
       series: series.data || [],
       cta: cta.data || [],
@@ -203,7 +252,11 @@ export default async function handler(req: any, res: any) {
       referrers: referrers.data || [],
       errors: errors.data || [],
       paths: paths.data || [],
-      leads: leads.data || [],
+      // `leads` is now only the callable ones — that is what the word should mean everywhere,
+      // including in the CSV/JSON export. The rest are still returned, labelled for what they
+      // are, so nothing is hidden.
+      leads: qualifiedLeads,
+      lead_signals: leadSignals,
       contact: contact.data || [],
       click_totals: clickTotals.data || {},
       clicks: clicks.data || [],

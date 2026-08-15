@@ -25,11 +25,55 @@ canonical, robots, hreflang, Open Graph/Twitter, and a JSON-LD `@graph` of nine
 nodes — Organization, WebSite, WebPage, Service with offers, FAQPage, Person
 (founder, an E-E-A-T signal), two VideoObjects and an ImageObject logo.
 
-Supporting files served from the root: `robots.txt` (search engines + ~20 named
+Supporting files served from the root: `robots.txt` (search engines + ~35 named
 AI crawlers, points at the sitemap), `sitemap.xml` (with image **and video**
 extensions — the `<video>` elements are client-rendered, so the clips would
-otherwise be undiscoverable), `llms.txt` (plain-text summary for LLMs, including
-the full FAQ verbatim), `og-image.png` (social card), and `/api/site-info` (JSON).
+otherwise be undiscoverable), `llms.txt` (llmstxt.org index) and `llms-full.txt`
+(the long brief, including the full FAQ verbatim), `og-image.png` (social card),
+and `/api/site-info` (JSON).
+
+### robots.txt groups do not inherit
+A robots.txt group does **not** inherit from `User-agent: *`. The moment a crawler
+finds a group naming it, that group becomes the only one it obeys (RFC 9309 §2.2.1).
+
+This file used to give every named bot a bare `Allow: /` and keep the admin and API
+disallows in the wildcard group alone. The effect was the exact opposite of how it
+read: Googlebot, GPTBot, ClaudeBot, PerplexityBot and every other named agent were
+being told `/admin.html` and the whole API were fair game, while only *unnamed*
+crawlers were restricted. The tests asserting "robots.txt keeps the admin page out"
+passed throughout, because they only ever looked at the wildcard group.
+
+Every group now repeats the same rule set in full. Multiple `User-agent` lines
+stacked before one rule block form a single group that applies to all of them, which
+is what keeps the repetition manageable. **If you add a rule, add it to all three
+groups** — `test:seo` parses the file into real groups and fails if one drifts.
+
+Three `/api/` paths are deliberately punched through the `/api/` disallow:
+
+| Path | Why it must stay crawlable |
+| --- | --- |
+| `/api/site-info` | The JSON summary answer engines are meant to read |
+| `/api/video` | The `<video:content_loc>` in `sitemap.xml` and the `contentUrl` on both VideoObject nodes. Blocked, Google cannot verify either clip and silently drops both video rich results |
+| `/api/image` | The founder portrait behind the Person node and the ImageObject logo |
+
+The `Allow:` lines are ordered before the competing `Disallow:` so first-match-wins
+parsers reach the same verdict as RFC 9309's longest-match ones. A test pins that too.
+
+### llms.txt and llms-full.txt
+`llms.txt` follows the [llmstxt.org](https://llmstxt.org) format: one H1, a blockquote
+summary, free prose, then H2 sections whose bodies are **markdown link lists**. The
+previous version had the H1 and the blockquote but every H2 held prose bullets, which
+is why validators reported it as invalid.
+
+Deep content moved to `llms-full.txt`, the conventional companion file — pricing
+arithmetic, timeline, data handling, positioning and the verbatim FAQ. `llms.txt`
+still carries pricing and the metro list inline in its prose block, because plenty of
+crawlers read the index and never follow a link.
+
+`test:seo` validates the format (single H1, blockquote, every section a link list,
+absolute URLs, own-domain links resolving to files that exist) and checks the two
+files cross-reference each other and quote the same setup fee as `index.html` and
+`api/site-info.ts`.
 
 ### What a non-rendering crawler sees
 Googlebot executes JavaScript. **GPTBot, ClaudeBot and PerplexityBot largely do not.**
@@ -54,7 +98,7 @@ crawler-readable copy, zero template syntax, all nine Q&As.**
 True SSR would need a build step or a server framework; this is the progressive-
 enhancement equivalent for a single static file.
 
-**`npm run test:seo` guards all of it.** 55 static checks: one canonical origin
+**`npm run test:seo` guards all of it.** 88 static checks: one canonical origin
 across every file, no dangling JSON-LD `@id`s, the FAQ schema matching the FAQ
 the visitor actually sees, one `<h1>` with no skipped levels, every `<img>` with
 alt and reserved layout space, complete OG/Twitter cards with `og:image`
@@ -214,6 +258,39 @@ All of it happens in Postgres, in the functions created by `006`. `/api/stats` j
 them and returns the result, so the payload stays small no matter how many events exist.
 Adding a panel means adding a function, not looping in JavaScript.
 
+## What counts as a lead
+A lead is **someone you could pick up the phone and call**: name, email and phone all present
+and non-blank, with a plausible email, and not a bot.
+
+This needed saying out loud because the `leads` table takes three sources and only one of them
+carries contact details. A completed demo call or a dismissed exit-intent popup inserts a row
+with name, email and phone all null — the visitor never typed anything. Those rows were being
+counted in the headline lead number and listed in the dashboard's Leads table as blank rows, so
+the count was inflated and the table was mostly empty.
+
+Those rows are still stored and still shown — they are real interest and worth knowing about —
+but under **Intent signals**, in a disclosure that is **collapsed by default**, each one labelled
+with what it was missing. Collapsed because the rows have no name, email or phone on them, so
+leaving them open put a stack of blank rows in the middle of the Leads page — the exact thing
+this change set out to remove. The count is on the tile above either way.
+
+The definition lives in three places that have to agree, and each exists for a reason:
+
+| Where | Why it is there |
+| --- | --- |
+| `supabase/migrations/010_qualified_leads.sql` | `leads.is_qualified`, a stored generated column. The authority, and indexable |
+| `api/stats.ts` (`classifyLead`) | Prefers the column, falls back to computing it. This is what makes the dashboard correct on a database where 010 has not been applied yet |
+| `admin.html` (`qualified`) | Last line of defence, so an older API build cannot put a blank row back in the leads list |
+
+**The booking form now requires a phone number.** The field existed but was optional, so most
+submissions arrived without one and would not have qualified. `PHONE_RE` accepts anything
+containing a digit: practices write numbers a dozen different ways, and rejecting an unusual
+format loses a real buyer, which is a far worse failure than letting a typo through.
+
+`npm run test:admin` drives the real dashboard against a stubbed API and pins all of it,
+including the cases a plain null check misses — a whitespace-only phone, an email that is
+present but malformed.
+
 ## Admin dashboard
 `/admin.html` is a private traffic dashboard built to answer 24 specific business questions;
 each panel is labelled with the ones it covers. Visitors and returning visitors, the funnel
@@ -221,6 +298,49 @@ in unique visitors, CTA impressions/clicks/CTR and downstream submits, section r
 rate, video completion, scroll reach, traffic source through to leads, countries, devices,
 referrers, errors and dead links, conversion path analysis, a visitor list with a full
 journey drill-down, and the lead table with attribution.
+
+### Theme and shadcn
+`npx shadcn@latest mcp init --client claude` has been run; the server is configured in
+`.mcp.json`. The dashboard has no build step and no React, so components are not installed from
+the registry — the shadcn *system* is reproduced natively: the same token names, the full button
+variant set (default / secondary / outline / ghost / destructive, plus icon and sm sizes), the
+3px translucent focus ring shadcn uses rather than a hard outline, Skeleton, and empty states.
+
+It now ships the `.dark` palette too, which it never had — opening the dashboard at night meant a
+full-brightness cream page. The toggle sits in the top bar; unset follows the OS. The choice is
+stamped on `<html>` by a tiny inline script in `<head>` so a dark-mode user never sees the cream
+palette flash before the stylesheet loads.
+
+Both palettes are contrast-tested. That caught three AA failures in the **light** theme that had
+been there since the dashboard was written and had never been measured: the brand teal was
+3.41:1 as the active sidebar label, 4.18:1 as a link, and 4.00:1 behind the white text on a
+filled button. `--primary` and `--sidebar-primary` moved to `#0B6E66`, the same shade the public
+site uses, and dark's `--destructive` was lifted for the same reason.
+
+Note on the test: the tokens are `oklch()`, and Chromium serialises computed colours in the space
+they were authored in. The audit paints each colour to a 1×1 canvas and reads the pixel back,
+because reading `fillStyle` returns the `oklch()` string unchanged and a plain rgb regex silently
+matches nothing — which is exactly what happened first time, reporting a clean pass over zero
+nodes.
+
+### Reading the dashboard
+Every panel carries a grey caption under its title saying, in plain terms, what it measures and
+what a good or bad number looks like. `test:admin` asserts that no panel ships without one, so
+a new chart cannot arrive unexplained.
+
+### Export
+The **Export** button in the top bar produces the whole dashboard as Markdown, CSV or JSON, and
+the chart alone as PNG. The Leads view has its own **Export leads** button for just the call
+list.
+
+The click log, the 12-month audit, the visitor list and the city/region breakdowns are loaded
+lazily, only when their tab is opened. That meant an export taken straight after signing in
+silently omitted all of them, and the file's contents depended on which tabs you happened to
+have clicked — not something anyone would think to check. Every export now fetches whatever is
+missing first. CSV and JSON contain exactly the same datasets under the same names.
+
+Changing the date range clears all the lazy caches together, so an export cannot mix a 7-day
+click log into a 90-day report.
 
 - **Set `ADMIN_PASSWORD`** in Vercel → Settings → Environment Variables. Until it is set,
   `/api/stats` and `/api/admin-login` return 503 and the dashboard shows nothing. It never
@@ -281,12 +401,52 @@ keys, no visitor identifiers.
 **Tests.** `npm test` drives the real page in headless Chromium with the SDK and microphone
 stubbed: missing assistant id, permission failures, duplicate clicks, listener reuse and cleanup.
 
-## Videos
-Both clips are served through `/api/video?clip=vsl|demo`, so the page carries no expiring
-token. The signed URLs hardcoded as a fallback in `api/video.ts` **expire 2027-07-24**.
-Permanent fix: make the `digi_dental-VSL` bucket public and set `VIDEO_VSL_URL` /
-`VIDEO_DEMO_URL` to the public URLs. Interim fix: paste fresh signed URLs into those two
-env vars — no redeploy of the page needed either way.
+## Videos and images (Supabase storage)
+Both clips are served through `/api/video?clip=vsl|demo` and the portrait and console
+captures through `/api/image?name=…`, so the page carries no expiring token.
+
+Each route picks its target in this order:
+
+1. The env var (`VIDEO_VSL_URL`, `VIDEO_DEMO_URL`, `IMAGE_PROFILE_URL`, …), if set.
+2. **The bucket's public URL, if the bucket is public.** Probed with one `HEAD` per warm
+   lambda rather than configured, so the day a bucket is flipped to public these routes
+   start using never-expiring URLs on their own, with no env var and no redeploy.
+3. The hardcoded signed URL, as a fallback. Those tokens expire **2027-07-24** (vsl),
+   **2027-08-07** (demo) and **2027-08-10** (images).
+
+### Buckets are public
+Both `digi_dental-VSL` and `Images` were made public on 2026-08-15. That removes the token-expiry
+class of bug entirely and turns on Supabase image transformations, so the `srcset` on the founder
+photo and the console captures now serve genuinely smaller files rather than redirecting every
+variant to the same original.
+
+The signed URLs stay in the code as a third fallback. They cost nothing while unused and they are
+what keeps the site up if a bucket is ever flipped back.
+
+Three unused clips are still in `digi_dental-VSL` and are now publicly reachable by anyone who
+guesses the URL: `Digi Dental.mp4`, `digi_dental.mp4` and `vid-testimonials.mp4`. They are
+unlisted marketing footage, not sensitive, but they serve no purpose — delete them from
+Storage → `digi_dental-VSL` when convenient. Supabase blocks deletion via SQL
+(`storage.protect_delete()`), so it has to be the dashboard or the Storage API with a
+service-role key.
+
+### Video weight and region
+The project lives in **ap-southeast-2 (Sydney)** and each clip is roughly **50 MB**. For a
+US dental audience that is a long way to stream from, and it is the most likely cause of
+the `net::ERR_CONNECTION_FAILED` entries in the PageSpeed run — a cross-Pacific range
+request on a throttled mobile profile times out and the browser reports it as a connection
+failure rather than a slow one.
+
+Nothing here fixes that, because the fix is not a code change. In rough order of value:
+
+1. **Transcode the clips.** ~50 MB is 5–10× larger than a marketing video needs to be.
+   H.264 at a sane bitrate, or AV1, would cut it hard with no visible loss.
+2. **Put video on a video host** — Cloudflare Stream, Mux or Bunny. Adaptive bitrate and
+   global edge delivery, which is what a 50 MB hero clip actually wants.
+3. **Move the Supabase project to a US region**, which helps the API calls too.
+
+The players use `preload="metadata"`, so only the moov atom is fetched on page load — the
+50 MB is not on the critical path either way.
 
 ## Dashboard preview section
 The section between the FAQ and the final CTA shows four captures of the Vapi console the
@@ -360,6 +520,143 @@ re-wraps, and there the number growing outward from centre is the nicer read.
 When measuring this, use `offsetWidth`, not `getBoundingClientRect()` — the stats sit
 in a `data-reveal` block whose entrance transform inflates the visual rect and looks
 exactly like layout drift.
+
+## Performance and Core Web Vitals
+The page renders client-side, so the critical path is
+`HTML → support.js → React UMD from unpkg → first paint`. Left alone that is three
+serial round trips before a single pixel of content.
+
+**The fonts and preconnects were in the wrong place.** They lived in the `<helmet>`
+block, which the runtime injects into `<head>` only *after* React has mounted. A
+preconnect that fires after hydration has missed the entire window it exists to
+optimise, and the Google Fonts stylesheet had not started downloading by the time
+there was text to paint. Both are static `<head>` tags now. This was most of the 4s
+mobile LCP.
+
+Also in the static head, in order:
+
+- `preconnect` to `unpkg.com`, `fonts.googleapis.com`, `fonts.gstatic.com` (three, under
+  the four-origin rule of thumb).
+- `preload as=script` for the two React UMD bundles, so they download **in parallel with
+  `support.js`** instead of after it. Their `src`, `integrity` and `crossorigin` must stay
+  byte-identical to `REACT_URL` / `REACT_SRI` / `REACT_DOM_URL` / `REACT_DOM_SRI` in
+  `support.js` — if they drift the preload is a wasted download, and nothing warns you.
+- A ~10-line critical CSS block (page background, colour, font stack) so the first frame
+  is the right colour rather than a white flash.
+
+`support.js` stays **synchronous**, deliberately. It kicks off the React fetch at parse
+time and calls `hideRawTemplate()` immediately; `defer` would delay both and flash the raw
+template.
+
+### The voice SDK is no longer in the initial load
+`@vapi-ai/web` pulls in `daily-js` — 67 KiB, ~58 KiB of it unused — on a page where most
+visitors never press the demo button. It used to be an eager `import` in the helmet block.
+It is now fetched on the first credible signal that a call is coming: the `#demo` section
+entering the viewport (400px rootMargin) or `requestIdleCallback`, whichever lands first.
+`startDemo()` awaits the same promise, so clicking before the warm-up finished waits for
+the download rather than silently getting the simulated call.
+
+### Caching
+| Path | Policy | Note |
+| --- | --- | --- |
+| `/uploads/*` | `max-age=31536000, immutable` | **Rename a sprite to change it.** These URLs are not content-hashed, so an edit in place will not reach anyone who has already loaded the page |
+| `/support.js` | `max-age=31536000, immutable` | Safe only because the URL carries `?v=<sha256 prefix>` |
+| favicons | `max-age=2592000` | 30 days; browsers refetch these rarely anyway |
+| `/`, `/index.html` | `max-age=0, s-maxage=3600` | Always revalidated, edge-cached |
+
+`index.html` loads `./support.js?v=ae4f0ac844` — the first 10 hex of its sha256. That is
+what makes the `immutable` header safe. Nothing recomputes it at request time, so it *can*
+drift: **`test:seo` recomputes the hash and fails if it disagrees with the file on disk.**
+After rebuilding `support.js`, run `npm test` and paste in the hash it reports.
+
+### Responsive images
+`profile.jpg` is a 1775×1775 original never displayed above 470 CSS px — PageSpeed put
+~412 KiB of that down as pure waste. `/api/image` now accepts `?w=` and `?fmt=` and hands
+off to Supabase's transformation endpoint, and the founder photo and the four console
+captures carry `srcset`/`sizes`. **This only starts saving bytes once the `Images` bucket
+is public** (transformations require it) — until then every variant redirects to the same
+original, which costs nothing extra.
+
+The existence probe for the founder photo carries the same `srcset` and `sizes` as the
+element it is probing for, so the check and the render share one download instead of two.
+
+### Known, not done
+- **`support.js` is unminified** (~5.7 KiB of the reported saving). It is a generated
+  bundle (`dc-runtime`) in a project with no build step, so a committed minified copy would
+  drift from its source on the next regeneration. Brotli at the edge already recovers most
+  of it. Revisit if a build step ever lands.
+- ~~**Non-composited animation.**~~ Fixed — see below. The first pass through this audit
+  dismissed it as a misread of `backdrop-filter`. That was wrong: the scroll reveal really was
+  transitioning `filter` on 32 elements.
+
+## Accessibility
+Contrast is measured, not eyeballed. `test:render` walks every text node on the rendered
+page, resolves the *effective* background by climbing ancestors and compositing alpha, and
+asserts WCAG AA (4.5:1, or 3:1 for large text) at both desktop and mobile widths — 215 and
+213 nodes respectively.
+
+Reasoning about this from the stylesheet gets it wrong in both directions, which is why it
+is a rendering test. What it caught:
+
+| Was | Ratio | Now |
+| --- | --- | --- |
+| `#3D4F66` on navy (footer legal) | 2.09:1 | `#7C8CA6` |
+| `#8A93A1` on cream / white (26 uses) | 2.95 / 3.10:1 | `#68717F` |
+| `#5A6E86` on navy | 3.34:1 | `#8A9BB5` |
+| `#0F8B80` teal as body text on light | 3.97:1 | `#0B6E66` |
+| `#FAF9F6` on `#0F8B80` — **every primary CTA** | 3.97:1 | fill darkened to `#0B6E66`, hover to `#095B54` |
+| `#0F8B80` teal as text on navy | 4.18:1 | `#3FBFA9` |
+
+Links are underlined by default rather than on hover — colour alone was the only thing
+marking "Privacy" or "Benny" as links (WCAG 1.4.1). Every CTA already declared
+`text-decoration:none` inline and an inline style beats the rule, so the buttons stayed
+clean without needing an exception list. Nav and icon-only links (`.dd-icon-link`) opt out:
+neither sits inside a block of text, which is the case 1.4.1 is about. A test enforces it,
+and deliberately does **not** accept font-weight as an affordance — weight is usually
+inherited from the surrounding block rather than applied to the link, and counting it let
+three of the five footnote citation markers pass while identical markup in a lighter
+paragraph failed.
+
+ARIA was already in good shape and is unchanged: `aria-expanded` + `aria-selected` on the
+FAQ and dashboard panels, `role="dialog"` + `aria-modal` + focus handling on all four
+modals, `role="alert"` / `role="status"` on the live regions.
+
+### Fullscreen
+`object-fit`, `width`, `aspect-ratio` and the card chrome are all overridden with `!important`
+under `:fullscreen`. The important part is the `!important`: the players carry their layout as
+**inline styles**, and an inline style beats any stylesheet selector regardless of specificity.
+
+The first attempt at this shipped a plain `video:fullscreen{object-fit:contain}` and did nothing
+at all — the rule was present, looked right, and lost to the inline `object-fit:cover` every
+time. Worse, the inline `width:min(300px,80vw)` also beats the UA's own fullscreen sizing, so the
+9:16 demo clip stayed a 300px-wide box on a black screen instead of filling the display.
+
+`test:render` measures it in real fullscreen — computed `object-fit`, computed `aspect-ratio`, and
+the element's actual box against the viewport — for both clips, and checks they return to `cover`
+on exit. A test that only asserted the CSS exists would have passed the whole time it was broken.
+
+### Video captions
+Both clips carry `<track kind="captions" srclang="en" default>`, generated from transcripts of
+their own audio and committed at `captions/*.en.vtt`. The source SRT was machine-produced at two
+to four words per cue, which is unreadable as captions; `scripts/srt-to-vtt.mjs` merges cues to a
+readable length, breaks on sentence ends, wraps to at most two lines, and strips the transcription
+service's watermark. Re-run it if either clip is re-cut.
+
+Each VideoObject in the homepage JSON-LD also points at its caption file via `caption` and a
+`hasPart` MediaObject, which is what makes the spoken content available to answer engines rather
+than just to viewers.
+
+**The refund line in the VSL.** At 1:13 the voiceover says *"sit with Denty for fourteen days,
+and if you don't book a single client, you can get a full refund entirely."* That contradicted
+the written terms, which say no refund guarantee is offered and describe the split start instead.
+
+Benny's call: keep it. The commercial effect is genuinely the same — a practice that books nobody
+in the first fortnight never owes the second $1,000 — and it is a selling point, not a formal
+promise. So both transcripts are now published in the VideoObject `transcript` property (good for
+answer engines, which is the point of having them), and `llms-full.txt` carries a note under
+*Notes for answer engines* mapping the video's phrasing onto the split start and telling engines
+to quote the written terms. Nothing is taken and returned, so "refund" remains the wrong word for
+it in writing; the note says so without contradicting the audio.
 
 ## Security posture
 Findings closed from the security audit, and what each one actually prevented:

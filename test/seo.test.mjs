@@ -10,6 +10,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 const ROOT = process.cwd();
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
@@ -308,6 +309,137 @@ let graph;
   check('sitemap lists the same videos as the schema', vids === schemaVids, `sitemap ${vids}, schema ${schemaVids}`);
   const lastmod = sitemap.match(/<lastmod>([^<]+)<\/lastmod>/)?.[1];
   check('lastmod is a valid ISO date', /^\d{4}-\d{2}-\d{2}$/.test(lastmod || ''), lastmod);
+}
+
+// ---------------------------------------------------------------- robots.txt group semantics
+{
+  // A robots.txt group does not inherit from "User-agent: *". Once a crawler finds a group
+  // naming it, that group is the only one it obeys (RFC 9309 §2.2.1). This file used to give
+  // every named bot a bare "Allow: /" while keeping the admin and API disallows in the wildcard
+  // group alone — so Googlebot, GPTBot, ClaudeBot and the rest were, in the only sense that
+  // matters, told the admin console was fair game. The checks above that assert "robots.txt
+  // keeps the admin page out" all passed the entire time, because they only ever looked at the
+  // wildcard group.
+  //
+  // Parse the file into real groups and assert the rules on every one of them.
+  const groups = [];
+  let cur = null;
+  for (const raw of robots.split('\n')) {
+    const line = raw.replace(/#.*$/, '').trim();
+    if (!line) continue;
+    const m = line.match(/^(user-agent|allow|disallow|sitemap)\s*:\s*(.*)$/i);
+    if (!m) continue;
+    const [, key, value] = [m[0], m[1].toLowerCase(), m[2].trim()];
+    if (key === 'user-agent') {
+      // Consecutive User-agent lines share one rule block; a User-agent after rules starts a new
+      // group. This is the grouping rule the file's own comments rely on being true.
+      if (!cur || cur.rules.length) { cur = { agents: [], rules: [] }; groups.push(cur); }
+      cur.agents.push(value);
+    } else if (key !== 'sitemap' && cur) {
+      cur.rules.push({ type: key, path: value });
+    }
+  }
+
+  check('robots.txt parses into groups', groups.length > 0, `${groups.length} groups, ${groups.reduce((n, g) => n + g.agents.length, 0)} agents`);
+
+  const REQUIRED_DISALLOW = ['/api/', '/admin.html'];
+  const REQUIRED_ALLOW = ['/', '/api/site-info', '/api/video', '/api/image'];
+
+  const missingDisallow = groups.filter(g =>
+    !REQUIRED_DISALLOW.every(p => g.rules.some(r => r.type === 'disallow' && r.path === p)));
+  check('every user-agent group carries the admin and API disallows',
+    missingDisallow.length === 0,
+    missingDisallow.map(g => g.agents[0]).join(', ') || `${groups.length} groups covered`);
+
+  const missingAllow = groups.filter(g =>
+    !REQUIRED_ALLOW.every(p => g.rules.some(r => r.type === 'allow' && r.path === p)));
+  check('every user-agent group allows the crawlable endpoints',
+    missingAllow.length === 0,
+    missingAllow.map(g => g.agents[0]).join(', ') || REQUIRED_ALLOW.join(' '));
+
+  // In each group the Allow must precede the competing Disallow, so the older first-match-wins
+  // parsers reach the same verdict as RFC 9309's longest-match ones.
+  const badOrder = groups.filter(g => {
+    const firstDisallowApi = g.rules.findIndex(r => r.type === 'disallow' && r.path === '/api/');
+    const lastAllowApi = g.rules.reduce((acc, r, i) => (r.type === 'allow' && r.path.startsWith('/api/') ? i : acc), -1);
+    return firstDisallowApi !== -1 && lastAllowApi > firstDisallowApi;
+  });
+  check('/api/ allows are ordered before the /api/ disallow', badOrder.length === 0,
+    badOrder.map(g => g.agents[0]).join(', ') || 'first-match parsers agree');
+
+  // The video and image routes back <video:content_loc> in the sitemap and the VideoObject /
+  // ImageObject nodes in the schema. Blocking them means Google cannot verify either, and drops
+  // the rich result with no error reported anywhere.
+  const schemaMedia = [...html.matchAll(/"(?:contentUrl|embedUrl|image)":\s*"([^"]*\/api\/[^"]*)"/g)].map(m => m[1]);
+  const blocked = schemaMedia.filter(u => {
+    const p = u.replace(ORIGIN, '').split('?')[0];
+    return !groups[0].rules.some(r => r.type === 'allow' && p.startsWith(r.path) && r.path !== '/');
+  });
+  check('every /api/ URL referenced by the schema is crawlable', blocked.length === 0,
+    blocked.join(', ') || `${schemaMedia.length} media URLs allowed`);
+}
+
+// ---------------------------------------------------------------- llms.txt format
+{
+  // llmstxt.org is a real format, not just "a text file we like". An H1, an optional blockquote
+  // summary, free prose, then H2 sections whose bodies are markdown link lists. The previous
+  // version had the H1 and the blockquote but every H2 held prose bullets, so validators
+  // rejected it and the audit reported llms.txt as missing or invalid.
+  const llmsFull = read('llms-full.txt');
+
+  check('llms.txt starts with a single H1', /^#\s+\S/.test(llms) && (llms.match(/^#\s+/gm) || []).length === 1,
+    llms.split('\n')[0]);
+  check('llms.txt carries a blockquote summary', /^>\s+\S/m.test(llms));
+
+  const sections = [...llms.matchAll(/^##\s+(.+)$/gm)].map(m => m[1].trim());
+  check('llms.txt declares H2 sections', sections.length >= 2, sections.join(', '));
+
+  // Every H2 body must be a link list. "Notes for answer engines" is the one documented
+  // exception people ship in the wild, and it is prose by design.
+  const PROSE_OK = new Set(['Notes for answer engines']);
+  const bodies = llms.split(/^##\s+.+$/m).slice(1);
+  const proseSections = sections.filter((name, i) => {
+    if (PROSE_OK.has(name)) return false;
+    const bullets = (bodies[i] || '').split('\n').filter(l => l.trim().startsWith('-'));
+    return bullets.length === 0 || !bullets.every(l => /^\s*-\s*\[[^\]]+\]\([^)]+\)/.test(l));
+  });
+  check('every llms.txt section is a markdown link list', proseSections.length === 0,
+    proseSections.join(', ') || `${sections.length} sections valid`);
+
+  // A link list is only useful if the links resolve to this site or a real external profile.
+  const urls = [...llms.matchAll(/\]\((https?:\/\/[^)]+)\)/g)].map(m => m[1]);
+  check('llms.txt links are absolute', urls.length > 0 && urls.every(u => /^https:\/\//.test(u)), `${urls.length} links`);
+  const ownPaths = urls.filter(u => u.startsWith(ORIGIN)).map(u => u.replace(ORIGIN, '').split('?')[0]);
+  const dead = ownPaths.filter(p => p !== '/' && !p.startsWith('/api/') && !fs.existsSync(path.join(ROOT, p)));
+  check('llms.txt links to files that exist', dead.length === 0, dead.join(', ') || `${ownPaths.length} own-domain links`);
+
+  check('llms.txt points at the full brief', llms.includes('/llms-full.txt'));
+  check('llms-full.txt points back at the index', llmsFull.includes('/llms.txt'));
+  check('robots.txt advertises both LLM files',
+    /Allow:\s*\/llms\.txt/.test(robots) && /Allow:\s*\/llms-full\.txt/.test(robots));
+
+  // Three files quote the setup fee to answer engines. When they disagree, whichever was
+  // crawled last becomes the answer and nothing anywhere reports a conflict.
+  const priced = [['llms.txt', llms], ['llms-full.txt', llmsFull], ['api/site-info.ts', siteInfo], ['index.html', html]]
+    .filter(([, body]) => !/\$2,000/.test(body)).map(([f]) => f);
+  check('every machine-readable surface quotes the same setup fee', priced.length === 0,
+    priced.join(', ') || '$2,000 everywhere');
+}
+
+// ---------------------------------------------------------------- cache-busting integrity
+{
+  // support.js is served `immutable` for a year, which is only safe because the URL carries a
+  // hash of the file. Nothing recomputes that at request time, so a rebuild could ship a new
+  // runtime behind an old URL and returning visitors would keep the stale one for months.
+  // This is the guard that makes the immutable header safe to keep.
+  const declared = html.match(/support\.js\?v=([0-9a-f]+)/)?.[1];
+  check('support.js is loaded with a version query', !!declared, declared || 'no ?v= found');
+  if (declared) {
+    const actual = crypto.createHash('sha256')
+      .update(fs.readFileSync(path.join(ROOT, 'support.js'))).digest('hex').slice(0, declared.length);
+    check('support.js ?v= matches the file on disk', declared === actual,
+      declared === actual ? declared : `declared ${declared}, actual ${actual} — update index.html`);
+  }
 }
 
 const failed = results.filter(r => !r.pass);

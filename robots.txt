@@ -1,126 +1,154 @@
-# Digi Dental, https://www.digidental.us
-# AI receptionist for dental practices.
-# Policy: open to search engines and AI assistants. We want to be quoted,
-# summarised and cited. Structured summary for LLMs: /llms.txt and /api/site-info
+# Digi Dental — https://www.digidental.us
+# AI receptionist setup for dental practices (vendor to practices, not a dental practice).
+#
+# Policy: we WANT to be crawled, quoted, summarised and cited. Search engines and AI
+# answer engines are welcome on everything except the admin console and the private API.
+#
+# Machine-readable summaries, in increasing order of detail:
+#   https://www.digidental.us/llms.txt        — index, llmstxt.org format
+#   https://www.digidental.us/llms-full.txt   — full plain-text brief (pricing, FAQ, terms)
+#   https://www.digidental.us/api/site-info   — JSON, same facts, with sources
+#
+# ---------------------------------------------------------------------------
+# HOW THIS FILE IS STRUCTURED — read before editing
+# ---------------------------------------------------------------------------
+# A robots.txt group does NOT inherit from the "User-agent: *" group. The moment a
+# crawler finds a group naming it, that group becomes the ONLY one it obeys and the
+# wildcard group is ignored entirely (RFC 9309 §2.2.1).
+#
+# This file previously listed every named bot with a bare "Allow: /" and kept the
+# admin/API disallows only in the "*" group. The effect was the exact opposite of what
+# it looked like: Googlebot, GPTBot, ClaudeBot, PerplexityBot and every other named
+# agent were told the admin console and the whole API were fair game, while only
+# unnamed crawlers were restricted.
+#
+# So: every group below repeats the SAME rule set in full. Multiple User-agent lines
+# stacked before one rule block form a single group that applies to all of them, which
+# is how the repetition stays manageable. If you add a rule, add it to all three groups.
+#
+# The /api/ disallow is deliberately punched through for three endpoints:
+#   /api/site-info — the JSON summary we want answer engines to read
+#   /api/video     — the <video> sources, and the <video:content_loc> in sitemap.xml.
+#                    Blocking it means Google cannot verify either clip and drops both
+#                    VideoObjects from rich results without reporting an error.
+#   /api/image     — the founder portrait and dashboard captures referenced by the
+#                    Person and ImageObject nodes in the homepage JSON-LD.
+# Allow wins over Disallow here under both matching rules in use in the wild: it is the
+# longer (more specific) path for RFC 9309 parsers, and it appears first for the older
+# first-match-wins parsers.
 
 # ---------------------------------------------------------------------------
-# Default: everything is crawlable
+# 1. Everything not named below
 # ---------------------------------------------------------------------------
-# One group per user-agent. There used to be a second "User-agent: *" block further down with
-# the admin rules in it. Google merges same-agent groups so it worked there, but stricter
-# parsers read only the first group and would have missed the admin disallows entirely.
 User-agent: *
 Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /api/site-info
+Allow: /api/video
+Allow: /api/image
 Disallow: /api/
-Disallow: /.thumbnail
 Disallow: /admin.html
-Disallow: /api/stats
-Disallow: /api/admin-login
+Disallow: /.thumbnail
 
 # ---------------------------------------------------------------------------
-# Search engines
+# 2. Search engines
 # ---------------------------------------------------------------------------
 User-agent: Googlebot
-Allow: /
-
 User-agent: Googlebot-Image
-Allow: /
-
+User-agent: Googlebot-Video
+User-agent: Googlebot-News
+User-agent: Storebot-Google
+User-agent: Google-InspectionTool
 User-agent: Bingbot
-Allow: /
-
+User-agent: BingPreview
+User-agent: Slurp
 User-agent: DuckDuckBot
-Allow: /
-
 User-agent: Applebot
+User-agent: YandexBot
+User-agent: Baiduspider
 Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /api/site-info
+Allow: /api/video
+Allow: /api/image
+Disallow: /api/
+Disallow: /admin.html
+Disallow: /.thumbnail
 
 # ---------------------------------------------------------------------------
-# AI assistants, answer engines and model crawlers are explicitly welcome.
-# Named individually because several ignore wildcard rules.
+# 3. AI assistants, answer engines and model crawlers — explicitly welcome
+#
+# Named individually because several ignore wildcard rules, and because being absent
+# from this list is how a site quietly stops being cited. Two kinds of agent are mixed
+# here on purpose:
+#   - training/index crawlers (GPTBot, ClaudeBot, Google-Extended, CCBot, Amazonbot…)
+#   - live fetchers that retrieve a page because a user asked about it right now
+#     (ChatGPT-User, Claude-User, Perplexity-User, MistralAI-User…)
+# Blocking the second kind is what makes an assistant say "I couldn't access that site"
+# mid-answer, so both are allowed.
 # ---------------------------------------------------------------------------
 
-# OpenAI / ChatGPT
+# OpenAI — ChatGPT training, ChatGPT Search, and live user-triggered fetches
 User-agent: GPTBot
-Allow: /
-
 User-agent: OAI-SearchBot
-Allow: /
-
 User-agent: ChatGPT-User
-Allow: /
-
-# Anthropic / Claude
+# Anthropic — Claude
 User-agent: ClaudeBot
-Allow: /
-
 User-agent: Claude-User
-Allow: /
-
 User-agent: Claude-SearchBot
-Allow: /
-
 User-agent: anthropic-ai
-Allow: /
-
-# Google AI (Gemini, AI Overviews grounding)
+User-agent: Claude-Web
+# Google — Gemini and AI Overviews grounding (separate from Googlebot indexing)
 User-agent: Google-Extended
-Allow: /
-
+User-agent: Google-CloudVertexBot
 # Perplexity
 User-agent: PerplexityBot
-Allow: /
-
 User-agent: Perplexity-User
-Allow: /
-
 # Apple Intelligence
 User-agent: Applebot-Extended
-Allow: /
-
 # Microsoft Copilot
 User-agent: msnbot
-Allow: /
-
 # Meta AI
 User-agent: meta-externalagent
-Allow: /
-
+User-agent: meta-externalfetcher
 User-agent: FacebookBot
-Allow: /
-
-# Amazon (Alexa / Rufus)
+# Amazon — Alexa and Rufus
 User-agent: Amazonbot
-Allow: /
-
-# DuckDuckGo AI
+# DuckDuckGo AI assist
 User-agent: DuckAssistBot
-Allow: /
-
-# Common Crawl, feeds many open models
+# Common Crawl — feeds a long tail of open models
 User-agent: CCBot
-Allow: /
-
 # Mistral
 User-agent: MistralAI-User
-Allow: /
-
 # Cohere
 User-agent: cohere-ai
-Allow: /
-
+User-agent: cohere-training-data-crawler
+# Allen Institute for AI
+User-agent: Ai2Bot
+User-agent: Ai2Bot-Dolma
 # You.com
 User-agent: YouBot
-Allow: /
-
-# Diffbot
+# Diffbot — knowledge graph feeding several assistants
 User-agent: Diffbot
-Allow: /
-
 # Kagi
 User-agent: Kagibot
+# ByteDance — Doubao / TikTok search
+User-agent: Bytespider
+# Webz.io — feeds several answer engines
+User-agent: Webzio-Extended
+# Timpi
+User-agent: Timpibot
 Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /api/site-info
+Allow: /api/video
+Allow: /api/image
+Disallow: /api/
+Disallow: /admin.html
+Disallow: /.thumbnail
 
 # ---------------------------------------------------------------------------
 Sitemap: https://www.digidental.us/sitemap.xml

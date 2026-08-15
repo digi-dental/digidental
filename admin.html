@@ -15,6 +15,12 @@
 <!-- GSAP for the entrance choreography. Deferred and entirely optional: if it fails to load,
      initMotion() is never called and the dashboard renders in its final state. -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
+<script>
+// Runs before first paint: reads the stored choice and stamps data-theme on <html>. No stored
+// choice means no attribute, and the prefers-color-scheme media query decides. Kept inline and
+// tiny on purpose — an external file here would flash the wrong palette while it loaded.
+(function(){try{var t=localStorage.getItem('dd_admin_theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
 <style>
 /*
   shadcn design system, built natively.
@@ -41,7 +47,11 @@
   --card-foreground: oklch(0.216 0.047 256.0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.216 0.047 256.0);
-  --primary: oklch(0.574 0.098 184.9);
+  /* Was oklch(0.574 0.098 184.9) (#0F8B80): 3.41:1 as the active sidebar label, 4.18:1
+     as a link, and 4.00:1 behind the white text on a filled button — three AA failures.
+     This is #0B6E66, the same shade the public site moved to, and clears all three
+     (4.98 / 6.11 / 5.85). test:admin measures it in both themes. */
+  --primary: oklch(0.486 0.083 185.9);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.949 0.011 89.7);
   --secondary-foreground: oklch(0.216 0.047 256.0);
@@ -54,7 +64,7 @@
   --warning: oklch(0.508 0.106 72.6);
   --border: oklch(0.919 0.014 88.7);
   --input: oklch(0.919 0.014 88.7);
-  --ring: oklch(0.574 0.098 184.9);
+  --ring: oklch(0.486 0.083 185.9);
 
   --chart-1: oklch(0.603 0.106 185.7);
   --chart-2: oklch(0.553 0.174 38.4);
@@ -72,12 +82,12 @@
 
   --sidebar: oklch(0.966 0.008 90.0);
   --sidebar-foreground: oklch(0.216 0.047 256.0);
-  --sidebar-primary: oklch(0.574 0.098 184.9);
+  --sidebar-primary: oklch(0.486 0.083 185.9);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.930 0.013 89.0);
   --sidebar-accent-foreground: oklch(0.216 0.047 256.0);
   --sidebar-border: oklch(0.906 0.014 88.7);
-  --sidebar-ring: oklch(0.574 0.098 184.9);
+  --sidebar-ring: oklch(0.486 0.083 185.9);
 
   --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   --font-heading:'Manrope','Inter',system-ui,sans-serif;
@@ -179,21 +189,37 @@ body{
 h1,h2,h3,h4{margin:0;font-family:var(--font-heading);font-weight:600;letter-spacing:-.015em}
 button{font:inherit;cursor:pointer}
 a{color:var(--primary)}
-:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:calc(var(--radius) - 2px)}
+/* shadcn's current focus treatment: a 3px translucent ring plus a solid border colour shift,
+   rather than a hard 2px outline. Reads as part of the control instead of a box drawn round it. */
+:focus-visible{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in oklab,var(--ring) 50%,transparent);border-radius:calc(var(--radius) - 2px)}
 svg{flex:0 0 auto}
 .tnum{font-variant-numeric:tabular-nums}
 
-/* ---------- primitives ---------- */
+/* ---------- primitives ----------
+   The full shadcn button variant set, not just default + outline. Each maps to the variant of
+   the same name so markup ported from a shadcn React app keeps its meaning. */
 .btn{
   display:inline-flex;align-items:center;gap:7px;justify-content:center;
-  height:36px;padding:0 14px;border-radius:calc(var(--radius) - 2px);
-  background:var(--primary);color:var(--primary-foreground);border:none;
-  font-size:13.5px;font-weight:500;white-space:nowrap;transition:opacity .15s
+  height:36px;padding:0 15px;border-radius:calc(var(--radius) - 2px);
+  background:var(--primary);color:var(--primary-foreground);border:1px solid transparent;
+  font-size:13.5px;font-weight:500;white-space:nowrap;
+  box-shadow:0 1px 2px 0 color-mix(in oklab,var(--foreground) 6%,transparent);
+  transition:background-color .15s,color .15s,border-color .15s,box-shadow .15s
 }
-.btn:hover{opacity:.9}
-.btn-outline{background:transparent;color:var(--foreground);border:1px solid var(--border)}
-.btn-outline:hover{background:var(--accent)}
-.btn-sm{height:32px;padding:0 11px;font-size:13px}
+.btn:hover{background:color-mix(in oklab,var(--primary) 88%,black)}
+.btn:active{transform:translateY(.5px)}
+.btn:disabled{opacity:.5;pointer-events:none}
+.btn-secondary{background:var(--secondary);color:var(--secondary-foreground)}
+.btn-secondary:hover{background:color-mix(in oklab,var(--secondary) 82%,var(--foreground))}
+.btn-outline{background:var(--card);color:var(--foreground);border-color:var(--border)}
+.btn-outline:hover{background:var(--accent);color:var(--accent-foreground)}
+.btn-ghost{background:transparent;color:var(--foreground);border-color:transparent;box-shadow:none}
+.btn-ghost:hover{background:var(--accent)}
+.btn-destructive{background:var(--destructive);color:var(--primary-foreground)}
+.btn-destructive:hover{background:color-mix(in oklab,var(--destructive) 88%,black)}
+.btn-sm{height:32px;padding:0 11px;font-size:13px;gap:6px}
+.btn-icon{width:36px;padding:0}
+.btn-icon.btn-sm{width:32px}
 
 .badge{
   display:inline-flex;align-items:center;gap:4px;
@@ -209,12 +235,30 @@ svg{flex:0 0 auto}
 .card{
   background:var(--card);color:var(--card-foreground);
   border:1px solid var(--border);border-radius:var(--radius);
-  box-shadow:0 1px 2px 0 color-mix(in oklab,var(--foreground) 5%,transparent);
-  min-width:0
+  /* Two stacked shadows rather than one: a tight contact shadow to seat the card on the page,
+     and a wider soft one for depth. A single 1px shadow reads as a flat outline, which is what
+     made every panel look like a table with a border round it. */
+  box-shadow:0 1px 2px -1px color-mix(in oklab,var(--foreground) 10%,transparent),
+             0 6px 20px -8px color-mix(in oklab,var(--foreground) 12%,transparent);
+  min-width:0;position:relative;
+  transition:box-shadow .18s ease,transform .18s ease,border-color .18s ease
+}
+.card:hover{
+  box-shadow:0 1px 2px -1px color-mix(in oklab,var(--foreground) 12%,transparent),
+             0 12px 30px -10px color-mix(in oklab,var(--foreground) 18%,transparent)
+}
+/* A hairline of brand colour along the top edge, for the panel that matters most in a view. */
+.card-accent::before{
+  content:'';position:absolute;inset:0 0 auto 0;height:2px;border-radius:var(--radius) var(--radius) 0 0;
+  background:linear-gradient(90deg,var(--primary),color-mix(in oklab,var(--primary) 35%,transparent))
 }
 .card-head{padding:18px 20px 0}
-.card-title{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px}
-.card-desc{font-size:12.5px;color:var(--muted-foreground);margin-top:4px}
+.card-title{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}
+/* The explainer under every chart. Small and grey on purpose — it should be there when you go
+   looking and invisible when you are not. max-width keeps it to a readable measure instead of
+   running the full width of a wide panel. */
+.card-desc{font-size:12px;line-height:1.5;color:var(--muted-foreground);margin-top:5px;max-width:74ch}
+.card-desc em{font-style:normal;color:var(--foreground);font-weight:500}
 .card-body{padding:16px 20px 20px}
 .sep{height:1px;background:var(--border);border:0;margin:0}
 
@@ -284,12 +328,37 @@ svg{flex:0 0 auto}
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 @media(min-width:820px){.stats{grid-template-columns:repeat(4,1fr)}}
 
-.stat{padding:14px 16px;cursor:pointer;transition:border-color .12s}
-.stat:hover{border-color:var(--primary)}
+.stat{padding:14px 16px 15px;cursor:pointer;text-align:left;overflow:hidden}
+.stat:hover{border-color:color-mix(in oklab,var(--primary) 45%,var(--border))}
 .stat[aria-pressed="true"]{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
 .stat .k{font-size:11.5px;color:var(--muted-foreground);display:flex;align-items:center;gap:6px;font-weight:500}
 .stat .v{font-family:var(--font-heading);font-size:27px;font-weight:700;letter-spacing:-.03em;margin-top:6px;line-height:1.05}
-.stat .d{font-size:11px;color:var(--muted-foreground);margin-top:4px}
+.stat .d{font-size:11px;line-height:1.45;color:var(--muted-foreground);margin-top:4px}
+.stat-static{cursor:default}
+.stat-static:hover{border-color:var(--border)}
+/* Tone stripe down the left edge, so a row of tiles can be ranked without reading it. */
+.stat-static::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--border)}
+.tone-good::after{background:var(--success)}
+.tone-warn::after{background:var(--warning)}
+.tone-mute::after{background:color-mix(in oklab,var(--muted-foreground) 45%,transparent)}
+.tone-plain::after{background:var(--primary)}
+.tone-good .v{color:var(--success)}
+/* The leads view leads with numbers, so its tiles get more room than the 4-up overview grid. */
+.stats-lead .stat .v{font-size:30px}
+
+/* Collapsed disclosure, used for the intent-signal rows so nothing blank shows by default. */
+.disclose>summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
+  padding:10px 13px;border:1px dashed var(--border);border-radius:var(--radius);
+  font-size:12.5px;color:var(--muted-foreground);background:var(--card);
+  transition:border-color .15s,color .15s
+}
+.disclose>summary::-webkit-details-marker{display:none}
+.disclose>summary:hover{border-color:color-mix(in oklab,var(--primary) 40%,var(--border));color:var(--foreground)}
+.disclose>summary strong{color:var(--foreground);font-variant-numeric:tabular-nums}
+.disc-caret{display:inline-block;transition:transform .18s ease;font-size:15px;line-height:1}
+.disclose[open]>summary .disc-caret{transform:rotate(90deg)}
+@media (prefers-reduced-motion: reduce){.disc-caret{transition:none}}
 
 /* the hero chart is the point of the overview, so it gets real height */
 .hero-chart{position:relative}
@@ -343,10 +412,17 @@ svg.big{display:block;width:100%;height:320px;overflow:visible}
 .tw{overflow-x:auto;max-height:none}
 .tw.tall{max-height:560px;overflow-y:auto}
 table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:440px}
-th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
-th{font-size:10.5px;color:var(--muted-foreground);font-weight:600;position:sticky;top:0;background:var(--card);z-index:1}
+th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+/* Uppercase, tracked-out headers read as a header row even when the table scrolls under them,
+   which a same-size grey row does not. The bottom rule anchors the sticky header to the body. */
+th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);
+   font-weight:600;position:sticky;top:0;background:var(--card);z-index:1;
+   border-bottom:1px solid color-mix(in oklab,var(--foreground) 14%,transparent)}
 td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 td.mono{font-variant-numeric:tabular-nums;color:var(--muted-foreground)}
+/* Zebra striping at very low contrast: enough to track a row across a wide table, not enough
+   to read as a second colour. */
+tbody tr:nth-child(even){background:color-mix(in oklab,var(--muted) 45%,transparent)}
 tbody tr:hover{background:var(--muted)}
 tr:last-child td{border-bottom:none}
 .linkish{color:var(--primary);cursor:pointer;background:none;border:none;padding:0;font:inherit;text-decoration:underline;text-underline-offset:2px}
@@ -373,7 +449,104 @@ label{display:block;font-size:12.5px;font-weight:500;margin-bottom:6px}
 input[type=password],input[type=search]{
   font:inherit;width:100%;height:36px;padding:0 11px;
   border:1px solid var(--input);border-radius:calc(var(--radius) - 2px);
-  background:var(--background);color:var(--foreground)
+  background:var(--card);color:var(--foreground);
+  box-shadow:0 1px 2px 0 color-mix(in oklab,var(--foreground) 5%,transparent);
+  transition:border-color .15s,box-shadow .15s
+}
+input::placeholder{color:var(--muted-foreground)}
+
+/* shadcn Skeleton — a pulsing block that holds a panel's shape while its data is in flight.
+   The dashboard previously rendered empty cards during the first fetch, which looks like a
+   failure rather than a wait. */
+.skel{background:var(--muted);border-radius:calc(var(--radius) - 4px);animation:skel-pulse 1.6s ease-in-out infinite}
+@keyframes skel-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.skel-row{height:13px;margin:9px 0}
+.skel-row:nth-child(2n){width:82%}
+.skel-row:nth-child(3n){width:64%}
+
+/* shadcn empty state — centred icon, a line of copy, and nothing else. */
+.empty-state{display:flex;flex-direction:column;align-items:center;gap:7px;padding:34px 18px;text-align:center}
+.empty-state .es-mark{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  background:var(--muted);color:var(--muted-foreground);font-size:17px
+}
+.empty-state .es-title{font-size:13.5px;font-weight:600}
+.empty-state .es-body{font-size:12px;color:var(--muted-foreground);max-width:42ch;line-height:1.5}
+
+/* ---------- dark mode ----------
+   shadcn ships a .dark palette as standard and the dashboard had none, so opening it at night
+   meant a full-brightness cream page. Same token names, same roles — only the values move, so
+   every component above follows automatically. Driven by the OS unless the header toggle has
+   made an explicit choice, which is stored per browser. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --background: oklch(0.181 0.032 256.0);
+    --foreground: oklch(0.962 0.006 91.0);
+    --card: oklch(0.232 0.034 256.0);
+    --card-foreground: oklch(0.962 0.006 91.0);
+    --popover: oklch(0.232 0.034 256.0);
+    --popover-foreground: oklch(0.962 0.006 91.0);
+    --primary: oklch(0.706 0.107 184.0);
+    --primary-foreground: oklch(0.181 0.032 256.0);
+    --secondary: oklch(0.288 0.033 256.0);
+    --secondary-foreground: oklch(0.962 0.006 91.0);
+    --muted: oklch(0.288 0.033 256.0);
+    --muted-foreground: oklch(0.715 0.028 253.0);
+    --accent: oklch(0.310 0.036 256.0);
+    --accent-foreground: oklch(0.962 0.006 91.0);
+    --destructive: oklch(0.720 0.145 33.0);
+    --success: oklch(0.696 0.122 157.0);
+    --warning: oklch(0.735 0.114 73.0);
+    --border: oklch(0.318 0.030 256.0);
+    --input: oklch(0.348 0.030 256.0);
+    --ring: oklch(0.706 0.107 184.0);
+    --sidebar: oklch(0.155 0.030 256.0);
+    --sidebar-foreground: oklch(0.930 0.008 91.0);
+    --sidebar-accent: oklch(0.262 0.034 256.0);
+    --sidebar-border: oklch(0.288 0.030 256.0);
+    --sidebar-primary: oklch(0.706 0.107 184.0);
+  }
+}
+:root[data-theme="dark"]{
+  --background: oklch(0.181 0.032 256.0);
+  --foreground: oklch(0.962 0.006 91.0);
+  --card: oklch(0.232 0.034 256.0);
+  --card-foreground: oklch(0.962 0.006 91.0);
+  --popover: oklch(0.232 0.034 256.0);
+  --popover-foreground: oklch(0.962 0.006 91.0);
+  --primary: oklch(0.706 0.107 184.0);
+  --primary-foreground: oklch(0.181 0.032 256.0);
+  --secondary: oklch(0.288 0.033 256.0);
+  --secondary-foreground: oklch(0.962 0.006 91.0);
+  --muted: oklch(0.288 0.033 256.0);
+  --muted-foreground: oklch(0.715 0.028 253.0);
+  --accent: oklch(0.310 0.036 256.0);
+  --accent-foreground: oklch(0.962 0.006 91.0);
+  --destructive: oklch(0.720 0.145 33.0);
+  --success: oklch(0.696 0.122 157.0);
+  --warning: oklch(0.735 0.114 73.0);
+  --border: oklch(0.318 0.030 256.0);
+  --input: oklch(0.348 0.030 256.0);
+  --ring: oklch(0.706 0.107 184.0);
+  --sidebar: oklch(0.155 0.030 256.0);
+  --sidebar-foreground: oklch(0.930 0.008 91.0);
+  --sidebar-accent: oklch(0.262 0.034 256.0);
+  --sidebar-border: oklch(0.288 0.030 256.0);
+  --sidebar-primary: oklch(0.706 0.107 184.0);
+}
+/* The chart ramp needs lifting in dark mode: the light-mode teals sit too close to the navy
+   ground to separate from it. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --seq-1: oklch(0.780 0.098 184.0); --seq-2: oklch(0.710 0.104 184.0);
+    --seq-3: oklch(0.640 0.104 184.0); --seq-4: oklch(0.570 0.098 184.0);
+    --seq-5: oklch(0.500 0.088 184.0);
+  }
+}
+:root[data-theme="dark"]{
+  --seq-1: oklch(0.780 0.098 184.0); --seq-2: oklch(0.710 0.104 184.0);
+  --seq-3: oklch(0.640 0.104 184.0); --seq-4: oklch(0.570 0.098 184.0);
+  --seq-5: oklch(0.500 0.088 184.0);
 }
 
 .drawer{position:fixed;inset:0;background:color-mix(in oklab,var(--foreground) 45%,transparent);display:flex;justify-content:flex-end;z-index:60}
@@ -454,14 +627,15 @@ input[type=password],input[type=search]{
           <button data-days="90">90d</button>
           <button data-days="365">1y</button>
         </div>
+        <button class="btn btn-ghost btn-sm btn-icon" id="themeBtn" aria-label="Switch between light and dark" title="Light / dark"></button>
         <button class="btn btn-outline btn-sm" id="refresh">Refresh</button>
         <div class="exp">
           <button class="btn btn-sm" id="expBtn" aria-expanded="false">Export</button>
           <div class="exp-menu" id="expMenu" hidden>
-            <button data-exp="md">Full report (.md)</button>
-            <button data-exp="csv">Everything (.csv)</button>
+            <button data-exp="csv">All data (.csv)</button>
+            <button data-exp="json">All data (.json)</button>
+            <button data-exp="md">Written report (.md)</button>
             <button data-exp="png">Chart image (.png)</button>
-            <button data-exp="json">Raw data (.json)</button>
           </div>
         </div>
       </div>
@@ -477,7 +651,7 @@ input[type=password],input[type=search]{
           <div class="card-head" style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap">
             <div>
               <div class="card-title" id="chartTitle">Visitors</div>
-              <div class="card-desc" id="chartDesc">Distinct people per day</div>
+              <div class="card-desc" id="chartDesc">How many different people came to the site each day</div>
             </div>
             <div class="tabs" id="metricPick" role="group" aria-label="Metric"></div>
           </div>
@@ -496,12 +670,12 @@ input[type=password],input[type=search]{
         <div class="grid g2">
           <div class="card">
             <div class="card-head"><div class="card-title">Click-through by placement</div>
-              <div class="card-desc">Impressions count people who scrolled the button into view</div></div>
+              <div class="card-desc">For each button: how many people actually saw it, and what share of them clicked. A low rate means the button is seen but not compelling; few impressions means people never scroll that far.</div></div>
             <div class="card-body"><div class="tw"><table id="ctaTable"></table></div></div>
           </div>
           <div class="card">
             <div class="card-head"><div class="card-title">Most-clicked controls</div>
-              <div class="card-desc">Every link and button, by total clicks</div></div>
+              <div class="card-desc">Every clickable thing on the site, ranked by how often it was clicked</div></div>
             <div class="card-body"><div class="rows" id="clicks"></div></div>
           </div>
         </div>
@@ -509,7 +683,7 @@ input[type=password],input[type=search]{
           <div class="card-head" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
             <div>
               <div class="card-title">Click log</div>
-              <div class="card-desc">Every recorded click: when, what, from where, and which region</div>
+              <div class="card-desc">The raw list — one row per click, newest first. Use the filter to find a specific button or place.</div>
             </div>
             <div style="display:flex;gap:8px;align-items:center">
               <input type="search" id="logFilter" placeholder="Filter…" style="width:180px;height:32px">
@@ -524,12 +698,12 @@ input[type=password],input[type=search]{
       <section class="view" id="v-contact">
         <div class="grid g2">
           <div class="card">
-            <div class="card-head"><div class="card-title">Channel mix</div><div class="card-desc">Share of everyone who arrived</div></div>
+            <div class="card-head"><div class="card-title">Channel mix</div><div class="card-desc">Of everyone who got in touch, which method they chose — WhatsApp, email or the booking form</div></div>
             <div class="card-body"><div class="donut-wrap"><div id="contactDonut"></div><div class="keys" id="contactKeys"></div></div></div>
           </div>
           <div class="card">
             <div class="card-head"><div class="card-title">Did they fill the form first?</div>
-              <div class="card-desc">Whether contact came after a submission or instead of one</div></div>
+              <div class="card-desc">Did they fill in the form before contacting you, or skip it and message you directly? Skipping it means you have no details on them.</div></div>
             <div class="card-body"><div class="tw"><table id="contactTable"></table></div></div>
           </div>
         </div>
@@ -539,12 +713,12 @@ input[type=password],input[type=search]{
       <section class="view" id="v-funnel">
         <div class="grid g2">
           <div class="card">
-            <div class="card-head"><div class="card-title">Conversion funnel</div><div class="card-desc">Unique visitors, not event counts</div></div>
+            <div class="card-head"><div class="card-title">Conversion funnel</div><div class="card-desc">How many people made it to each stage. Counts people, not actions — one person clicking twice is still one person. The big drops are where you are losing them.</div></div>
             <div class="card-body"><div class="fun" id="funnel"></div></div>
           </div>
           <div class="card">
             <div class="card-head"><div class="card-title">What converting visits have in common</div>
-              <div class="card-desc">How much more often each step appears in journeys that converted</div></div>
+              <div class="card-desc">Things people who converted did more often than people who did not. A high number means that step is a strong sign someone is about to buy.</div></div>
             <div class="card-body"><div class="rows" id="paths"></div></div>
           </div>
         </div>
@@ -554,7 +728,7 @@ input[type=password],input[type=search]{
       <section class="view" id="v-pipeline">
         <div class="card">
           <div class="card-head"><div class="card-title">Pipeline</div>
-            <div class="card-desc">Every visitor sits in exactly one stage, the furthest they reached. Click a card for their journey.</div></div>
+            <div class="card-desc">Everyone who visited, sorted into the furthest stage they reached. Nobody appears twice. Click any card to replay exactly what that person did.</div></div>
           <div class="card-body"><div class="kan" id="kanban"></div></div>
         </div>
       </section>
@@ -565,7 +739,7 @@ input[type=password],input[type=search]{
           <div class="card-head" style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap">
             <div>
               <div class="card-title">Monthly conversions</div>
-              <div class="card-desc">Calendar months, so one can be compared with the last</div>
+              <div class="card-desc">Whole calendar months, so this month can be compared fairly with the last</div>
             </div>
             <div class="tabs" id="auditDim" role="group" aria-label="Break down by">
               <button data-dim="source" aria-pressed="true">Source</button>
@@ -578,7 +752,7 @@ input[type=password],input[type=search]{
         </div>
         <div class="card">
           <div class="card-head"><div class="card-title">Where those conversions came from</div>
-            <div class="card-desc">Same months, split by the dimension above</div></div>
+            <div class="card-desc">The same months again, broken down by whichever button you picked above</div></div>
           <div class="card-body"><div class="tw tall"><table id="auditTable"></table></div></div>
         </div>
       </section>
@@ -587,11 +761,11 @@ input[type=password],input[type=search]{
       <section class="view" id="v-video">
         <div class="grid g2">
           <div class="card">
-            <div class="card-head"><div class="card-title">Watch-through</div><div class="card-desc">People reaching each quarter</div></div>
+            <div class="card-head"><div class="card-title">Watch-through</div><div class="card-desc">How far into the video people get. The drop between bars is where they stop watching.</div></div>
             <div class="card-body"><div class="rows" id="videoBars"></div></div>
           </div>
           <div class="card">
-            <div class="card-head"><div class="card-title">Time watched</div><div class="card-desc">Real seconds, ignoring seeks</div></div>
+            <div class="card-head"><div class="card-title">Time watched</div><div class="card-desc">Actual seconds of video watched. Skipping ahead does not count.</div></div>
             <div class="card-body"><div class="tw"><table id="videoTable"></table></div></div>
           </div>
         </div>
@@ -601,29 +775,30 @@ input[type=password],input[type=search]{
       <section class="view" id="v-audience">
         <div class="grid g3">
           <div class="card">
-            <div class="card-head"><div class="card-title">Devices</div></div>
+            <div class="card-head"><div class="card-title">Devices</div><div class="card-desc">Phone, tablet or computer. Mostly phones means the page has to work at small sizes first.</div></div>
             <div class="card-body"><div class="donut-wrap"><div id="devDonut"></div><div class="keys" id="devKeys"></div></div></div>
           </div>
           <div class="card">
-            <div class="card-head"><div class="card-title">Sources</div></div>
+            <div class="card-head"><div class="card-title">Sources</div><div class="card-desc">How people found the site — a search engine, a link somewhere, an ad, or typing it in directly</div></div>
             <div class="card-body"><div class="donut-wrap"><div id="srcDonut"></div><div class="keys" id="srcKeys"></div></div></div>
           </div>
           <div class="card">
-            <div class="card-head"><div class="card-title">Countries</div></div>
+            <div class="card-head"><div class="card-title">Countries</div><div class="card-desc">Where visitors are. Traffic far outside the US is unlikely to become a customer.</div></div>
             <div class="card-body"><div class="rows" id="countries"></div></div>
           </div>
         </div>
         <div class="grid g2">
           <div class="card">
-            <div class="card-head"><div class="card-title">Sections</div><div class="card-desc">Reach, median time, and where visits end</div></div>
+            <div class="card-head"><div class="card-title">Sections</div><div class="card-desc">For each part of the page: how many people reached it, how long they stayed, and how often it was the last thing they saw before leaving</div></div>
             <div class="card-body"><div class="tw"><table id="secTable"></table></div></div>
           </div>
           <div class="card">
-            <div class="card-head"><div class="card-title">Scroll depth</div><div class="card-desc">Share of visitors reaching each point</div></div>
+            <div class="card-head"><div class="card-title">Scroll depth</div><div class="card-desc">How far down the page people scroll. If few reach 75%, anything below that is not being read.</div></div>
             <div class="card-body">
               <div class="rows" id="scroll"></div>
               <hr class="sep" style="margin:16px 0">
-              <div class="card-title" style="font-size:13px;margin-bottom:9px">Errors and dead ends</div>
+              <div class="card-title" style="font-size:13px;margin-bottom:2px">Errors and dead ends</div>
+              <div class="card-desc" style="margin-bottom:9px">Things that visibly went wrong: failed form submissions, demo calls that would not connect, buttons that led nowhere</div>
               <div class="tw"><table id="errTable"></table></div>
             </div>
           </div>
@@ -632,11 +807,37 @@ input[type=password],input[type=search]{
 
       <!-- ===== LEADS ===== -->
       <section class="view" id="v-leads">
-        <div class="card">
-          <div class="card-head"><div class="card-title">Leads</div>
-            <div class="card-desc">Bots excluded, with the campaign that produced each one</div></div>
+        <div class="stats stats-lead" id="leadStats"></div>
+
+        <div class="card card-accent">
+          <div class="card-head" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+            <div>
+              <div class="card-title">Leads you can call</div>
+              <div class="card-desc">People who finished the booking form and left a name, an email <em>and</em> a phone number. These are the only rows counted as leads anywhere on this dashboard.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="search" id="leadFilter" placeholder="Filter by name, email, practice…" style="width:230px;height:32px">
+              <button class="btn btn-outline btn-sm" id="leadExport">Export leads</button>
+            </div>
+          </div>
           <div class="card-body"><div class="tw tall"><table id="leadTable"></table></div></div>
         </div>
+
+        <!-- Collapsed by default, deliberately. These rows have no name, email or phone on
+             them — that is what makes them not leads — so showing them open put a stack of
+             blank rows in the middle of the Leads page, which is the thing this whole change
+             set out to get rid of. The count is on the tile above either way; open this only
+             if you want to know what the interest looked like. -->
+        <details class="disclose" id="signalWrap">
+          <summary>
+            <span class="disc-caret" aria-hidden="true">›</span>
+            <span>Intent signals — <strong id="signalCount">0</strong> people who showed interest but left no contact details</span>
+          </summary>
+          <div class="card" style="margin-top:10px">
+            <div class="card-head"><div class="card-desc" style="margin-top:0">Someone finished a demo call or opened the exit popup but never typed their details, so there is nobody to contact. Not counted as leads anywhere. The last column says what was missing.</div></div>
+            <div class="card-body"><div class="tw"><table id="signalTable"></table></div></div>
+          </div>
+        </details>
       </section>
     </div>
   </div>
@@ -647,6 +848,7 @@ input[type=password],input[type=search]{
     <header>
       <div>
         <h2 style="font-size:16px">Visitor journey</h2>
+        <div class="card-desc" style="margin-top:2px">Everything this one person did, in order, from landing to leaving</div>
         <div style="font-size:11px;color:var(--muted-foreground)" id="drawerId"></div>
       </div>
       <button class="btn btn-outline btn-sm" id="drawerClose">Close</button>
@@ -659,10 +861,14 @@ input[type=password],input[type=search]{
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var state = { days: 30, view: 'overview', metric: 'visitors', data: null,
-                log: null, audit: null, auditDim: 'source', logFilterText: '' };
+                log: null, audit: null, auditDim: 'source', logFilterText: '',
+                // Lazily fetched, and pulled in wholesale before any export — see fetchAllViews.
+                visitors: null, extra: {} };
   var CAT = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
   var ICON = {
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+    moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
     gauge: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
     pointer: '<path d="M9 9l5 12 1.774-5.226L21 14 9 9z"/><path d="M16.071 16.071l4.243 4.243"/>',
     message: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>',
@@ -698,13 +904,13 @@ input[type=password],input[type=search]{
   // The metrics the hero chart can switch between. All arrive in one payload, so switching is
   // instant and every series covers exactly the same days.
   var METRICS = [
-    { k: 'visitors', t: 'Visitors', d: 'Distinct people per day' },
-    { k: 'clicks', t: 'Clicks', d: 'Every link and button click' },
-    { k: 'sessions', t: 'Visits', d: 'Sessions per day' },
-    { k: 'demo_starts', t: 'Demos', d: 'Demo calls started' },
-    { k: 'form_submits', t: 'Forms', d: 'Completed form submissions' },
-    { k: 'contacts', t: 'Contacts', d: 'WhatsApp, email or Calendly' },
-    { k: 'leads', t: 'Leads', d: 'Leads captured' }
+    { k: 'visitors', t: 'Visitors', d: 'How many different people came to the site each day' },
+    { k: 'clicks', t: 'Clicks', d: 'Every link and button click, added up per day' },
+    { k: 'sessions', t: 'Visits', d: 'Separate visits — one person coming back twice counts twice' },
+    { k: 'demo_starts', t: 'Demos', d: 'People who pressed the button to talk to the AI receptionist' },
+    { k: 'form_submits', t: 'Forms', d: 'Booking forms filled in all the way to the end' },
+    { k: 'contacts', t: 'Contacts', d: 'People who reached out by WhatsApp, email or Calendly' },
+    { k: 'leads', t: 'Leads', d: 'People who left a name, an email and a phone number' }
   ];
   $('metricPick').innerHTML = METRICS.map(function (m) {
     return '<button data-metric="' + m.k + '"' + (m.k === 'visitors' ? ' aria-pressed="true"' : '') + '>' + m.t + '</button>';
@@ -806,11 +1012,31 @@ input[type=password],input[type=search]{
     fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ logout: true }) })
       .then(function () { showLogin(''); });
   });
-  $('refresh').addEventListener('click', function () { state.log = null; state.audit = null; load(); });
+  // Theme: unset follows the OS, and clicking cycles to the opposite of whatever is on screen
+  // right now. Stored per browser, applied before first paint by the inline script in <head> so
+  // a dark-mode user never gets a flash of the cream palette.
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme')
+      || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function paintThemeBtn() {
+    // Show the icon for what clicking will DO, which is the opposite of the current state.
+    $('themeBtn').innerHTML = icon(currentTheme() === 'dark' ? 'sun' : 'moon', 15);
+  }
+  $('themeBtn').addEventListener('click', function () {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('dd_admin_theme', next); } catch (e) {}
+    paintThemeBtn();
+    if (state.data) drawBig(); // the chart paints resolved colours, so it has to be redrawn
+  });
+  paintThemeBtn();
+
+  $('refresh').addEventListener('click', function () { resetLazy(); load(); });
   $('sbToggle').addEventListener('click', function () { $('sidebar').classList.toggle('open'); });
   $('range').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-days]'); if (!b) return;
-    state.days = Number(b.dataset.days); state.log = null;
+    state.days = Number(b.dataset.days); resetLazy();
     Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
     load();
   });
@@ -843,6 +1069,10 @@ input[type=password],input[type=search]{
         $('degraded').innerHTML = '<div><b>Could not load the report.</b> ' + esc(err.message) + '</div>';
       });
   }
+  // Everything fetched per-window. Clearing them together is the only way an export taken
+  // after changing the range cannot mix a 7-day click log into a 90-day report.
+  function resetLazy() { state.log = null; state.audit = null; state.visitors = null; state.extra = {}; }
+
   function loadLog() {
     fetch('/api/stats?view=clicklog&days=' + state.days + '&limit=2000', { credentials: 'same-origin' })
       .then(function (r) { return r.json(); })
@@ -882,7 +1112,12 @@ input[type=password],input[type=search]{
       { k: 'WhatsApp', m: 'contacts', v: num(reach('whatsapp')), d: o.visitors ? (reach('whatsapp') / o.visitors * 100).toFixed(1) + '% of visitors' : '—' },
       { k: 'Emailed you', m: 'contacts', v: num(reach('email')), d: o.visitors ? (reach('email') / o.visitors * 100).toFixed(1) + '% of visitors' : '—' },
       { k: 'Demos', m: 'demo_starts', v: num(o.demo_completes), d: num(o.demo_starts) + ' started' },
-      { k: 'Leads', m: 'leads', v: num(o.leads), d: o.visitors ? (o.leads / o.visitors * 100).toFixed(1) + '% of visitors' : '—' }
+      // "Leads" means contactable leads now — name, email and phone all present. The count is
+      // lower than it used to be because it no longer includes rows with nobody to ring; the
+      // description says so, so a smaller number does not read as lost business.
+      { k: 'Leads you can call', m: 'leads', v: num(o.leads),
+        d: (o.lead_signals ? num(o.lead_signals) + ' more showed intent, left no details'
+                           : (o.visitors ? (o.leads / o.visitors * 100).toFixed(1) + '% of visitors' : '—')) }
     ];
     $('stats').innerHTML = tiles.map(function (t) {
       return '<button class="card stat"' + (t.m ? ' data-metric-tile="' + t.m + '"' : ' disabled style="cursor:default"') + '>' +
@@ -970,16 +1205,7 @@ input[type=password],input[type=search]{
       d.errors || [],
       function (r) { return '<tr><td><span class="badge badge-bad">' + esc(r.event) + '</span></td><td>' + esc(r.detail) + '</td><td class="n">' + num(r.hits) + '</td></tr>'; });
 
-    table($('leadTable'),
-      [{ t: 'When' }, { t: 'Name' }, { t: 'Practice' }, { t: 'Email' }, { t: 'Phone' }, { t: 'Calls/mo' }, { t: 'Campaign' }, { t: '' }],
-      d.leads || [],
-      function (r) {
-        return '<tr><td class="mono">' + esc(when(r.created_at)) + '</td><td>' + esc(r.name || '—') + '</td><td>' + esc(r.practice_name || '—') +
-          '</td><td>' + (r.email ? '<a href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a>' : '—') +
-          '</td><td>' + esc(r.phone || '—') + '</td><td>' + esc(r.monthly_call_volume || '—') +
-          '</td><td>' + esc(r.utm_campaign || r.referrer_host || 'direct') +
-          '</td><td>' + (r.visitor_id ? '<button class="linkish" data-vid="' + esc(r.visitor_id) + '">journey</button>' : '') + '</td></tr>';
-      });
+    renderLeads();
 
     initMotion();
   }
@@ -1133,6 +1359,99 @@ input[type=password],input[type=search]{
   // ---------- export ----------
   // Everything on screen comes from a small number of arrays, so every format is generated from
   // the same source rather than scraped back out of the DOM.
+  // A non-interactive stat tile. The Overview tiles double as chart controls and carry their
+  // own markup; these are read-only, with a tone stripe so the eye can rank them at a glance.
+  function tile(k, v, d, tone) {
+    return '<div class="card stat stat-static' + (tone ? ' tone-' + tone : '') + '">' +
+      '<div class="k">' + esc(k) + '</div><div class="v tnum">' + esc(v) + '</div>' +
+      '<div class="d">' + esc(d) + '</div></div>';
+  }
+
+  // ---------------------------------------------------------------- leads
+  // A lead is someone you could pick up the phone and call: name, email and phone all present.
+  // Anything else is an intent signal. The API already splits them (api/stats.ts), but the
+  // same test is applied here so an older API build, or a hand-edited row, cannot put a blank
+  // record back in the leads list.
+  var LOOSE_EMAIL = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+  function filled(v) { return typeof v === 'string' && v.trim() !== ''; }
+  function qualified(r) {
+    if (typeof r.is_qualified === 'boolean') return r.is_qualified;
+    return filled(r.name) && filled(r.phone) && filled(r.email) && LOOSE_EMAIL.test(String(r.email).trim());
+  }
+  function missingBits(r) {
+    var out = [];
+    if (!filled(r.name)) out.push('name');
+    if (!filled(r.email)) out.push('email');
+    else if (!LOOSE_EMAIL.test(String(r.email).trim())) out.push('valid email');
+    if (!filled(r.phone)) out.push('phone');
+    return out;
+  }
+  function allLeadRows() {
+    var d = state.data || {};
+    return (d.leads || []).concat(d.lead_signals || []);
+  }
+  function leadRows() { return allLeadRows().filter(qualified); }
+  function signalRows() { return allLeadRows().filter(function (r) { return !qualified(r); }); }
+
+  function renderLeads() {
+    var leads = leadRows(), signals = signalRows();
+    var q = ($('leadFilter') && $('leadFilter').value || '').trim().toLowerCase();
+    var shown = !q ? leads : leads.filter(function (r) {
+      return [r.name, r.email, r.practice_name, r.phone, r.country, r.utm_campaign]
+        .some(function (v) { return v && String(v).toLowerCase().indexOf(q) !== -1; });
+    });
+
+    // Headline tiles for this view only. "Contactable" is the number that matters: it is what
+    // the Overview lead count now reports, and the reason it is lower than it used to be.
+    var totalAll = leads.length + signals.length;
+    $('leadStats').innerHTML = [
+      tile('Leads you can call', num(leads.length), 'Name, email and phone all present', 'good'),
+      tile('Intent signals', num(signals.length), 'Interested, but left no contact details', 'mute'),
+      tile('Conversion to contact', totalAll ? (leads.length / totalAll * 100).toFixed(0) + '%' : '—',
+        'Share of interested people who left details', 'plain'),
+      tile('Missing a phone number', num(signals.filter(function (r) { return !filled(r.phone); }).length),
+        'The most common reason a signal is not a lead', 'warn')
+    ].join('');
+
+    table($('leadTable'),
+      [{ t: 'When' }, { t: 'Name' }, { t: 'Practice' }, { t: 'Email' }, { t: 'Phone' },
+       { t: 'Country' }, { t: 'Calls/mo' }, { t: 'Sites', n: true }, { t: 'Campaign' }, { t: '' }],
+      shown,
+      function (r) {
+        return '<tr><td class="mono">' + esc(when(r.created_at, true)) + '</td>' +
+          '<td><strong>' + esc(r.name) + '</strong></td>' +
+          '<td>' + esc(r.practice_name || '—') + '</td>' +
+          '<td><a href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a></td>' +
+          '<td class="mono"><a href="tel:' + esc(String(r.phone).replace(/[^\d+]/g, '')) + '">' + esc(r.phone) + '</a></td>' +
+          '<td>' + esc(r.country || '—') + '</td>' +
+          '<td>' + esc(r.monthly_call_volume || '—') + '</td>' +
+          '<td class="n">' + esc(r.locations || '—') + '</td>' +
+          '<td>' + esc(r.utm_campaign || r.referrer_host || 'direct') + '</td>' +
+          '<td>' + (r.visitor_id ? '<button class="linkish" data-vid="' + esc(r.visitor_id) + '">journey</button>' : '') + '</td></tr>';
+      });
+
+    $('signalCount').textContent = String(signals.length);
+    // An empty disclosure is noise; hide the control entirely when there is nothing behind it.
+    $('signalWrap').hidden = signals.length === 0;
+
+    table($('signalTable'),
+      [{ t: 'When' }, { t: 'What happened' }, { t: 'Anything they left' }, { t: 'Campaign' }, { t: 'Missing' }, { t: '' }],
+      signals,
+      function (r) {
+        var partial = [r.name, r.email, r.phone].filter(filled).join(' · ');
+        return '<tr><td class="mono">' + esc(when(r.created_at, true)) + '</td>' +
+          '<td><span class="badge badge-mute">' + esc(sourceLabel(r.source)) + '</span></td>' +
+          '<td>' + esc(partial || 'nothing') + '</td>' +
+          '<td>' + esc(r.utm_campaign || r.referrer_host || 'direct') + '</td>' +
+          '<td><span class="badge badge-bad">' + esc(missingBits(r).join(', ') || '—') + '</span></td>' +
+          '<td>' + (r.visitor_id ? '<button class="linkish" data-vid="' + esc(r.visitor_id) + '">journey</button>' : '') + '</td></tr>';
+      });
+  }
+
+  function sourceLabel(s) {
+    return { form: 'Started the form', demo_call: 'Finished a demo call', exit_intent: 'Opened the exit popup' }[s] || (s || 'unknown');
+  }
+
   function datasets() {
     var d = state.data || {};
     var sets = [
@@ -1152,9 +1471,22 @@ input[type=password],input[type=search]{
       ['conversion_paths', d.paths || []],
       ['errors', d.errors || []],
       ['pipeline', d.pipeline || []],
-      ['leads', d.leads || []]
+      // Split deliberately: a spreadsheet of "leads" that is half blank rows is the problem
+      // this dashboard had. Contactable leads are their own sheet; signals are labelled.
+      ['leads_contactable', leadRows()],
+      ['lead_signals_no_contact_details', signalRows().map(function (r) {
+        return {
+          created_at: r.created_at, source: r.source, source_label: sourceLabel(r.source),
+          missing: missingBits(r).join(' '), partial_name: r.name || '', partial_email: r.email || '',
+          partial_phone: r.phone || '', visitor_id: r.visitor_id || '',
+          utm_source: r.utm_source || '', utm_campaign: r.utm_campaign || '', referrer_host: r.referrer_host || ''
+        };
+      })]
     ];
     if (state.log && state.log.length) sets.push(['click_log', state.log]);
+    if (state.visitors && state.visitors.length) sets.push(['visitors', state.visitors]);
+    if (state.extra.city && state.extra.city.length) sets.push(['cities', state.extra.city]);
+    if (state.extra.region && state.extra.region.length) sets.push(['regions', state.extra.region]);
     if (state.audit) {
       sets.push(['monthly', state.audit.monthly || []]);
       sets.push(['monthly_by_' + state.auditDim, state.audit.breakdown || []]);
@@ -1216,10 +1548,12 @@ input[type=password],input[type=search]{
     download('digidental-data-' + stamp() + '.csv', parts.join('\n'), 'text/csv;charset=utf-8');
   }
   function exportJson() {
-    download('digidental-raw-' + stamp() + '.json',
-      JSON.stringify({ generated_at: new Date().toISOString(), range_days: state.days,
-        dashboard: state.data, click_log: state.log, audit: state.audit }, null, 2),
-      'application/json');
+    // Mirrors the CSV exactly: same datasets, same names, same lead/signal split. A JSON export
+    // that quietly holds different data from the CSV export is worse than having only one.
+    var out = { generated_at: new Date().toISOString(), range_days: state.days, datasets: {} };
+    datasets().forEach(function (s2) { out.datasets[s2[0]] = s2[1]; });
+    out.raw = { dashboard: state.data, click_log: state.log, audit: state.audit, visitors: state.visitors };
+    download('digidental-export-' + stamp() + '.json', JSON.stringify(out, null, 2), 'application/json');
   }
   // PNG comes from the chart's own SVG: serialise it, paint it on a canvas at 2x, and save.
   // Computed colours are resolved first because an exported file has no stylesheet to inherit.
@@ -1272,17 +1606,65 @@ input[type=password],input[type=search]{
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
   }
 
+  // Leads view: live filter, and a leads-only CSV for when you want the call list rather than
+  // the whole dashboard.
+  $('leadFilter').addEventListener('input', function () { renderLeads(); });
+  $('leadExport').addEventListener('click', function () {
+    var rows = leadRows();
+    if (!rows.length) { alert('No contactable leads in this window yet.'); return; }
+    download('digidental-leads-' + stamp() + '.csv', toCsv(rows.map(function (r) {
+      return {
+        created_at: r.created_at, name: r.name, practice_name: r.practice_name || '',
+        email: r.email, phone: r.phone, country: r.country || '',
+        monthly_call_volume: r.monthly_call_volume || '', locations: r.locations || '',
+        source: r.source || '', utm_source: r.utm_source || '', utm_campaign: r.utm_campaign || '',
+        referrer_host: r.referrer_host || '', visitor_id: r.visitor_id || ''
+      };
+    })), 'text/csv;charset=utf-8');
+  });
+
   $('expBtn').addEventListener('click', function () {
     var open = $('expMenu').hidden;
     $('expMenu').hidden = !open;
     this.setAttribute('aria-expanded', String(open));
   });
+  // The click log, the 12-month audit and the visitor list are loaded lazily, only when their
+  // tab is opened. That meant an export taken straight after signing in silently omitted all
+  // three — the file's contents depended on which tabs you happened to have clicked, which is
+  // not something anyone would think to check. Every export now fetches whatever is missing
+  // first, so "export everything" means everything regardless of where you were standing.
+  function fetchAllViews() {
+    var jobs = [];
+    var get = function (qs) {
+      return fetch('/api/stats?days=' + state.days + '&' + qs, { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .catch(function () { return null; }); // a missing section must not sink the whole export
+    };
+    if (!state.log) jobs.push(get('view=clicklog&limit=5000').then(function (d) { state.log = (d && d.log) || []; }));
+    if (!state.audit) jobs.push(get('view=audit&months=12&dim=' + state.auditDim).then(function (d) { state.audit = d || { monthly: [], breakdown: [] }; }));
+    if (!state.visitors) jobs.push(get('view=visitors&limit=500').then(function (d) { state.visitors = (d && d.visitors) || []; }));
+    // Breakdowns the dashboard renders but never keeps in a form the export can read.
+    ['city', 'region'].forEach(function (dim) {
+      if (state.extra[dim]) return;
+      jobs.push(get('view=breakdown&dim=' + dim).then(function (d) { state.extra[dim] = (d && d.rows) || []; }));
+    });
+    return Promise.all(jobs);
+  }
+
   $('expMenu').addEventListener('click', function (e) {
     var b = e.target.closest('[data-exp]'); if (!b) return;
     this.hidden = true; $('expBtn').setAttribute('aria-expanded', 'false');
     var k = b.dataset.exp;
-    if (k === 'md') exportMd(); else if (k === 'csv') exportCsv();
-    else if (k === 'png') exportPng(); else exportJson();
+    // The chart image is the one export that is genuinely about what is on screen, so it does
+    // not wait on anything.
+    if (k === 'png') { exportPng(); return; }
+    var btn = $('expBtn'), label = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Collecting…';
+    fetchAllViews().then(function () {
+      if (k === 'md') exportMd(); else if (k === 'csv') exportCsv(); else exportJson();
+    }).then(function () {
+      btn.disabled = false; btn.textContent = label;
+    });
   });
   document.addEventListener('click', function (e) {
     if (!e.target.closest('.exp')) { $('expMenu').hidden = true; $('expBtn').setAttribute('aria-expanded', 'false'); }

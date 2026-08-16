@@ -32,6 +32,9 @@ const CATEGORY: Record<string, string> = {
   scroll_depth: 'BEHAVIOR', section_time: 'BEHAVIOR', video_play: 'BEHAVIOR',
   video_progress: 'BEHAVIOR', video_watch: 'BEHAVIOR', calc_interact: 'BEHAVIOR',
   session_end: 'BEHAVIOR',
+  // Arrived on a shared section link (#calculator, #demo) rather than the top of the page.
+  // props.target carries which section, so outreach links can be told apart from each other.
+  deep_link: 'BEHAVIOR',
   // Every link and button click on the page, captured by one delegated listener so a control
   // added later is measured without anyone remembering to instrument it. This is what makes
   // "how many clicks happened" answerable rather than "how many clicks we thought to count".

@@ -14,6 +14,33 @@ Repo scaffolding for the production build (React + Vite + Tailwind + Vercel func
 - `.env.example` — every required variable, placeholder values only
 - `vercel.json` — response headers for the SEO/AI files (content types, CORS, caching)
 
+## Shareable section links
+
+Two URLs for outreach. Both open the page *in* that section rather than at the top:
+
+| Link | Lands on |
+|---|---|
+| `https://www.digidental.us/#calculator` | The lost-revenue calculator ("The math is short.") |
+| `https://www.digidental.us/#demo` | The 60-second live call with Toothy |
+
+These are a public contract. Once a link is in a sent email it cannot be recalled, so
+**never rename `id="calculator"` or `id="demo"`** — add an alias to `SECTION_ALIASES` in
+`index.html` instead. That map also forgives the near misses people type from memory
+(`#arr`, `#roi`, `#calc`, `#math` → the calculator; `#try`, `#test`, `#toothy` → the demo).
+
+Why this needs code at all: the page renders client-side, so the browser makes its own
+anchor jump against markup the runtime is about to replace, and the visitor ends up at the
+top of the page with the hash still in the address bar. `initDeepLink()` resolves the hash
+after mount, then corrects once 600ms later for the layout shift as fonts and images settle
+— abandoning the correction the moment the visitor scrolls. `NAV_OFFSET` (component) and
+`section[id]{scroll-margin-top}` (stylesheet) are the same number on purpose: one governs
+the runtime's scrolls, the other the browser's, and they must stop in the same place.
+
+Arrivals fire a `deep_link` event carrying `props.target`, so the calculator link and the
+demo link can be told apart in the dashboard. `test/deeplink.test.mjs` drives a real browser
+at both links, on desktop and mobile, and fails if either lands anywhere but inside its
+section.
+
 ## SEO and AI discoverability
 Canonical origin: **`https://www.digidental.us`**. The bare apex `digidental.us`
 is an A record to Vercel (`216.198.79.1`) which 308-redirects to `www`.
@@ -172,7 +199,7 @@ allowlist in `api/event.ts` is derived from the same map, so the two cannot drif
 
 - **BEHAVIOR** — `page_view`, `view_hero`, `section_view`, `scroll_depth`, `section_time`,
   `video_play`, `video_progress`, `video_watch`, `calc_interact`, `session_end`,
-  `element_click`
+  `element_click`, `deep_link`
 - **INTENT** — `cta_impression`, `cta_click`, `form_open`, `form_step_1..5`, `demo_start`,
   `exit_intent_shown`, `exit_intent_demo`
 - **CONVERSION** — `demo_complete`, `form_submit`, `calendly_click`, `lead_captured`,

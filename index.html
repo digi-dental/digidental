@@ -509,6 +509,16 @@ input,select,button,textarea{font-family:inherit}
 .dd-hero-copy{display:flex;flex-direction:column;align-items:center;gap:28px;max-width:820px}
 .dd-hero-demo{width:min(720px,94vw);min-height:230px}
 .dd-hero-links{justify-content:center}
+/* Hero standfirst. It has to outweigh ordinary body copy without reading as a second
+   headline, so every cue that says "heading" on this page is deliberately left alone:
+   it stays in Inter (the h1 is Fraunces), stays at body weight, stays sentence-cased.
+   Size, contrast, a shorter measure and the teal rule do the work instead. */
+.dd-hero-sub{position:relative;max-width:660px;margin:0;font-size:clamp(19px,1.4vw + 12px,22px);line-height:1.55;letter-spacing:-0.004em;color:#213548;text-wrap:pretty}
+.dd-hero-sub strong{font-weight:600;color:#0A1A2F}
+/* Deep links (#calculator, #demo) land under the fixed nav, not behind it. This governs the
+   browser's own anchor jump; keep it equal to NAV_OFFSET in the component, which governs the
+   runtime's scrolls, so both paths stop in exactly the same place. */
+section[id],#sources{scroll-margin-top:84px}
 @media (min-width:1024px){
   .dd-hero{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,0.98fr);align-items:center;gap:clamp(40px,5vw,80px);text-align:left}
   .dd-hero-copy{align-items:flex-start;max-width:none}
@@ -516,6 +526,9 @@ input,select,button,textarea{font-family:inherit}
   .dd-hero-cta{align-items:flex-start !important}
   .dd-hero-links{justify-content:flex-start}
   .dd-hero-demo{width:100%;justify-self:end}
+  /* Left rule only where the copy is left-aligned; centred text would hang off it. */
+  .dd-hero-sub{padding-left:20px}
+  .dd-hero-sub::before{content:"";position:absolute;left:0;top:.3em;bottom:.3em;width:3px;border-radius:3px;background:linear-gradient(180deg,#0F8B80,rgba(15,139,128,.2))}
 }
 /* The four cost statistics stay in the original 2x2 block. Four across read as a thin
    ribbon of percentages on a wide screen; capping the grid keeps the pairs balanced. */
@@ -666,7 +679,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       2. "Every call answered. Every opening filled. Nobody hired."
       3. "The receptionist that never sleeps, never sighs, and never misses a call." -->
     <h1 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2.5rem,6vw,4.25rem);line-height:1.05;letter-spacing:-0.025em;margin:0;text-wrap:balance">Your phone rings. A patient gets booked. You never lifted a finger.</h1>
-    <p style="font-size:17px;line-height:1.65;color:#3D4F66;max-width:740px;margin:0;text-wrap:pretty">A 24/7 human-sounding AI receptionist that answers every call and writes appointments straight into your calendar, set up entirely for you.</p>
+    <p class="dd-hero-sub">A <strong>24/7 human-sounding</strong> AI receptionist that answers every call and writes appointments straight into your calendar, <strong>set up entirely for you.</strong></p>
     <div class="dd-hero-cta" style="display:flex;flex-direction:column;align-items:center;gap:14px">
       <button onClick="{{ openBookingHero }}" data-cta="hero" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(10,26,47,0.2)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
       <button onClick="{{ scrollToToothy }}" data-cta="hero_demo_button" aria-label="Hear the AI receptionist live, a 60 second demo" style="background:none;color:#0F8B80;border:1.5px solid #0F8B80;border-radius:12px;padding:16px 30px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;transition:background-color .25s,color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;color:#FAF9F6;transform:translateY(-2px)">Hear it live — 60-second demo</button>
@@ -840,7 +853,10 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 </section>
 
 <!-- ================= 5. THE MATH ================= -->
-<section data-section="calculator" style="background:#FAF9F6;padding:160px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+<!-- id="calculator" is a public link target: https://www.digidental.us/#calculator is sent in
+     outreach to drop an owner straight onto the lost-revenue calculator. Renaming it breaks
+     every link already in the wild — add an alias in SECTION_ALIASES instead. -->
+<section id="calculator" data-section="calculator" style="background:#FAF9F6;padding:160px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
   <div data-reveal="" style="width:100%;max-width:1080px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
     <img src="uploads/denty_happy.png" alt="" width="72" height="72" loading="lazy" decoding="async" style="width:72px;height:72px;object-fit:contain;image-rendering:pixelated;animation:toothy-bob 2.6s ease-in-out infinite">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-0.02em;margin:0">The math is short.</h2>
@@ -901,6 +917,8 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 </section>
 
 <!-- ================= 6+7. TOOTHY — LIVE DEMO ================= -->
+<!-- id="demo" is a public link target: https://www.digidental.us/#demo drops an owner on the
+     60-second call with Toothy. Same rule as #calculator — alias, never rename. -->
 <section id="demo" data-toothy="" data-section="demo" style="background:#0A1A2F;padding:160px clamp(20px,4vw,48px);color:#FAF9F6;border-top:1px solid #EEEAE0">
   <div style="width:100%;max-width:900px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center">
     <p style="font-family:'Fraunces',serif;font-size:clamp(1.8rem,4.2vw,2.7rem);line-height:1.4;margin:0;text-wrap:balance;color:#FAF9F6">“Don't take anyone's word for it. Talk to the receptionist yourself.”</p>
@@ -1552,6 +1570,23 @@ class Component extends DCLogic {
   VAPI_PUBLIC_KEY = 'fd2dddbc-3c7d-4eed-9cea-cf4fc9828d9f';
   VAPI_ASSISTANT_ID = 'e3c3d544-3023-4725-bc7a-cbe78b35d36c';
 
+  // Height the fixed nav occupies. Anything scrolled to programmatically stops this far short
+  // so the section header clears the bar instead of hiding behind it. Kept in step with the
+  // scroll-margin-top rule in the stylesheet.
+  NAV_OFFSET = 84;
+
+  // Shareable section links. The two canonical ones are #calculator and #demo; the rest are
+  // aliases, because these URLs are typed into cold emails, DMs and call notes from memory and
+  // a near miss should still land the visitor in the right place rather than at the top of the
+  // page. Keys are lowercase and matched after the leading '#' is stripped.
+  SECTION_ALIASES = {
+    calculator: 'calculator', calc: 'calculator', arr: 'calculator', roi: 'calculator',
+    math: 'calculator', 'arr-calculator': 'calculator', 'loss-calculator': 'calculator',
+    'revenue-calculator': 'calculator', 'lost-revenue': 'calculator',
+    demo: 'demo', try: 'demo', test: 'demo', toothy: 'demo', denty: 'demo',
+    'live-demo': 'demo', 'try-it': 'demo', '60-seconds': 'demo'
+  };
+
   componentDidMount() {
     this._timers = [];
     this.initAnalytics();
@@ -1652,6 +1687,12 @@ class Component extends DCLogic {
     // Handle for the automated voice-call tests, which drive the real component rather than a
     // re-implementation of it. Harmless in production: it exposes no keys and no visitor data.
     try { window.__ddRoot = this; } catch (e) {}
+
+    // Deep links. Runs last, after the reveal and count-up observers are watching, so a visitor
+    // who lands mid-page gets the same entrance animations as one who scrolled there.
+    this.initDeepLink();
+    this._onHash = () => this.scrollToHash(location.hash, true);
+    window.addEventListener('hashchange', this._onHash);
 
     // The SDK is an ES module, so it may already be present or still loading. Cover both, and
     // build the client exactly once for the lifetime of the page (see initVapi).
@@ -2139,6 +2180,7 @@ class Component extends DCLogic {
     if (this._mq && this._mq.removeEventListener) this._mq.removeEventListener('change', this._onMq);
     [this._rio, this._cio, this._tio, this._hio, this._sio].forEach(o => o && o.disconnect());
     window.removeEventListener('scroll', this._onDepth);
+    window.removeEventListener('hashchange', this._onHash);
     window.removeEventListener('pagehide', this._onLeave);
     if (this._lpRaf) cancelAnimationFrame(this._lpRaf);
     if (this._lpCard) this._lpCard.remove();
@@ -2222,7 +2264,41 @@ class Component extends DCLogic {
 
   scrollToEl(id) {
     const el = document.getElementById(id);
-    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 20, behavior: this._reduced ? 'auto' : 'smooth' });
+    if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - this.NAV_OFFSET), behavior: this._reduced ? 'auto' : 'smooth' });
+  }
+
+  // Resolve a hash to a section and scroll to it. Returns the id it landed on, or false.
+  // Spelling is forgiving on purpose: these links get retyped by hand into emails and DMs.
+  scrollToHash(hash, smooth) {
+    let raw;
+    try { raw = decodeURIComponent(String(hash || '')).replace(/^#/, '').trim().toLowerCase(); }
+    catch (e) { raw = String(hash || '').replace(/^#/, '').trim().toLowerCase(); }
+    if (!raw) return false;
+    const id = this.SECTION_ALIASES[raw] || raw;
+    const el = document.getElementById(id);
+    if (!el) return false;
+    const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - this.NAV_OFFSET);
+    // 'auto' would defer to html{scroll-behavior:smooth} and animate the whole page on
+    // arrival, which is disorienting. 'instant' is the only value that really means instant.
+    window.scrollTo({ top, behavior: smooth && !this._reduced ? 'smooth' : 'instant' });
+    return id;
+  }
+
+  // Arriving on a deep link. The page renders client-side, so by the time the runtime mounts
+  // the browser has already made its own anchor jump against markup that no longer exists —
+  // the visitor lands at the top of the page with the hash still in the address bar. Resolving
+  // the hash here is what makes a shared #calculator or #demo link actually open in that
+  // section. A second pass 600ms later corrects for the layout shift as fonts, the founder
+  // portrait and the dashboard images settle, and is abandoned the moment the visitor scrolls
+  // so it can never yank the page out from under them.
+  initDeepLink() {
+    const id = this.scrollToHash(location.hash, false);
+    if (!id) return;
+    this.track('deep_link', { target: id });
+    let moved = false;
+    const cancel = () => { moved = true; };
+    ['wheel', 'touchstart', 'keydown'].forEach(ev => window.addEventListener(ev, cancel, { once: true, passive: true }));
+    this._timers.push(setTimeout(() => { if (!moved) this.scrollToHash(location.hash, false); }, 600));
   }
 
   // ---- Demo call ----

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-page="home">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- ===================== SEO / crawler-facing head =====================
-     These live in the static head, NOT in the helmet block: the page renders
+     These live in the static head, NOT in a helmet block: the page renders
      client-side, so anything inside the x-dc element is invisible to crawlers
      that don't execute JavaScript. Keep canonical SEO tags here.
      NOTE: never write the x-dc or helmet tag names in angle brackets anywhere
@@ -15,18 +15,6 @@
 <title>AI Receptionist for Dental Practices | Digi Dental</title>
 <meta name="description" content="A 24/7 AI receptionist that answers your dental practice's calls and books patients straight into your calendar. Set up entirely for you. $2,000 one-time. Live in days.">
 <link rel="canonical" href="https://www.digidental.us/">
-
-<!-- Bing Webmaster Tools verification. Paste the code Bing gives you between the quotes and
-     uncomment. Left commented rather than empty on purpose: a meta tag with an empty content
-     attribute is a verification attempt that fails, and Bing will keep reporting the site as
-     unverified without saying why.
-<meta name="msvalidate.01" content="PASTE_YOUR_BING_CODE_HERE">
--->
-<!-- Google Search Console: verify by DNS TXT instead (see README) — a domain property covers
-     the apex, www and every subdomain at once, and survives changes to this file. -->
-
-<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 
 <link rel="alternate" hreflang="en" href="https://www.digidental.us/">
 <link rel="alternate" hreflang="x-default" href="https://www.digidental.us/">
@@ -48,6 +36,18 @@
 <meta name="twitter:image" content="https://www.digidental.us/og-image.png">
 <meta name="twitter:image:alt" content="Digi Dental: AI receptionist for dental practices.">
 
+<!-- Bing Webmaster Tools verification. Paste the code Bing gives you between the quotes and
+     uncomment. Left commented rather than empty on purpose: a meta tag with an empty content
+     attribute is a verification attempt that fails, and Bing will keep reporting the site as
+     unverified without saying why.
+<meta name="msvalidate.01" content="PASTE_YOUR_BING_CODE_HERE">
+-->
+<!-- Google Search Console: verify by DNS TXT instead (see README) — a domain property covers
+     the apex, www and every subdomain at once, and survives changes to this file. -->
+
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
 <meta name="theme-color" content="#0A1A2F">
 <meta name="author" content="Digi Dental">
 
@@ -62,34 +62,12 @@
 <link rel="alternate" type="application/json" href="/api/site-info" title="Digi Dental site info (JSON)">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 
-<style>
-/* ============ Pre-JS view: what non-rendering crawlers actually read ============
-   Googlebot executes JavaScript. GPTBot, ClaudeBot and PerplexityBot largely do not —
-   they read the HTML as served. The dc-runtime keeps its content as real markup, so the
-   copy IS in the raw file, but two things pollute it before the runtime takes over:
-
-     1. <sc-if> is a directive, not a conditional at the HTML level. With no JS, EVERY
-        branch renders — so the error-boundary markup ("A momentary hiccup. This page had
-        trouble rendering.") was the first thing an AI crawler read on the page.
-     2. Unresolved {{ holes }} render as literal text, dropping 17 fragments of template
-        syntax into the extracted copy.
-
-   Both rules below are scoped to `x-dc` / `sc-if`, which the runtime REMOVES from the DOM
-   once it mounts. So these selectors can only ever match before hydration: they are
-   inert for anyone running JavaScript, and no rule here affects the rendered site. */
-
-/* The error boundary is not the page. Hide it until the runtime is driving. */
-x-dc sc-if[value*="crashed"] { display: none !important; }
-
-/* Dynamic values — call widget, calculator output, demo status, form state. Never
-   marketing copy, so hiding them costs a crawler nothing and removes the noise. */
-x-dc [data-dyn] { display: none !important; }
-
-/* Loop bodies are templates, not content: with no JS they render once with {{ f.q }}
-   style holes intact. The FAQ they stand in for is mirrored in <noscript> below, so
-   nothing is lost by hiding the unrendered template. */
-x-dc sc-for { display: none !important; }
-</style>
+<!-- Fonts and the site stylesheet load from the static head rather than the runtime's
+     helmet: they are render-blocking here, which is what the pre-hydration rules at the
+     bottom of dd.css need in order to be in force during the raw-HTML pass. -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/dd.css">
 
 <script type="application/ld+json">
 {
@@ -176,24 +154,30 @@ x-dc sc-for { display: none !important; }
       },
       "inLanguage": "en",
       "datePublished": "2026-07-18",
-      "dateModified": "2026-08-10",
+      "dateModified": "2026-08-18",
       "video": [
         {
           "@id": "https://www.digidental.us/#video-overview"
-        },
-        {
-          "@id": "https://www.digidental.us/#video-demo"
         }
       ],
       "speakable": {
         "@type": "SpeakableSpecification",
         "cssSelector": [
           "h1",
-          "[data-section=\"problem\"] h2"
+          "[data-section=\"cost\"] h2"
         ]
       },
+      "citation": {
+        "@id": "https://medium.com/@bennyco/the-real-cost-of-a-missed-call-at-your-dental-practice-and-why-voicemail-isnt-fixing-it-5ae0fdf3ac39"
+      },
       "significantLink": [
+        "https://www.digidental.us/how-it-works/",
         "https://calendly.com/digidental/digi-dental-inquiry"
+      ],
+      "relatedLink": [
+        "https://www.digidental.us/how-it-works/#demo",
+        "https://www.digidental.us/how-it-works/#pricing",
+        "https://www.digidental.us/how-it-works/#faq"
       ]
     },
     {
@@ -264,127 +248,17 @@ x-dc sc-for { display: none !important; }
       },
       "availableChannel": {
         "@type": "ServiceChannel",
-        "serviceUrl": "https://www.digidental.us/",
+        "serviceUrl": "https://www.digidental.us/how-it-works/",
         "servicePhone": {
           "@type": "ContactPoint",
           "telephone": "+351912859130",
           "contactType": "sales"
         }
       },
-      "termsOfService": "https://www.digidental.us/#terms"
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://www.digidental.us/#faq",
-      "isPartOf": {
-        "@id": "https://www.digidental.us/#webpage"
+      "subjectOf": {
+        "@id": "https://medium.com/@bennyco/the-real-cost-of-a-missed-call-at-your-dental-practice-and-why-voicemail-isnt-fixing-it-5ae0fdf3ac39"
       },
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Is this HIPAA-compliant?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We'll walk you through exactly how data flows on your strategy call, and we're happy to sign a BAA with the voice platform if your practice requires one."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Will patients know it's AI?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Some ask. The voice is natural enough that most don't. It never pretends to be human when asked directly. It says it's the practice's automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What does usage roughly cost monthly?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us, and nothing else is billed monthly unless you choose a care plan."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What if it mishears something, or books the wrong details?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "It confirms every detail that matters. Name, phone number, and appointment time are read back to the caller before anything is booked. If a caller needs something outside its script, it takes a message and flags it for your staff instead of guessing. And when something does slip through, it slips through where you can see it: the appointment sits in your calendar like any other, so your team fixes it in seconds and we tune the script so it doesn't happen twice."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How is this different from an answering service?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list, and every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Does it replace my front desk?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. It catches what they physically can't: after-hours calls, lunch rushes, the second line while they're checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Will this work with Dentrix, Eaglesoft or Open Dental?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes. That is the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn't, Denty still books into a calendar your team already lives in."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How fast is go-live?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Contracts, cancellation, and data?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No long-term contract. The setup fee is one-time, and care plans cancel anytime: the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don't receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we'll have it in place before a single patient call is answered. Ask us to delete anything you've given us and it's deleted."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How much does an AI receptionist for a dental practice cost?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Setup is $2,000, one time. That covers the voice AI configured to your practice, your calendar, call scripting for your services and insurance list, testing and go-live. You can split it: $1,000 up front and the remaining $1,000 only once a real patient is booked into your calendar within 14 days of go-live — if that doesn't happen, you don't owe it. After that the only running cost is voice usage on your own platform account, billed at cost, typically $0.10–$0.15 per minute of live conversation, which lands most practices between $60 and $150 a month. Ongoing care plans are optional at $149 or $299 a month and cancel anytime."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can it answer calls after hours, at lunch, and on weekends?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "That is the entire point. A practice answering phones roughly 40 hours a week is unreachable for the other 128, and the calls that land in those hours are the ones your marketing already paid for. It answers on the first ring at 7 PM, on Saturday, over lunch, and on the second line while your front desk is checking a patient in. There is no separate after-hours mode to switch on: it is the same receptionist, all 168 hours."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What happens if a patient calls with a dental emergency?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "It follows the rules you set, and it does not make clinical judgements. You tell us what counts as urgent for your practice and what should happen: route the caller to your on-call number, give them your emergency instructions, book them into the first available slot, or take the details and flag them immediately. Anything outside the script gets escalated rather than guessed at, and every call is transcribed and logged so your team sees exactly what was said."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can it handle multiple callers at the same time?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Several callers can be on the line at once and each one is answered on the first ring — no hold queue, no busy signal, no voicemail. This is the part a single receptionist physically cannot do: when a campaign lands or a Monday morning rush hits, the third and fourth callers get the same answer as the first."
-          }
-        }
-      ]
+      "termsOfService": "https://www.digidental.us/how-it-works/#terms"
     },
     {
       "@type": "Person",
@@ -398,8 +272,31 @@ x-dc sc-for { display: none !important; }
       "image": "https://www.digidental.us/api/image?name=profile",
       "sameAs": [
         "https://www.linkedin.com/in/ceobenny/",
-        "https://bennys-portfolio.vercel.app/"
+        "https://bennys-portfolio.vercel.app/",
+        "https://medium.com/@bennyco"
       ]
+    },
+    {
+      "@type": "Article",
+      "@id": "https://medium.com/@bennyco/the-real-cost-of-a-missed-call-at-your-dental-practice-and-why-voicemail-isnt-fixing-it-5ae0fdf3ac39",
+      "url": "https://medium.com/@bennyco/the-real-cost-of-a-missed-call-at-your-dental-practice-and-why-voicemail-isnt-fixing-it-5ae0fdf3ac39",
+      "mainEntityOfPage": "https://medium.com/@bennyco/the-real-cost-of-a-missed-call-at-your-dental-practice-and-why-voicemail-isnt-fixing-it-5ae0fdf3ac39",
+      "headline": "The Real Cost of a Missed Call at Your Dental Practice (And Why Voicemail Isn't Fixing It)",
+      "name": "The Real Cost of a Missed Call at Your Dental Practice (And Why Voicemail Isn't Fixing It)",
+      "description": "A case study on what unanswered calls cost a dental practice: why a missed implant, Invisalign or sedation enquiry is a $3,000–$5,000 decision rather than a $150 scheduling problem, what a review of the top-ranked practices in one metro showed about after-hours coverage, and why a next-morning voicemail callback arrives after the patient has booked elsewhere.",
+      "datePublished": "2026-08-12",
+      "inLanguage": "en",
+      "isAccessibleForFree": true,
+      "author": {
+        "@id": "https://www.digidental.us/#founder"
+      },
+      "publisher": {
+        "@id": "https://www.digidental.us/#organization"
+      },
+      "about": {
+        "@id": "https://www.digidental.us/#service"
+      },
+      "keywords": "missed calls, dental practice, AI receptionist, after-hours phone coverage, voicemail, patient lifetime value"
     },
     {
       "@type": "VideoObject",
@@ -424,28 +321,6 @@ x-dc sc-for { display: none !important; }
       }
     },
     {
-      "@type": "VideoObject",
-      "@id": "https://www.digidental.us/#video-demo",
-      "name": "Denty booking a patient appointment live on a call",
-      "description": "A recorded call showing the Digi Dental AI receptionist, Denty, greeting a caller, answering questions and booking an appointment end to end.",
-      "thumbnailUrl": [
-        "https://www.digidental.us/og-image.png"
-      ],
-      "uploadDate": "2026-08-06",
-      "contentUrl": "https://www.digidental.us/api/video?clip=demo",
-      "embedUrl": "https://www.digidental.us/api/video?clip=demo",
-      "width": 1080,
-      "height": 1920,
-      "isFamilyFriendly": true,
-      "inLanguage": "en",
-      "publisher": {
-        "@id": "https://www.digidental.us/#organization"
-      },
-      "isPartOf": {
-        "@id": "https://www.digidental.us/#webpage"
-      }
-    },
-    {
       "@type": "ImageObject",
       "@id": "https://www.digidental.us/#logo",
       "url": "https://www.digidental.us/apple-touch-icon.png",
@@ -458,179 +333,16 @@ x-dc sc-for { display: none !important; }
 </script>
 <!-- =================== end SEO / crawler-facing head =================== -->
 
-<script src="./support.js"></script>
+<script src="/support.js"></script>
+<script src="/dd-logic.js"></script>
 </head>
 <body>
 <x-dc>
-<helmet>
-<!-- Title, description, OG/Twitter, canonical, hreflang and JSON-LD now live in the
-     static head so crawlers see them without running JS. Do not re-add them here:
-     this block is injected client-side and would duplicate those tags. -->
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
-<!-- Voice demo SDK.
-     Was: cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest — an UNPINNED build of a wrapper repo.
-     `@latest` means every page load takes whatever upstream published last, so the call path can
-     change without a deploy on our side. That is exactly how working calls turned into
-     `error-assistant-did-not-receive-customer-audio` with no commit to blame.
-     Now: the official SDK, pinned to an exact version, whose start(assistantId) is documented and
-     returns a Promise we can actually handle. Update the version deliberately, never implicitly. -->
-<script type="module">
-  import Vapi from 'https://cdn.jsdelivr.net/npm/@vapi-ai/web@2.6.1/+esm';
-  window.DentyVapiCtor = Vapi;
-  window.dispatchEvent(new Event('denty-vapi-ready'));
-</script>
-<style>
-#vapi-support-btn,#vapi-btn{display:none !important}
-html{scroll-behavior:smooth}
-body{margin:0;background:#FAF9F6;color:#0A1A2F;font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
-a{color:#0F8B80;text-decoration:none}
-a:hover{color:#0B6E66;text-decoration:underline}
-input,select,button,textarea{font-family:inherit}
-@keyframes toothy-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-@keyframes toothy-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.12)}}
-@keyframes dd-bar{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
-@keyframes dd-pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes dd-fadeup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes dd-pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
-@keyframes dd-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
-@keyframes dd-shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
-.dd-navlink{display:none}
-.dd-navdemo{display:none}
-@media (min-width:600px){.dd-navdemo{display:inline-flex}}
-@media (min-width:860px){.dd-navlink{display:inline}}
-/* ===== Desktop layout =====================================================
-   The page was authored mobile-first and kept mobile's narrow column on large
-   screens. Every rule here is additive and gated behind a min-width query, so
-   the mobile rendering below 900px is byte-for-byte what it was. */
-.dd-wrap{width:100%;max-width:1180px;margin:0 auto}
-@media (min-width:1440px){.dd-wrap{max-width:1300px}}
-.dd-hero{display:flex;flex-direction:column;align-items:center;gap:72px;width:100%}
-.dd-hero-copy{display:flex;flex-direction:column;align-items:center;gap:28px;max-width:820px}
-.dd-hero-demo{width:min(720px,94vw);min-height:230px}
-.dd-hero-links{justify-content:center}
-@media (min-width:1024px){
-  .dd-hero{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,0.98fr);align-items:center;gap:clamp(40px,5vw,80px);text-align:left}
-  .dd-hero-copy{align-items:flex-start;max-width:none}
-  .dd-hero-copy h1,.dd-hero-copy p{text-align:left}
-  .dd-hero-cta{align-items:flex-start !important}
-  .dd-hero-links{justify-content:flex-start}
-  .dd-hero-demo{width:100%;justify-self:end}
-}
-/* The four cost statistics stay in the original 2x2 block. Four across read as a thin
-   ribbon of percentages on a wide screen; capping the grid keeps the pairs balanced. */
-.dd-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:110px clamp(48px,7vw,120px);align-items:start;max-width:1060px;margin:0 auto;width:100%}
-.dd-split{display:flex;flex-direction:column;gap:40px;width:100%;align-items:center}
-@media (min-width:980px){
-  .dd-split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,0.85fr);align-items:center;gap:clamp(40px,5vw,72px)}
-  .dd-split>*{width:100%}
-  .dd-split-side{text-align:left}
-  .dd-split-side .dd-center{align-items:flex-start;text-align:left}
-}
-/* Founder card: square portrait with the note overlapping it on desktop. */
-.dd-founder{display:flex;flex-direction:column;align-items:stretch;gap:0}
-/* ---- Dashboard accordion -------------------------------------------------
-   One panel open, the rest collapsed to a vertical labelled rail. Mobile stacks them
-   full-width, because a 60px rail on a phone is a nuisance rather than a feature.
-   `--ar` is written per panel from the image's natural size once it loads, so the frame
-   always matches the real screenshot and never crops it. */
-.dd-dash{display:flex;flex-direction:column;gap:14px;margin-top:38px}
-.dd-dash-panel{
-  position:relative;display:block;width:100%;text-align:left;padding:0;
-  background:#FFFFFF;border:1px solid #E8E4DA;border-radius:18px;overflow:hidden;
-  cursor:pointer;font:inherit;color:inherit;
-  box-shadow:0 10px 30px rgba(10,26,47,0.06);
-  transition:border-color .3s ease, box-shadow .3s ease;
-}
-.dd-dash-panel:hover,.dd-dash-panel[aria-selected="true"]{border-color:#0F8B80;box-shadow:0 16px 40px rgba(10,26,47,0.12)}
-.dd-dash-panel:focus-visible{outline:2px solid #0F8B80;outline-offset:3px}
-
-/* Mobile: a vertical accordion. The rail is the always-visible header you tap; the body
-   below it opens. 0fr -> 1fr animates to the content's real height, which plain `height`
-   cannot do and `max-height` only fakes (a guessed ceiling makes the easing arrive early
-   and stutter). Same duration and curve as the desktop width transition. */
-.dd-dash-rail{
-  display:flex;align-items:center;justify-content:space-between;gap:14px;
-  padding:18px 20px;text-align:left;
-  font-size:15px;font-weight:600;letter-spacing:0.01em;color:#0A1A2F
-}
-.dd-dash-rail::after{
-  content:'';flex:0 0 auto;width:10px;height:10px;margin-right:4px;
-  border-right:2px solid #0F8B80;border-bottom:2px solid #0F8B80;
-  transform:rotate(45deg) translateY(-3px);
-  transition:transform .55s cubic-bezier(.22,1,.36,1)
-}
-.dd-dash-panel[aria-selected="true"] .dd-dash-rail::after{transform:rotate(-135deg) translateY(2px)}
-.dd-dash-body{
-  display:grid;grid-template-rows:0fr;
-  transition:grid-template-rows .55s cubic-bezier(.22,1,.36,1)
-}
-.dd-dash-panel[aria-selected="true"] .dd-dash-body{grid-template-rows:1fr}
-.dd-dash-inner{display:block;overflow:hidden;min-height:0}
-.dd-dash-frame{display:block;background:#0A1A2F;position:relative}
-.dd-dash-bar{display:flex;gap:6px;align-items:center;padding:10px 14px;background:#12263F;border-bottom:1px solid #22344E}
-.dd-dash-bar i{width:9px;height:9px;border-radius:50%;background:#3D4F66;display:block}
-.dd-dash-scroll{
-  display:block;width:100%;
-  /* Cap the visible height so a 5000px capture does not become the whole page, and let the
-     rest scroll inside the frame. The image is never scaled to fit or cropped. */
-  max-height:min(70vh,560px);overflow-y:auto;overflow-x:hidden;background:#0A1A2F;
-  -webkit-overflow-scrolling:touch;scrollbar-width:thin
-}
-.dd-dash-scroll img{display:block;width:100%;height:auto;border:0;
-  /* Reserve space before the bytes arrive, or the frame is 0px tall and the whole
-     section jumps when each capture loads. sizeDash() overwrites --ar with the real
-     ratio on load, so the placeholder is only ever wrong for one frame. */
-  aspect-ratio:var(--ar,16/10)}
-.dd-dash-cap{display:block;padding:16px 20px;background:#FFFFFF}
-.dd-dash-cap strong{display:block;font-size:16px;color:#0A1A2F;font-weight:600;margin-bottom:4px}
-.dd-dash-cap span{display:block;font-size:14px;line-height:1.6;color:#4A5C72}
-
-@media (min-width:1000px){
-  /* Desktop: the accordion proper. Collapsed panels shrink to a rail with a rotated label. */
-  .dd-dash{flex-direction:row;align-items:stretch;gap:12px;height:600px}
-  .dd-dash-panel{width:74px;flex:0 0 auto;transition:width .55s cubic-bezier(.22,1,.36,1),border-color .3s ease,box-shadow .3s ease}
-  .dd-dash-panel[aria-selected="true"]{width:100%;flex:1 1 auto}
-  /* Desktop animates width, not height: hand the body back to normal flow so the grid
-     transition above cannot fight the width transition. */
-  .dd-dash-body{display:block;grid-template-rows:none;transition:none}
-  .dd-dash-inner{overflow:visible}
-  .dd-dash-panel .dd-dash-frame,
-  .dd-dash-panel .dd-dash-cap{opacity:0;transition:opacity .3s ease .1s;pointer-events:none}
-  .dd-dash-panel[aria-selected="true"] .dd-dash-frame,
-  .dd-dash-panel[aria-selected="true"] .dd-dash-cap{opacity:1;pointer-events:auto}
-  .dd-dash-panel[aria-selected="true"] .dd-dash-rail{display:none}
-  .dd-dash-rail{
-    position:absolute;inset:0;padding:0;
-    writing-mode:vertical-rl;transform:rotate(180deg);
-    display:flex;align-items:center;justify-content:center;
-    font-size:14px;font-weight:600;letter-spacing:0.04em;color:#4A5C72;white-space:nowrap
-  }
-  .dd-dash-rail::after{display:none}
-  .dd-dash-scroll{max-height:496px}
-}
-@media (prefers-reduced-motion:reduce){
-  .dd-dash-panel,.dd-dash-body,.dd-dash-rail::after{transition:none}
-}
-.dd-founder-photo{width:100%;aspect-ratio:1;border-radius:24px;overflow:hidden;background:#12263F;flex-shrink:0}
-.dd-founder-photo img{width:100%;height:100%;object-fit:cover;display:block}
-.dd-founder-card{background:#FAF9F6;color:#0A1A2F;border-radius:24px;padding:clamp(24px,4vw,34px);box-shadow:0 30px 70px rgba(0,0,0,0.45);margin-top:-40px;position:relative;z-index:2}
-@media (min-width:900px){
-  .dd-founder{display:flex;flex-direction:row;align-items:center;gap:0}
-  .dd-founder-photo{width:min(420px,42%);aspect-ratio:1}
-  .dd-founder-card{margin-top:0;margin-left:-72px;flex:1;min-width:0;padding:clamp(28px,3vw,40px)}
-}
-button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic-bezier(.4,0,.2,1),transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s cubic-bezier(.22,1,.36,1),border-color .25s cubic-bezier(.4,0,.2,1)}
-:focus-visible{outline:2px solid #0F8B80;outline-offset:2px;border-radius:4px}
-@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}html{scroll-behavior:auto}}
-</style>
-</helmet>
-
 <!-- ================= CRASH FALLBACK (error boundary) ================= -->
 <sc-if value="{{ crashed }}" hint-placeholder-val="{{ false }}">
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF9F6;padding:24px">
     <div role="alert" style="max-width:420px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px">
-      <img src="uploads/denty_happy.png" alt="" width="88" height="88" loading="lazy" decoding="async" style="image-rendering:pixelated;object-fit:contain">
+      <img src="/uploads/denty_happy.png" alt="" width="88" height="88" loading="lazy" decoding="async" style="image-rendering:pixelated;object-fit:contain">
       <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:600;color:#0A1A2F;letter-spacing:-0.02em">A momentary hiccup.</div>
       <p style="font-size:15px;line-height:1.65;color:#3D4F66;margin:0;text-wrap:pretty">This page had trouble rendering. A quick reload fixes it. Nothing you entered is lost.</p>
       <button onClick="{{ reloadPage }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:14px 30px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Reload the page</button>
@@ -639,22 +351,44 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   </div>
 </sc-if>
 <sc-if value="{{ appOk }}" hint-placeholder-val="{{ true }}">
-<!-- ================= NAV ================= -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(16px,4vw,32px);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:{{ navBg }};transition:background .35s ease">
-  <div style="display:flex;align-items:center;gap:10px">
-    <img src="uploads/denty_neutral.png" alt="" width="34" height="34" decoding="async" fetchpriority="high" style="display:block;width:34px;height:34px;object-fit:contain;image-rendering:pixelated">
-    <div style="font-family:'Fraunces',serif;font-weight:600;font-size:21px;letter-spacing:-0.02em;line-height:1;white-space:nowrap;color:{{ navFg }};transition:color .35s ease">Digi<span style="color:#0F8B80"> Dental</span></div>
-  </div>
-  <div style="display:flex;align-items:center;gap:clamp(12px,2.2vw,24px)">
-    <a href="#demo" onClick="{{ navDemo }}" data-cta="nav_demo" class="dd-navdemo" style="align-items:center;gap:9px;font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap;text-decoration:none;padding:7px 16px 7px 8px;border:1.5px solid rgba(15,139,128,0.45);border-radius:999px;background:rgba(15,139,128,0.08);transition:background-color .25s,border-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:rgba(15,139,128,0.16);border-color:#0F8B80;color:#0F8B80;text-decoration:none;transform:translateY(-1px)">
-      <span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#0F8B80;flex-shrink:0">
-        <svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M8 4.13a1 1 0 0 1 0 1.74L1.5 9.4A1 1 0 0 1 0 8.53V1.47A1 1 0 0 1 1.5.6L8 4.13Z" fill="#FAF9F6"></path></svg>
-      </span>Hear the demo</a>
-    <a href="#pricing" class="dd-navlink" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">Pricing</a>
-    <a href="#faq" class="dd-navlink" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">FAQ</a>
-    <button onClick="{{ openBookingNav }}" data-cta="nav" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
+<!-- ================= NAV =================
+     Identical markup on both pages, driven by vals that know which page they are on:
+     navBg/navFg handle cream-vs-navy, navCurHome/navCurDeep set aria-current, and the
+     panel below 900px carries the links the bar cannot fit. -->
+<nav aria-label="Primary" style="position:fixed;top:0;left:0;right:0;z-index:50;height:66px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 clamp(16px,4vw,32px);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:{{ navBg }};transition:background .35s ease">
+  <a href="/" onClick="{{ closeNav }}" aria-current="{{ navCurHome }}" aria-label="Digi Dental, home" style="display:flex;align-items:center;gap:10px;text-decoration:none" style-hover="text-decoration:none">
+    <img src="/uploads/denty_neutral.png" alt="" width="34" height="34" decoding="async" fetchpriority="high" style="display:block;width:34px;height:34px;object-fit:contain;image-rendering:pixelated">
+    <span class="dd-navmark" style="color:{{ navFg }}">Digi<span style="color:#0F8B80"> Dental</span></span>
+  </a>
+  <div style="display:flex;align-items:center;gap:clamp(10px,2vw,20px)">
+    <div class="dd-navdesk">
+      <a href="/how-it-works/" aria-current="{{ navCurDeep }}" style="font-size:14px;white-space:nowrap;color:{{ navFg }};transition:color .35s ease">How it works</a>
+      <a href="/how-it-works/#pricing" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">Pricing</a>
+      <a href="/how-it-works/#faq" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">FAQ</a>
+      <a href="/how-it-works/#demo" onClick="{{ navDemo }}" data-cta="nav_demo" style="display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap;text-decoration:none;padding:7px 16px 7px 8px;border:1.5px solid rgba(15,139,128,0.45);border-radius:999px;background:rgba(15,139,128,0.08);transition:background-color .25s,border-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:rgba(15,139,128,0.16);border-color:#0F8B80;color:#0F8B80;text-decoration:none;transform:translateY(-1px)">
+        <span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#0F8B80;flex-shrink:0">
+          <svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M8 4.13a1 1 0 0 1 0 1.74L1.5 9.4A1 1 0 0 1 0 8.53V1.47A1 1 0 0 1 1.5.6L8 4.13Z" fill="#FAF9F6"></path></svg>
+        </span>Hear the demo</a>
+    </div>
+    <!-- The label shortens below 900px. "Book a Strategy Call" plus a wordmark plus a menu
+         control does not fit a 360px bar, and the casualty was always the menu control,
+         pushed off the right edge. Shortening the label is cheaper than losing either. -->
+    <button onClick="{{ openBookingNav }}" data-cta="nav" class="dd-navcta" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)"><span class="dd-navcta-full">Book a Strategy Call</span><span class="dd-navcta-min">Book a call</span></button>
+    <button class="dd-navburger" onClick="{{ toggleNav }}" aria-expanded="{{ navOpen }}" aria-controls="dd-nav-panel" aria-label="{{ navToggleLabel }}">
+      <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true"><path d="M1 1h18M1 7h18M1 13h18" stroke="{{ navFg }}" stroke-width="2" stroke-linecap="round"></path></svg>
+    </button>
   </div>
 </nav>
+<sc-if value="{{ navOpen }}" hint-placeholder-val="{{ false }}">
+  <div id="dd-nav-panel" class="dd-navpanel">
+    <a href="/" onClick="{{ closeNav }}" aria-current="{{ navCurHome }}">Home</a>
+    <a href="/how-it-works/" onClick="{{ closeNav }}" aria-current="{{ navCurDeep }}">How it works</a>
+    <a href="/how-it-works/#demo" onClick="{{ navDemoMenu }}" data-cta="nav_menu_demo">Hear the 60-second demo</a>
+    <a href="/how-it-works/#pricing" onClick="{{ closeNav }}">Pricing</a>
+    <a href="/how-it-works/#faq" onClick="{{ closeNav }}">FAQ</a>
+    <a href="{{ caseStudyUrl }}" target="_blank" rel="noopener" onClick="{{ closeNav }}">Case study on Medium</a>
+  </div>
+</sc-if>
 
 <main>
 <!-- ================= HERO ================= -->
@@ -669,10 +403,14 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <p style="font-size:17px;line-height:1.65;color:#3D4F66;max-width:740px;margin:0;text-wrap:pretty">A 24/7 human-sounding AI receptionist that answers every call and writes appointments straight into your calendar, set up entirely for you.</p>
     <div class="dd-hero-cta" style="display:flex;flex-direction:column;align-items:center;gap:14px">
       <button onClick="{{ openBookingHero }}" data-cta="hero" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(10,26,47,0.2)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
-      <button onClick="{{ scrollToToothy }}" data-cta="hero_demo_button" aria-label="Hear the AI receptionist live, a 60 second demo" style="background:none;color:#0F8B80;border:1.5px solid #0F8B80;border-radius:12px;padding:16px 30px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;transition:background-color .25s,color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;color:#FAF9F6;transform:translateY(-2px)">Hear it live — 60-second demo</button>
+      <!-- A real link, not a button: the deep-dive page is where the demo now lives, and
+           the hero is the strongest place on the site to point a crawler at it. navDemo
+           still fires so the click is measured before the navigation. -->
+      <a href="/how-it-works/#demo" onClick="{{ navDemo }}" data-cta="hero_demo_button" aria-label="Hear the AI receptionist live, a 60 second demo" style="display:inline-block;background:none;color:#0F8B80;border:1.5px solid #0F8B80;border-radius:12px;padding:16px 30px;font-size:16px;font-weight:600;cursor:pointer;text-decoration:none;transition:background-color .25s,color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;color:#FAF9F6;text-decoration:none;transform:translateY(-2px)">Hear it live — 60-second demo</a>
       <div style="font-size:13px;color:#5A6E86;font-variant-numeric:tabular-nums;line-height:1.6;text-wrap:pretty">A free 20-minute call, no pressure. Start for $1,000 — the rest is due only once we book a real patient into your calendar within 14 days. If we don’t, you don’t owe it.</div>
       <div class="dd-hero-links" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px">
         <a href="https://wa.me/351912859130" target="_blank" rel="noopener" onClick="{{ trackWhatsappHero }}" data-cta="hero_whatsapp" style="font-size:15px;color:#0F8B80">Prefer to talk? WhatsApp us</a>
+        <a href="/how-it-works/" data-cta="hero_deep" style="font-size:15px;color:#0F8B80">Or read the full breakdown: demo, pricing, every objection</a>
       </div>
     </div>
   </div>
@@ -751,6 +489,13 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <div data-reveal="" style="text-align:center">
       <p style="font-size:20px;line-height:1.65;color:#0A1A2F;max-width:560px;margin:0 auto;font-variant-numeric:tabular-nums;text-wrap:pretty">Meanwhile, a full-time front desk hire runs <strong>$39,000–$54,000 a year</strong><sup style="font-size:0.55em"><a href="https://www.ziprecruiter.com" target="_blank" rel="noopener" data-linkpreview="https://www.ziprecruiter.com" title="Source: ZipRecruiter national average; Salary.com California" style="color:#5A6E86;text-decoration:none;padding:2px 4px">5</a></sup>, and covers 40 of the week's 168 hours.</p>
       <p style="font-size:17px;line-height:1.65;color:#3D4F66;max-width:560px;margin:22px auto 0;font-variant-numeric:tabular-nums;text-wrap:pretty">Most practices never hear another call ring out for <strong style="color:#0A1A2F">$2,000, once.</strong></p>
+      <!-- Our own long-form working of these numbers, published off-domain. Labelled as
+           ours, not as press: it is the founder's byline on Medium. -->
+      <a class="dd-cite" href="{{ caseStudyUrl }}" target="_blank" rel="noopener" onClick="{{ trackCaseStudy }}" data-cta="case_study_cost" style="max-width:640px;margin:56px auto 0;text-align:left">
+        <span class="dd-cite-kicker">Our case study · Medium</span>
+        <span class="dd-cite-title">The Real Cost of a Missed Call at Your Dental Practice (And Why Voicemail Isn't Fixing It)</span>
+        <span class="dd-cite-meta">The same arithmetic, worked call by call: why a missed implant enquiry is a $3,000–$5,000 decision rather than a $150 scheduling problem, what a review of the top-ranked practices in one metro turned up, and why a voicemail callback the next morning arrives after the patient has already booked. Written by Benny, founder.</span>
+      </a>
       <div id="sources" style="font-size:12px;line-height:1.8;color:#8A93A1;max-width:640px;margin:72px auto 0;text-align:left;border-top:1px solid #EEEAE0;padding-top:20px">
         1. Peerlogic 2026 study of 4,280 calls across 26 practices; corroborated by multiple industry analyses. &nbsp;
         2. Industry call-tracking data: Weave / Forbes Healthcare 2025; DenteMax. &nbsp;
@@ -832,6 +577,25 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
       </div>
     </div>
     </div>
+    <!-- Proof that the thing on the right-hand column actually exists. One capture from the
+         practice owner's own console; the four-panel tour is on /how-it-works/, because a
+         researcher wants to read all four and a first-time visitor wants one. -->
+    <div class="dd-proof" style="margin-top:24px">
+      <div class="dd-proof-shell">
+        <span class="dd-dash-frame" style="display:block;background:#0A1A2F;position:relative">
+          <span class="dd-dash-bar" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="dd-dash-scroll">
+            <img src="{{ proofSrc }}" alt="{{ proofAlt }}" loading="lazy" decoding="async" onLoad="{{ proofSized }}">
+          </span>
+        </span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;text-align:left;min-width:0">
+        <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#0F8B80;font-weight:600">What you actually get</div>
+        <h3 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.2;letter-spacing:-0.02em;margin:0;color:#0A1A2F;text-wrap:balance">Every call, in writing, in your own dashboard</h3>
+        <p style="font-size:16px;line-height:1.7;color:#4A5C72;margin:0;text-wrap:pretty">You are not handing your phone line to something you cannot see. Every call is recorded, transcribed and timed, and you can read any of them back. This is the real console, not a mock-up.</p>
+        <a href="/how-it-works/#dashboard" data-cta="before_after_dashboard" style="font-size:15px;font-weight:600;color:#0F8B80">See the full dashboard tour →</a>
+      </div>
+    </div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:24px;margin-top:16px">
       <div style="font-size:15px;color:#5A6E86">Set up entirely by us. Live in days.</div>
       <button onClick="{{ openBookingSection }}" data-cta="before_after" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
@@ -842,7 +606,7 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
 <!-- ================= 5. THE MATH ================= -->
 <section data-section="calculator" style="background:#FAF9F6;padding:160px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
   <div data-reveal="" style="width:100%;max-width:1080px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
-    <img src="uploads/denty_happy.png" alt="" width="72" height="72" loading="lazy" decoding="async" style="width:72px;height:72px;object-fit:contain;image-rendering:pixelated;animation:toothy-bob 2.6s ease-in-out infinite">
+    <img src="/uploads/denty_happy.png" alt="" width="72" height="72" loading="lazy" decoding="async" style="width:72px;height:72px;object-fit:contain;image-rendering:pixelated;animation:toothy-bob 2.6s ease-in-out infinite">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-0.02em;margin:0">The math is short.</h2>
     <div class="dd-split">
     <div style="width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:28px;text-align:left;background:#FFFFFF;border:1px solid #E8E4DA;border-radius:16px;padding:clamp(22px,4vw,34px);box-shadow:0 18px 44px rgba(10,26,47,0.06)">
@@ -900,275 +664,21 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   </div>
 </section>
 
-<!-- ================= 6+7. TOOTHY — LIVE DEMO ================= -->
-<section id="demo" data-toothy="" data-section="demo" style="background:#0A1A2F;padding:160px clamp(20px,4vw,48px);color:#FAF9F6;border-top:1px solid #EEEAE0">
-  <div style="width:100%;max-width:900px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center">
-    <p style="font-family:'Fraunces',serif;font-size:clamp(1.8rem,4.2vw,2.7rem);line-height:1.4;margin:0;text-wrap:balance;color:#FAF9F6">“Don't take anyone's word for it. Talk to the receptionist yourself.”</p>
-    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.3rem,2.8vw,1.7rem);letter-spacing:-0.02em;margin:0;text-wrap:balance;color:#8A9BB5">Your phone rings. This answers it. Hear exactly what your patients will hear.</h2>
-    <!-- Speech bubble -->
-    <div style="min-height:64px;display:flex;align-items:flex-end;justify-content:center">
-      <sc-if value="{{ bubbleOn }}" hint-placeholder-val="{{ false }}">
-        <div role="status" style="background:#FAF9F6;color:#0A1A2F;border-radius:14px;padding:14px 20px;font-size:15px;line-height:1.5;max-width:380px;box-shadow:0 12px 32px rgba(0,0,0,0.35);animation:dd-fadeup .45s cubic-bezier(.22,1,.36,1) both" data-dyn="">{{ bubble }}</div>
-      </sc-if>
-    </div>
-    <!-- Toothy + countdown ring -->
-    <div style="position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center">
-      <sc-if value="{{ ringOn }}" hint-placeholder-val="{{ false }}">
-        <svg width="150" height="150" viewBox="0 0 150 150" style="position:absolute;inset:0;transform:rotate(-90deg)" aria-hidden="true">
-          <circle cx="75" cy="75" r="68" fill="none" stroke="#22344E" stroke-width="4"></circle>
-          <circle cx="75" cy="75" r="68" fill="none" stroke="{{ ringColor }}" stroke-width="4" stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="{{ ringOffset }}" style="transition:stroke-dashoffset 1s linear, stroke .4s"></circle>
-        </svg>
-      </sc-if>
-      <button onClick="{{ startDemo }}" disabled="{{ tBusy }}" aria-busy="{{ tBusy }}" aria-label="Talk to the AI receptionist. Free 60 second demo call" style="position:relative;width:100px;height:100px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
-        <img id="denty-sprite" src="uploads/denty_neutral.png" alt="Toothy, the Digi Dental AI receptionist mascot" width="100" height="100" loading="lazy" decoding="async" style="width:100px;height:100px;image-rendering:pixelated;display:block;object-fit:contain;position:absolute;inset:0">
-      </button>
-    </div>
-    <!-- Shown only when the browser refused the microphone. Generic "check your settings" is
-         useless, so the instructions name the actual control for the visitor's browser. -->
-    <sc-if value="{{ micBlocked }}" hint-placeholder-val="{{ false }}">
-      <div role="alert" style="background:rgba(179,48,12,0.12);border:1px solid rgba(240,134,90,0.5);color:#FAF9F6;border-radius:14px;padding:16px 18px;max-width:420px;margin-top:6px;text-align:left">
-        <div style="font-weight:600;margin-bottom:6px">Your microphone is blocked</div>
-        <div style="font-size:14px;line-height:1.55;color:#D8E2E2" data-dyn="">{{ micHelp }}</div>
-        <button onClick="{{ retryDemo }}" style="margin-top:12px;background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#0B6E66">Try again</button>
-      </div>
-    </sc-if>
-    <!-- Connected, but nothing is reaching the assistant. Better to say so than let them talk to
-         a dead input for the whole minute. -->
-    <sc-if value="{{ micWarn }}" hint-placeholder-val="{{ false }}">
-      <div role="status" style="background:rgba(138,90,6,0.16);border:1px solid rgba(224,177,85,0.5);color:#FAF9F6;border-radius:12px;padding:12px 16px;max-width:420px;margin-top:6px;font-size:14px;text-align:left">We can't hear you yet. Check that the right microphone is selected and not muted.</div>
-    </sc-if>
-    <sc-if value="{{ tLive }}" hint-placeholder-val="{{ false }}">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
-        <div style="display:flex;align-items:flex-end;gap:3px;height:28px" aria-hidden="true">
-          <sc-for list="{{ demoBars }}" as="bar" hint-placeholder-count="8">
-            <div style="width:4px;height:100%;border-radius:2px;background:#0F8B80;transform-origin:bottom;animation:dd-bar 0.8s ease-in-out infinite;animation-delay:{{ bar.delay }}"></div>
-          </sc-for>
-        </div>
-        <div style="font-size:15px;font-variant-numeric:tabular-nums;color:#B9C4D4" data-dyn="">{{ remaining }}s remaining</div>
-        <button onClick="{{ endDemo }}" style="background:none;border:none;color:#5A6E86;font-size:13px;cursor:pointer;text-decoration:underline">End the call</button>
-      </div>
-    </sc-if>
-    <sc-if value="{{ tEnded }}" hint-placeholder-val="{{ false }}">
-      <button onClick="{{ openBookingPostDemo }}" data-cta="post_demo" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:14px 30px;font-size:15px;font-weight:600;cursor:pointer;animation:dd-fadeup .5s cubic-bezier(.22,1,.36,1) both" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
-    </sc-if>
-    <div style="font-size:12px;color:#5A6E86;max-width:380px;line-height:1.6">Demo limited to 60 seconds. Audio is processed by our voice AI provider. <a href="#privacy" onClick="{{ openPrivacy }}" style="color:#8A9BB5">Privacy</a></div>
-  </div>
-
-  <!-- Proof + professionalism next to the mascot: the recording, and exactly how the
-       assistant is configured before it answers anything. -->
-  <div style="width:100%;max-width:1140px;margin:96px auto 0;border-top:1px solid #22344E;padding-top:72px;display:flex;flex-wrap:wrap;gap:clamp(32px,5vw,64px);align-items:center;justify-content:center">
-    <div style="flex:0 1 300px;display:flex;flex-direction:column;align-items:center;gap:14px">
-      <video data-clip="demo_recording" controls="controls" preload="metadata" playsInline="{{ true }}" src="/api/video?clip=demo" onPlay="{{ trackDemoVideo }}" style="width:min(300px,80vw);aspect-ratio:9/16;border-radius:16px;border:1px solid #22344E;background:#08131F;box-shadow:0 18px 44px rgba(0,0,0,0.35);display:block;object-fit:cover"></video>
-      <div style="font-size:13px;color:#8A9BB5;text-align:center;line-height:1.6;max-width:300px;text-wrap:pretty">A recorded call, start to finish: answered, questions handled, appointment booked.</div>
-    </div>
-    <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:18px;text-align:left">
-      <h3 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.2rem,2.6vw,1.5rem);letter-spacing:-0.02em;margin:0;color:#FAF9F6">What we configure before it answers a single call</h3>
-      <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;font-size:14.5px;line-height:1.6;color:#B9C4D4">
-        <li style="display:flex;gap:12px"><span aria-hidden="true" style="color:#0F8B80">•</span>Your services and your insurance list, answered in your own words, not a generic script.</li>
-        <li style="display:flex;gap:12px"><span aria-hidden="true" style="color:#0F8B80">•</span>Your calendar rules: which slots it can offer, how far ahead it may book, what it must never book.</li>
-        <li style="display:flex;gap:12px"><span aria-hidden="true" style="color:#0F8B80">•</span>Escalation: anything outside the script becomes a message flagged for your staff, never a guess.</li>
-        <li style="display:flex;gap:12px"><span aria-hidden="true" style="color:#0F8B80">•</span>Tested with you against real call scenarios before go-live. Nothing goes live that you haven't heard.</li>
-      </ul>
-    </div>
-  </div>
-    <!-- M-6: the three objections that stop a decision, answered where the decision is made
-         rather than only at the bottom of the page. Same source as the FAQ section. -->
-    <div style="max-width:720px;margin:36px auto 0;text-align:left">
-      <sc-for list="{{ faqTop }}" as="ft" hint-placeholder-count="3">
-        <details style="border-top:1px solid #22344E;padding:14px 0">
-          <summary style="cursor:pointer;font-size:15px;font-weight:600;color:#FAF9F6;list-style:none">{{ ft.q }}</summary>
-          <p style="margin:10px 0 0;font-size:14px;line-height:1.7;color:#B9C4D4">{{ ft.a }}</p>
-        </details>
-      </sc-for>
-    </div>
-</section>
-
-<!-- ================= 8. PRICING ================= -->
-<section id="pricing" data-section="pricing" style="background:#FAF9F6;padding:160px clamp(20px,4vw,48px)">
-  <div data-reveal="" style="width:100%;max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:48px">
-    <div style="text-align:center;display:flex;flex-direction:column;gap:12px;max-width:640px;margin:0 auto">
-      <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0">Simple pricing. No surprises.</h2>
-      <p style="font-size:15px;color:#5A6E86;margin:0;text-wrap:pretty">One setup fee. Usage billed at cost on your own account. Everything monthly is optional.</p>
-    </div>
-    <div ref="{{ tiltRef }}" onMouseMove="{{ tiltMove }}" onMouseLeave="{{ tiltLeave }}" style="position:relative;overflow:hidden;transform-style:preserve-3d;will-change:transform;background:#FFFFFF;border:1px solid #E8E4DA;border-radius:24px;padding:clamp(36px,5vw,56px);box-shadow:0 24px 60px rgba(10,26,47,0.1);display:flex;flex-direction:column;gap:32px">
-      <div style="display:flex;flex-wrap:wrap;gap:clamp(28px,4.5vw,60px);align-items:stretch">
-        <div style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:26px">
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8A93A1">Setup, done for you</div>
-            <div style="font-family:'Fraunces',serif;font-size:clamp(2.8rem,6vw,3.6rem);font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">$2,000</div>
-            <div style="font-size:15px;color:#5A6E86">one-time setup. Every practice starts here.</div>
-          </div>
-          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;font-size:15px;line-height:1.5;color:#3D4F66">
-            <li style="display:flex;gap:12px"><span style="color:#0F8B80">•</span>Voice AI configured to your practice</li>
-            <li style="display:flex;gap:12px"><span style="color:#0F8B80">•</span>Google Calendar setup included, appointments written directly</li>
-            <li style="display:flex;gap:12px"><span style="color:#0F8B80">•</span>Call scripting for your services and insurance FAQs</li>
-            <li style="display:flex;gap:12px"><span style="color:#0F8B80">•</span>Testing, tuning, and go-live</li>
-          </ul>
-          <div style="font-size:13px;color:#5A6E86;line-height:1.6;margin-top:auto;border-top:1px solid #EEEAE0;padding-top:16px">Voice-AI usage is billed at cost on your own account with our voice platform. Digi Dental takes no markup on usage.</div>
-        </div>
-        <div style="flex:1 1 300px;min-width:0;background:#FAF9F6;border:1px solid #EEEAE0;border-radius:16px;padding:clamp(24px,3.5vw,34px);display:flex;flex-direction:column;gap:18px">
-          <div style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8A93A1">Care plans, optional</div>
-          <div style="font-size:14px;line-height:1.6;color:#3D4F66;text-wrap:pretty">We keep it answering perfectly: monitoring, updates, and script tuning as your services, insurance list and hours change.</div>
-          <div style="display:flex;flex-direction:column;gap:14px">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:15px;color:#0A1A2F;border-bottom:1px solid #EEEAE0;padding-bottom:14px"><span>Google Calendar integration</span><span style="font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">$149<span style="font-weight:400;color:#8A93A1;font-size:13px">/mo</span></span></div>
-            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:15px;color:#0A1A2F;border-bottom:1px solid #EEEAE0;padding-bottom:14px"><span>Practice-management (PMS) integration</span><span style="font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">$299<span style="font-weight:400;color:#8A93A1;font-size:13px">/mo</span></span></div>
-          </div>
-          <div style="font-size:13px;color:#5A6E86;line-height:1.6;text-wrap:pretty">What you're paying for is the ongoing service, not the integration. Optional, no minimum term, cancel anytime. Skip the plan entirely and Google Calendar setup is still included with your setup fee, and your receptionist keeps answering either way.</div>
-        </div>
-      </div>
-      <!-- M-5: owners annualise whatever they are shown. Better they read our arithmetic than
-           invent their own. Every figure here appears elsewhere on the page already. -->
-      <details style="margin-top:22px;border-top:1px solid #EEEAE0;padding-top:18px">
-        <summary style="cursor:pointer;font-size:14px;font-weight:600;color:#0A1A2F;list-style:none">What year one actually costs</summary>
-        <div style="font-size:14px;line-height:1.75;color:#4A5C72;margin-top:12px;font-variant-numeric:tabular-nums">
-          $2,000 setup, once — or $1,000 up front on the split start. Then voice usage on your own
-          account, at cost: roughly $60–$150 a month for a practice handling 300 answered calls.
-          A care plan is optional at $149 or $299 a month.
-          <br><br>
-          Without a care plan that is about <strong>$250–$350 a month equivalent across year one</strong>,
-          and year two costs only the usage. With the PMS plan it is nearer $460–$550. No markup on
-          usage, and nothing else bills monthly.
-        </div>
-      </details>
-
-      <!-- Risk reversal: this is the load-bearing line of the pricing section, not a footnote. -->
-      <div style="background:#0A1A2F;color:#FAF9F6;border-radius:16px;padding:clamp(22px,3.5vw,30px);display:flex;flex-direction:column;gap:10px;text-align:center">
-        <div style="font-family:'Fraunces',serif;font-size:clamp(1.25rem,2.8vw,1.6rem);font-weight:600;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;text-wrap:balance">Start for $1,000. The rest is on us until it works.</div>
-        <p style="margin:0;font-size:15px;line-height:1.65;color:#B9C4D4;max-width:520px;margin-inline:auto;text-wrap:pretty;font-variant-numeric:tabular-nums">You pay the remaining $1,000 only once Denty books a real patient into your calendar, inside the first 14 days of go-live. If it doesn't, you don't. That's how sure we are.</p>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <a href="https://calendly.com/digidental/digi-dental-inquiry" target="_blank" rel="noopener" onClick="{{ trackCalendlyPricing }}" data-cta="pricing" style="display:block;text-align:center;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:17px 36px;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 8px 24px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</a>
-        <div style="font-size:12.5px;color:#8A93A1;line-height:1.6;text-align:center;font-variant-numeric:tabular-nums">Free 20-minute call. Ask about the split start on it. No paperwork, just say the word.</div>
-        <!-- M-6: the same three objections, answered at the moment the price is read. -->
-        <div style="max-width:640px;margin:26px auto 0;text-align:left">
-          <sc-for list="{{ faqTop }}" as="ft" hint-placeholder-count="3">
-            <details style="border-top:1px solid #EEEAE0;padding:14px 0">
-              <summary style="cursor:pointer;font-size:15px;font-weight:600;color:#0A1A2F;list-style:none">{{ ft.q }}</summary>
-              <p style="margin:10px 0 0;font-size:14px;line-height:1.7;color:#4A5C72">{{ ft.a }}</p>
-            </details>
-          </sc-for>
-        </div>
-      </div>
-      <div ref="{{ glareRef }}" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;opacity:0.15;border-radius:24px"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= 9. FAQ ================= -->
-<section id="faq" data-section="faq" style="background:#FFFFFF;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
-  <div data-reveal="" style="width:100%;max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:8px">
-    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0 0 40px;text-align:center">Questions owners ask</h2>
-    <noscript>
-      <!-- The FAQ above is rendered from faqData by the runtime, so a crawler that does not
-           execute JavaScript sees an empty loop. This mirror carries the identical text, kept
-           honest by test/seo.test.mjs which fails if the two ever diverge. -->
-      <dl style="max-width:820px;margin:24px auto 0;text-align:left">
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Is this HIPAA-compliant?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what&#x27;s needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We&#x27;ll walk you through exactly how data flows on your strategy call, and we&#x27;re happy to sign a BAA with the voice platform if your practice requires one.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Will patients know it&#x27;s AI?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Some ask. The voice is natural enough that most don&#x27;t. It never pretends to be human when asked directly. It says it&#x27;s the practice&#x27;s automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What does usage roughly cost monthly?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us, and nothing else is billed monthly unless you choose a care plan.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What if it mishears something, or books the wrong details?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">It confirms every detail that matters. Name, phone number, and appointment time are read back to the caller before anything is booked. If a caller needs something outside its script, it takes a message and flags it for your staff instead of guessing. And when something does slip through, it slips through where you can see it: the appointment sits in your calendar like any other, so your team fixes it in seconds and we tune the script so it doesn&#x27;t happen twice.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How is this different from an answering service?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list, and every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Does it replace my front desk?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">No. It catches what they physically can&#x27;t: after-hours calls, lunch rushes, the second line while they&#x27;re checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Will this work with Dentrix, Eaglesoft or Open Dental?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes. That is the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn&#x27;t, Denty still books into a calendar your team already lives in.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How fast is go-live?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Contracts, cancellation, and data?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">No long-term contract. The setup fee is one-time, and care plans cancel anytime: the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don&#x27;t receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we&#x27;ll have it in place before a single patient call is answered. Ask us to delete anything you&#x27;ve given us and it&#x27;s deleted.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How much does an AI receptionist for a dental practice cost?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Setup is $2,000, one time. That covers the voice AI configured to your practice, your calendar, call scripting for your services and insurance list, testing and go-live. You can split it: $1,000 up front and the remaining $1,000 only once a real patient is booked into your calendar within 14 days of go-live — if that doesn&#x27;t happen, you don&#x27;t owe it. After that the only running cost is voice usage on your own platform account, billed at cost, typically $0.10–$0.15 per minute of live conversation, which lands most practices between $60 and $150 a month. Ongoing care plans are optional at $149 or $299 a month and cancel anytime.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Can it answer calls after hours, at lunch, and on weekends?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">That is the entire point. A practice answering phones roughly 40 hours a week is unreachable for the other 128, and the calls that land in those hours are the ones your marketing already paid for. It answers on the first ring at 7 PM, on Saturday, over lunch, and on the second line while your front desk is checking a patient in. There is no separate after-hours mode to switch on: it is the same receptionist, all 168 hours.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What happens if a patient calls with a dental emergency?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">It follows the rules you set, and it does not make clinical judgements. You tell us what counts as urgent for your practice and what should happen: route the caller to your on-call number, give them your emergency instructions, book them into the first available slot, or take the details and flag them immediately. Anything outside the script gets escalated rather than guessed at, and every call is transcribed and logged so your team sees exactly what was said.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Can it handle multiple callers at the same time?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Yes. Several callers can be on the line at once and each one is answered on the first ring — no hold queue, no busy signal, no voicemail. This is the part a single receptionist physically cannot do: when a campaign lands or a Monday morning rush hits, the third and fourth callers get the same answer as the first.</dd>
-      </dl>
-    </noscript>
-    <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="9">
-      <div style="border-bottom:1px solid #EEEAE0">
-        <button onClick="{{ f.toggle }}" aria-expanded="{{ f.open }}" style="width:100%;background:none;border:none;padding:22px 4px;display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;font-size:16.5px;font-weight:500;color:#0A1A2F;text-align:left">
-          <span>{{ f.q }}</span><span style="color:#0F8B80;font-size:20px;flex-shrink:0">{{ f.icon }}</span>
-        </button>
-        <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
-          <p style="margin:0;padding:0 4px 24px;font-size:15px;line-height:1.7;color:#3D4F66;text-wrap:pretty">{{ f.a }}</p>
-        </sc-if>
-      </div>
-    </sc-for>
-  </div>
-</section>
-
-<!-- ================= 9b. THE DASHBOARD THEY GET =================
-     Placed between the FAQ and the final CTA on purpose: objections have just been answered, the
-     price is known, and the last thing before the ask is proof that a real system exists behind
-     the promise. Screenshots are the practice owner's own console.
-
-     The panels are an accordion — one open, the rest collapsed to labelled rails, exactly the
-     interaction from the supplied React component, ported natively (this site has no React
-     build step or Tailwind; see the note in the README).
-
-     On ratios: these are full-page captures and their true dimensions are not known ahead of
-     time, so nothing here assumes one. Each frame takes its aspect ratio from the image's own
-     naturalWidth/naturalHeight once it loads, and very tall captures scroll inside their frame.
-     No crop, no letterbox, whatever the screenshots turn out to be. -->
-<section data-section="dashboard" style="background:#FAF9F6;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
-  <div data-reveal="" class="dd-wrap" style="max-width:1180px;margin:0 auto">
-    <div style="text-align:center;max-width:720px;margin:0 auto 14px">
-      <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#0F8B80;font-weight:600;margin-bottom:14px">What you actually get</div>
-      <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.9rem,4.2vw,3rem);line-height:1.12;letter-spacing:-0.025em;margin:0 0 18px;color:#0A1A2F;text-wrap:balance">Every call, in writing, in your own dashboard</h2>
-      <p style="font-size:17px;line-height:1.7;color:#4A5C72;margin:0 0 8px;text-wrap:pretty">You are not handing your phone line to something you cannot see. Every call the receptionist takes is recorded, transcribed and timed, and you can read any of them back. This is the real console, not a mock-up.</p>
-    </div>
-
-    <div class="dd-dash" role="tablist" aria-label="Dashboard previews">
-      <sc-for list="{{ dashShots }}" as="shot" hint-placeholder-count="4">
-        <button class="dd-dash-panel" role="tab" type="button"
-                data-dash="{{ shot.id }}"
-                aria-selected="{{ shot.active }}"
-                aria-expanded="{{ shot.active }}"
-                aria-label="{{ shot.title }}"
-                onClick="{{ shot.pick }}">
-          <span class="dd-dash-rail" aria-hidden="true">{{ shot.title }}</span>
-          <span class="dd-dash-body">
-           <span class="dd-dash-inner">
-          <span class="dd-dash-frame">
-            <span class="dd-dash-bar" aria-hidden="true"><i></i><i></i><i></i></span>
-            <span class="dd-dash-scroll">
-              <img src="{{ shot.src }}" alt="{{ shot.alt }}" loading="lazy" decoding="async"
-                   onLoad="{{ shot.sized }}">
-            </span>
-          </span>
-          <span class="dd-dash-cap">
-            <strong>{{ shot.title }}</strong>
-            <span>{{ shot.note }}</span>
-          </span>
-           </span>
-          </span>
-        </button>
-      </sc-for>
-    </div>
-
-    <p style="text-align:center;font-size:14px;color:#6B7A8D;margin:26px auto 0;max-width:620px">Screens from the live console. Tall captures scroll inside their frame, so nothing is cropped.</p>
-  </div>
-</section>
-
-<!-- ================= 10. FINAL + FOOTER ================= -->
-<section data-section="final" style="background:#0A1A2F;color:#FAF9F6;padding:160px clamp(20px,4vw,48px) 0">
-  <div data-reveal="" style="width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;padding-bottom:90px">
+<!-- ================= 6. PRIMARY CTA =================
+     One ask, and one door for the people who are not ready to take it. Everything a
+     researcher wants next — the live demo, the pricing card, the objections, the
+     founder — is one link away on /how-it-works/ rather than three more screens here. -->
+<section data-section="final" style="background:#0A1A2F;color:#FAF9F6;padding:160px clamp(20px,4vw,48px) 140px;border-top:1px solid #EEEAE0">
+  <div data-reveal="" style="width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2rem,5vw,3rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">Every call answered. Every opening filled.</h2>
-    <p style="font-size:16px;color:#B9C4D4;margin:0;font-variant-numeric:tabular-nums">$2,000 one-time setup. Every call answered from day one.</p>
+    <p style="font-size:16px;color:#B9C4D4;margin:0;font-variant-numeric:tabular-nums;text-wrap:pretty">$2,000 one-time setup, and every call answered from day one. Start with $1,000 — the rest is due only once we book a real patient into your calendar within 14 days. If we don't, you don't owe it.</p>
     <button onClick="{{ openBookingFinal }}" data-cta="final_cta" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,0.3)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
     <!-- GO-LIVE LINE — Benny: deliberately a speed claim, NOT a refund promise, because you
          only confirmed the split start as a commercial commitment. To turn it into a real
          guarantee, swap the badge text below for
              "Live within 7 days of your call — or the setup is on us."
-         and restore the matching clause in the Terms modal and the "How fast is go-live?" FAQ
-         (both currently state the timeline without a remedy). All three change together. -->
+         and restore the matching clause in the Terms (dd-logic.js LEGAL.terms) and the
+         "How fast is go-live?" FAQ (dd-logic.js faqData). All three change together. -->
     <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
       <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(15,139,128,0.14);border:1px solid rgba(15,139,128,0.45);border-radius:999px;padding:10px 20px;font-size:14.5px;font-weight:600;color:#FAF9F6;font-variant-numeric:tabular-nums">
         <span aria-hidden="true" style="color:#3FBFA9">✓</span>Most practices are live within 7 days of the onboarding call.
@@ -1177,73 +687,15 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     </div>
   </div>
 
-  <!-- ================= FOUNDER ================= -->
-  <!-- ============================ SOCIAL PROOF SLOT ============================
-       For REAL customer quotes only. Populate this.SOCIAL_PROOF in the logic class with
-       { quote, name, practice, metric } entries and the section renders itself; leave it
-       empty and nothing appears at all.
-
-       Do not fill this with anything invented. A dental owner spending $2,000 is asking
-       "who else has this?", and a fabricated answer is worth less than no answer — the
-       page's credibility is currently built on sourced numbers and a live demo, and one
-       fake quote would undo both.
-
-       It is a tracked section (data-section="social_proof"), so once real quotes land,
-       rpc_sections shows its reach and exit rate against its neighbours. ==================== -->
-  <sc-if value="{{ hasSocialProof }}" hint-placeholder-val="{{ false }}">
-    <section data-section="social_proof" style="background:#FAF9F6;padding:120px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
-      <div data-reveal="" class="dd-wrap" style="max-width:1080px;margin:0 auto;text-align:center">
-        <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#0F8B80;font-weight:600;margin-bottom:14px">From practices running it</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:24px;margin-top:32px;text-align:left">
-          <sc-for list="{{ socialProof }}" as="sp" hint-placeholder-count="2">
-            <figure style="margin:0;background:#FFFFFF;border:1px solid #E8E4DA;border-radius:18px;padding:28px;box-shadow:0 10px 30px rgba(10,26,47,0.06)">
-              <blockquote style="margin:0;font-size:17px;line-height:1.7;color:#0A1A2F">{{ sp.quote }}</blockquote>
-              <figcaption style="margin-top:18px;font-size:14px;color:#4A5C72">{{ sp.name }} · {{ sp.practice }}</figcaption>
-            </figure>
-          </sc-for>
-        </div>
-      </div>
-    </section>
-  </sc-if>
-
-  <!-- Portrait + overlapping note, adapted from the profile-card pattern into this page's
-       own markup and palette. BENNY: the photo is uploads/profile.jpg. Until that file
-       exists the card falls back to the monogram automatically, so nothing ever renders broken. -->
-  <div data-reveal="" class="dd-wrap" style="padding-bottom:120px">
-    <div class="dd-founder">
-      <div class="dd-founder-photo">
-        <sc-if value="{{ founderPhotoOn }}" hint-placeholder-val="{{ true }}">
-          <img id="founder-photo" alt="Benny, founder of Digi Dental, who sets up each AI receptionist personally" width="470" height="470" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block">
-        </sc-if>
-        <sc-if value="{{ founderMonogramOn }}" hint-placeholder-val="{{ false }}">
-          <div aria-hidden="true" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0F8B80;color:#FAF9F6;font-family:'Fraunces',serif;font-size:96px;font-weight:600">B</div>
-        </sc-if>
-      </div>
-      <div class="dd-founder-card">
-        <div style="margin-bottom:18px">
-          <div style="font-family:'Fraunces',serif;font-size:clamp(1.4rem,2.6vw,1.75rem);font-weight:600;letter-spacing:-0.02em;color:#0A1A2F">Built by Benny</div>
-          <div style="font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#8A93A1;margin-top:6px">Founder, Digi Dental</div>
-        </div>
-        <p style="margin:0 0 24px;font-size:15.5px;line-height:1.75;color:#3D4F66;text-wrap:pretty">Digi Dental is a one-person shop, on purpose. I build and tune every receptionist myself: your script, your insurance list, your calendar. When something needs changing you message me, not a support queue. The demo above is the same system I would configure for your practice, which is why I would rather you try it than take my word for it. Every setup is done personally, by me. If the receptionist under-delivers, you know exactly who to call — and the number is right here.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:12px">
-          <a href="https://wa.me/351912859130" target="_blank" rel="noopener" onClick="{{ trackFounderWhatsapp }}" aria-label="WhatsApp Benny" title="WhatsApp" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="#FAF9F6" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.87 9.87 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.16 8.16 0 0 1-1.25-4.35c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.83 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.2-8.24 8.2Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07s.89 2.4 1.02 2.56c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.22-.17-.47-.29Z"></path></svg>
-          </a>
-          <a href="mailto:bennysworkspace@gmail.com" onClick="{{ trackFounderEmail }}" aria-label="Email Benny" title="Email" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FAF9F6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"></rect><path d="m3 6.5 9 6.5 9-6.5"></path></svg>
-          </a>
-          <a href="https://www.linkedin.com/in/ceobenny/" target="_blank" rel="noopener" onClick="{{ trackFounderLinkedin }}" aria-label="Benny on LinkedIn" title="LinkedIn" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="#FAF9F6" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5ZM3 9.75h4v10.75H3V9.75Zm6.5 0h3.83v1.47h.05c.53-1 1.84-2.06 3.78-2.06 4.04 0 4.79 2.66 4.79 6.12v5.22h-4v-4.63c0-1.1-.02-2.53-1.54-2.53-1.54 0-1.78 1.2-1.78 2.45v4.71h-4V9.75Z"></path></svg>
-          </a>
-          <a href="https://bennys-portfolio.vercel.app/" target="_blank" rel="noopener" onClick="{{ trackFounderPortfolio }}" aria-label="Benny's portfolio" title="Portfolio" style="width:46px;height:46px;border-radius:50%;background:#0A1A2F;display:inline-flex;align-items:center;justify-content:center;transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:#0F8B80;transform:translateY(-2px)">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FAF9F6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.2"></circle><path d="M2.9 12h18.2M12 2.8c2.3 2.5 3.6 5.8 3.6 9.2s-1.3 6.7-3.6 9.2c-2.3-2.5-3.6-5.8-3.6-9.2s1.3-6.7 3.6-9.2Z"></path></svg>
-          </a>
-        </div>
-      </div>
-    </div>
+  <!-- The other door. Not a second CTA competing with the one above: it is the exit for
+       someone who wants to keep reading, and it names exactly what is behind it. -->
+  <div data-reveal="" style="width:100%;max-width:760px;margin:80px auto 0;border-top:1px solid #22344E;padding-top:44px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px">
+    <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#5A6E86">Not ready to book?</div>
+    <p style="font-size:17px;line-height:1.7;color:#B9C4D4;margin:0;max-width:560px;text-wrap:pretty">Talk to the receptionist yourself for 60 seconds, tour the dashboard, read the pricing in full and every objection we get asked — all on one page.</p>
+    <a href="/how-it-works/" data-cta="final_deep" style="display:inline-flex;align-items:center;gap:8px;font-size:16px;font-weight:600;color:#3FBFA9;border:1.5px solid rgba(63,191,169,0.5);border-radius:10px;padding:15px 30px;text-decoration:none;transition:background-color .25s,border-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:rgba(63,191,169,0.12);border-color:#3FBFA9;color:#3FBFA9;text-decoration:none;transform:translateY(-2px)">See how it works, in full →</a>
   </div>
-
 </section>
+
 </main>
 
 <footer style="background:#0A1A2F;color:#FAF9F6">
@@ -1251,16 +703,28 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
     <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:44px">
       <div style="display:flex;flex-direction:column;gap:14px;max-width:280px">
         <div style="display:flex;align-items:center;gap:10px">
-          <img src="uploads/denty_neutral.png" alt="" width="28" height="28" loading="lazy" decoding="async" style="display:block;width:28px;height:28px;object-fit:contain;image-rendering:pixelated">
+          <img src="/uploads/denty_neutral.png" alt="" width="28" height="28" loading="lazy" decoding="async" style="display:block;width:28px;height:28px;object-fit:contain;image-rendering:pixelated">
           <div style="font-family:'Fraunces',serif;font-weight:600;font-size:19px;letter-spacing:-0.02em">Digi<span style="color:#0F8B80"> Dental</span></div>
         </div>
         <p style="font-size:13.5px;line-height:1.65;color:#8A9BB5;margin:0;text-wrap:pretty">A 24/7 AI receptionist that answers your practice's calls and books patients straight into your calendar.</p>
+      </div>
+      <!-- Both pages, both directions. A two-page site needs the second page reachable from
+           the bottom of the first, not only from a bar people have already scrolled past. -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#5A6E86">Explore</div>
+        <a href="/" aria-current="{{ navCurHome }}" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Home</a>
+        <a href="/how-it-works/" aria-current="{{ navCurDeep }}" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">How it works</a>
+        <a href="/how-it-works/#pricing" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Pricing</a>
+        <a href="/how-it-works/#faq" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">FAQ</a>
+        <a href="/how-it-works/#demo" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Live demo</a>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#5A6E86">Contact</div>
         <a href="mailto:bennysworkspace@gmail.com" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">bennysworkspace@gmail.com</a>
         <a href="https://wa.me/351912859130" target="_blank" rel="noopener" style="font-size:14px;color:#B9C4D4;font-variant-numeric:tabular-nums" style-hover="color:#FAF9F6">WhatsApp: +351 912 859 130</a>
         <a href="https://web.facebook.com/meetdigidenty" target="_blank" rel="noopener" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Facebook</a>
+        <!-- Our own long-form case study. Labelled as ours everywhere it appears. -->
+        <a href="{{ caseStudyUrl }}" target="_blank" rel="noopener" onClick="{{ trackCaseStudy }}" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Case study on Medium</a>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#5A6E86">Legal</div>
@@ -1268,8 +732,8 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <a href="#terms" onClick="{{ openTerms }}" style="font-size:14px;color:#B9C4D4" style-hover="color:#FAF9F6">Terms</a>
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-        <button onClick="{{ scrollToToothy }}" data-cta="hero_demo" aria-label="Talk to the AI receptionist" title="Talk to the AI receptionist" style="width:60px;height:60px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
-          <img src="uploads/denty_neutral.png" alt="" width="60" height="60" loading="lazy" decoding="async" style="display:block;width:60px;height:60px;object-fit:contain;image-rendering:pixelated">
+        <button onClick="{{ scrollToToothy }}" data-cta="footer_demo" aria-label="Talk to the AI receptionist" title="Talk to the AI receptionist" style="width:60px;height:60px;background:none;border:none;cursor:pointer;padding:0;animation:toothy-bob 2.6s ease-in-out infinite" style-hover="transform:scale(1.06)">
+          <img src="/uploads/denty_neutral.png" alt="" width="60" height="60" loading="lazy" decoding="async" style="display:block;width:60px;height:60px;object-fit:contain;image-rendering:pixelated">
         </button>
         <div style="font-size:12px;color:#5A6E86">Talk to the receptionist</div>
       </div>
@@ -1370,7 +834,9 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   </div>
 </sc-if>
 
-<!-- ================= PRIVACY / TERMS MODALS ================= -->
+<!-- ================= PRIVACY / TERMS MODALS =================
+     Both dialogs render from DDLogic's LEGAL block, so the two pages cannot end up
+     promising different things. Edit the copy in dd-logic.js, never here. -->
 <sc-if value="{{ mPrivacy }}" hint-placeholder-val="{{ false }}">
   <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(10,26,47,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px">
     <div role="dialog" aria-modal="true" aria-label="Privacy policy" onClick="{{ stopProp }}" style="background:#FAF9F6;border-radius:20px;width:min(640px,100%);max-height:80vh;overflow-y:auto;padding:clamp(26px,5vw,44px);box-shadow:0 40px 100px rgba(0,0,0,0.4);animation:dd-fadeup .4s cubic-bezier(.22,1,.36,1) both">
@@ -1378,22 +844,11 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <h3 style="font-family:'Fraunces',serif;font-size:24px;margin:0">Privacy Policy</h3>
         <button onClick="{{ closeModal }}" aria-label="Close" style="background:none;border:none;font-size:22px;color:#5A6E86;cursor:pointer">×</button>
       </div>
-      <!-- LEGAL REVIEW REQUIRED (Benny): this is final, non-placeholder copy written to be
-           honest and to claim no certification of any kind. It has NOT been reviewed by a
-           lawyer. Before treating it as final, have counsel check: (1) the subprocessor list
-           against your actual vendors, (2) whether you need CCPA/GDPR-specific sections for
-           the markets you sell into, (3) governing law / entity name, deliberately left out
-           here rather than invented. Keep the "no certification" posture in any rewrite. -->
       <div style="font-size:14px;line-height:1.75;color:#3D4F66;display:flex;flex-direction:column;gap:16px">
-        <p style="margin:0;color:#8A93A1;font-size:12.5px">Last updated 6 August 2026. Digi Dental is a business-to-business service for dental practices. If you are a patient of a practice that uses Digi Dental, contact that practice directly about your records, as we do not hold them.</p>
-        <p style="margin:0"><strong>What we collect.</strong> What you type into the form on this page: your name, practice name, email, phone, country, rough monthly call volume, and number of locations. Nothing more, and nothing you haven't typed.</p>
-        <p style="margin:0"><strong>Demo calls.</strong> The in-browser demo is a live call: your microphone audio is streamed to the third-party voice-AI platform that powers the conversation, processed there under that platform's own security and data-processing terms, and used to generate the assistant's replies. Demo calls are capped at 60 seconds. Please don't share patient, health, or payment information during the demo. The assistant is not configured to receive it, and neither are we.</p>
-        <p style="margin:0"><strong>Demo limits and your IP address.</strong> The free demo is one per visitor. To enforce that without keeping a record of who you are, we store a one-way salted hash of your IP address, never the address itself, and the hash cannot be reversed back into an IP.</p>
-        <p style="margin:0"><strong>Usage measurement.</strong> We record anonymous events about how this page is used: for example that a demo was started, that a section was viewed, or which button was clicked, together with a coarse timestamp. To count returning visits without knowing who you are, your browser stores a random first-party identifier. It is a random string, it holds no name or email, it is never shared with anyone and it is never used for advertising. Clearing your browser storage removes it. These events carry no advertising identifier and no third-party tracker, and are used only to understand which parts of the page work.</p>
-        <p style="margin:0"><strong>Who else touches it.</strong> We use a small number of established service providers to run this: a voice-AI platform (live call audio), a hosted database (your form details and usage events), an email delivery service (so your enquiry reaches our inbox), a hosting provider (serving this page), and a scheduling tool (booking your strategy call). Each processes data only to provide its part of the service. We do not sell your information, we do not share it for advertising, and we run no advertising trackers on this page.</p>
-        <p style="margin:0"><strong>How long we keep it.</strong> Enquiry details are kept while we're in touch and for as long as we may need them to answer you. Ask us to delete them and we delete them.</p>
-        <p style="margin:0"><strong>Your choices.</strong> Email us to see what we hold, correct it, or have it deleted. One message is enough, and there is no form to fill in.</p>
-        <p style="margin:0"><strong>Working with your practice.</strong> When we set up a receptionist for a practice, how call data is handled is agreed in writing with that practice before go-live, including a BAA or data-processing agreement where the practice requires one. This page's policy covers this website and its demo only.</p>
+        <p style="margin:0;color:#8A93A1;font-size:12.5px" data-dyn="">{{ privacyNote }}</p>
+        <sc-for list="{{ privacyParas }}" as="p" hint-placeholder-count="8">
+          <p style="margin:0"><strong>{{ p.term }}</strong> {{ p.text }}</p>
+        </sc-for>
         <p style="margin:0"><strong>Contact.</strong> <a href="mailto:bennysworkspace@gmail.com">bennysworkspace@gmail.com</a> · <a href="https://wa.me/351912859130" target="_blank" rel="noopener">WhatsApp +351 912 859 130</a></p>
       </div>
     </div>
@@ -1406,36 +861,20 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
         <h3 style="font-family:'Fraunces',serif;font-size:24px;margin:0">Terms of Service</h3>
         <button onClick="{{ closeModal }}" aria-label="Close" style="background:none;border:none;font-size:22px;color:#5A6E86;cursor:pointer">×</button>
       </div>
-      <!-- LEGAL REVIEW REQUIRED (Benny): final, non-placeholder copy — but it now states two
-           commercial promises you must be willing to honour exactly as written:
-             1. Split start: $1,000 up front, the second $1,000 due only if a real patient is
-                booked within 14 days of go-live (confirmed by Benny, 7 Aug 2026). The same
-                wording appears in the pricing section, llms.txt and api/site-info.ts — change
-                all four together.
-             2. Go-live timeline: stated as a normal expectation, with no refund remedy, because
-                that promise was never confirmed. Add one only if you intend to honour it.
-           Governing law and entity name are deliberately not invented here — add both with
-           counsel before treating this as final. -->
       <div style="font-size:14px;line-height:1.75;color:#3D4F66;display:flex;flex-direction:column;gap:16px">
-        <p style="margin:0;color:#8A93A1;font-size:12.5px">Last updated 6 August 2026. These terms cover the setup service sold on this page. Anything agreed in writing with your practice takes precedence over what's here.</p>
-        <p style="margin:0"><strong>What the setup fee covers.</strong> $2,000, one-time: the voice assistant configured to your practice, Google Calendar setup so appointments are written directly, call scripting for your services and insurance list, and testing, tuning and go-live. One practice location unless we agree otherwise in writing.</p>
-        <p style="margin:0"><strong>Split start.</strong> On request, setup begins with $1,000. If the receptionist books a real patient appointment into your calendar within 14 days of go-live, the remaining $1,000 falls due, completing the standard $2,000 setup fee. If it does not, the balance is not owed.</p>
-        <p style="margin:0"><strong>Go-live timeline.</strong> Your receptionist is normally live within 7 days of the onboarding call. The 7 days start once we have what we need from you: your services list, your insurance list, and calendar access. Delays caused by waiting on those, or by a third party we don't control (your phone carrier or practice-management vendor), pause the clock, and we'll tell you in writing when that happens and why.</p>
-        <p style="margin:0"><strong>Usage.</strong> Voice-AI usage is billed at cost on the practice's own platform account, typically $0.10–$0.15 per minute of live conversation. Digi Dental applies no markup and never bills you for usage.</p>
-        <p style="margin:0"><strong>Care plans.</strong> Ongoing care plans ($149/month for Google Calendar integration, $299/month for practice-management integration) cover monitoring, updates, and ongoing script refinement. Optional, no minimum term, cancel anytime effective at the end of the current billing month. Without a plan, Google Calendar setup remains included in the setup fee and the receptionist keeps running, we simply stop actively tuning it.</p>
-        <p style="margin:0"><strong>What we need from you.</strong> Accurate service and insurance information, calendar access, and a named person who can approve the script. The assistant answers from what you give us; if the underlying information is wrong, its answers will be too.</p>
-        <p style="margin:0"><strong>What this is not.</strong> Digi Dental sets up an AI receptionist. It is not a dental practice, gives no clinical or diagnostic advice, and is not an emergency service. Your scripts must direct urgent callers to appropriate care, and the practice remains responsible for the clinical and regulatory side of every patient interaction.</p>
-        <p style="margin:0"><strong>Availability.</strong> The receptionist runs on third-party voice and telephony infrastructure. We monitor it and fix what we can, but we can't guarantee those platforms never have an outage, and the practice should keep its existing phone path in place as a fallback.</p>
-        <p style="margin:0"><strong>Changes.</strong> Prices and terms on this page can change for new customers at any time. What was agreed with you when you paid is what applies to you.</p>
+        <p style="margin:0;color:#8A93A1;font-size:12.5px" data-dyn="">{{ termsNote }}</p>
+        <sc-for list="{{ termsParas }}" as="p" hint-placeholder-count="9">
+          <p style="margin:0"><strong>{{ p.term }}</strong> {{ p.text }}</p>
+        </sc-for>
       </div>
     </div>
   </div>
 </sc-if>
 
 <!-- ================= BACK TO TOP ================= -->
-<button onClick="{{ backToTop }}" aria-label="Back to top" style="position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:60;width:40px;height:40px;border-radius:50%;border:1px solid #E8E4DA;background:rgba(250,249,246,0.92);backdrop-filter:blur(6px);color:#5A6E86;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;box-shadow:0 6px 18px rgba(10,26,47,0.1)" style-hover="color:#0F8B80;border:1px solid #0F8B80;transform:translateY(-50%);background:rgba(250,249,246,1)">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-  </button>
+<button onClick="{{ backToTop }}" aria-label="Back to top" style="position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:30;width:40px;height:40px;border-radius:50%;border:1px solid #E8E4DA;background:rgba(250,249,246,0.92);backdrop-filter:blur(6px);color:#5A6E86;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;box-shadow:0 6px 18px rgba(10,26,47,0.1)" style-hover="color:#0F8B80;border:1px solid #0F8B80;transform:translateY(-50%);background:rgba(250,249,246,1)">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
 
 <!-- ================= EXIT-INTENT MODAL (desktop, once per session) ================= -->
 <sc-if value="{{ mExit }}" hint-placeholder-val="{{ false }}">
@@ -1460,1372 +899,10 @@ button{transition:background-color .25s cubic-bezier(.4,0,.2,1),color .25s cubic
   &quot;firstVisitValue&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 850, &quot;min&quot;: 300, &quot;max&quot;: 3000, &quot;section&quot;: &quot;ROI calculator&quot;, &quot;tsType&quot;: &quot;number&quot;},
   &quot;bookingRate&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 0.3, &quot;min&quot;: 0.1, &quot;max&quot;: 0.6, &quot;step&quot;: 0.05, &quot;section&quot;: &quot;ROI calculator&quot;, &quot;tsType&quot;: &quot;number&quot;}
 }">
-class Component extends DCLogic {
-  state = {
-    heroPhase: 0, heroIdx: 0,
-    scrolled: false, showSticky: false,
-    calcSize: '1', calcCalls: '20', calcValue: '850', faqOpen: -1,
-    modal: null, // null | 'booking' | 'privacy' | 'terms' | 'exit'
-    step: 0, bName: '', bPractice: '', bCountry: '', bVolume: '', bLocations: '', bEmail: '', bPhone: '',
-    founderPhotoOk: false, // flipped true only once uploads/profile.jpg has actually loaded
-    bWebsite: '', // honeypot — must stay empty; anything in it means a bot filled the form
-    formError: '', shake: false,
-    toothy: 'idle', // idle | connecting | live | ended | limited
-    remaining: 60, bubble: '', demoUsed: false, sendState: null,
-    // Voice demo plumbing. `starting` disables the button between the click and the first state
-    // change; `micState` drives the permission panel; `micWarn` is the "we cannot hear you" hint.
-    dashActive: 0, // which dashboard screenshot is expanded
-    starting: false, micState: 'unknown', // unknown | granted | denied | error
-    micWarn: false, micDeviceId: null
-  };
-
-  // Diagnostics are development-only: localhost, a Vercel preview URL, or ?debug=1 on the page.
-  // Production visitors never see voice logging in their console.
-  DEV = (() => {
-    try {
-      return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ||
-             /vercel\.app$/.test(location.hostname) && /-git-|-[a-z0-9]{9}-/.test(location.hostname) ||
-             new URLSearchParams(location.search).get('debug') === '1';
-    } catch (e) { return false; }
-  })();
-
-  // The practice owner's console, as four real captures. Served through /api/image so the page
-  // carries no expiring Supabase token; see api/image.ts.
-  DASH_SHOTS = [
-    { id: 'dash-metrics', title: 'Call volume', note: 'How many calls came in, when they came in, and how they ended.' },
-    { id: 'dash-call', title: 'A single call', note: 'The full transcript and recording of one conversation, start to finish.' },
-    { id: 'dash-logs', title: 'Call log', note: 'Every call the receptionist has taken, searchable, with its outcome.' },
-    { id: 'dash-assistant', title: 'Your setup', note: 'Exactly how your receptionist is configured, in plain view.' }
-  ];
-
-  // Real customer quotes only — see the SOCIAL PROOF SLOT comment in the markup. While this is
-  // empty the section does not render at all, which is the correct state until a practice
-  // agrees to be quoted. Add entries as { quote, name, practice }.
-  SOCIAL_PROOF = [];
-
-  CALLERS = [
-    { tag: 'New patient, 7:42 PM, after hours', l1: '\u201CHi, I chipped a tooth at dinner. Can I get in tomorrow?\u201D', l2: '\u201CDr. Patel has 2:00 PM Tuesday open. Shall I book it?\u201D', booked: 'Booked: Tuesday 2:00 PM', cap: 'Booked while the office was closed.' },
-    { tag: 'New patient, 12:15 PM, lunch rush', l1: '\u201CDo you take Delta Dental? I need a cleaning.\u201D', l2: '\u201CWe do. Thursday 10:30 AM is available. Shall I book it?\u201D', booked: 'Booked: Thursday 10:30 AM', cap: 'Booked while the line was busy.' },
-    { tag: 'New patient, 9:03 PM, Sunday', l1: '\u201CMy crown came off. How soon can someone see me?\u201D', l2: '\u201CMonday 8:00 AM, first slot. Shall I book it?\u201D', booked: 'Booked: Monday 8:00 AM', cap: 'Booked before the week began.' }
-  ];
-
-  // Denty sprite frames (user-provided pixel art in uploads/)
-  FRAMES = {
-    neutral: 'uploads/denty_neutral.png',
-    half: 'uploads/denty_half_mouth_yap.png',
-    full: 'uploads/denty_full_mouth_yap.png',
-    happy: 'uploads/denty_happy.png'
-  };
-  YAP_CYCLE = ['neutral', 'half', 'full', 'half'];
-
-  // Direct-to-Supabase fallback for static hosting (RLS insert-only policy required on `leads`).
-  // BUG-9 / VERIFY (Benny): this is a new-style publishable key, which really is this short —
-  // the `sb_publishable_<random>` format replaced the long legacy JWT anon key, so its length
-  // is not evidence of truncation. It still needs one live check, because if it is wrong the
-  // browser fallback fails silently and leads only ever arrive through /api/notify-lead:
-  //   curl -i "https://hctpvnqanwhxlmpmfmme.supabase.co/rest/v1/leads?select=id&limit=1" \
-  //     -H "apikey: <key>" -H "Authorization: Bearer <key>"
-  // 401 "Invalid API key" = wrong key, replace it from Supabase → Settings → API Keys.
-  // 403 / permission denied = key is valid and RLS is doing its job (reads blocked, inserts allowed).
-  SUPABASE_URL = 'https://hctpvnqanwhxlmpmfmme.supabase.co';
-  SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_MWPe84PkAw7Zo1T_MMvlFg_ppAOL';
-
-  CALENDLY_URL = 'https://calendly.com/digidental/digi-dental-inquiry';
-  // Served through /api/image so the page never carries the Supabase signed token, which expires
-  // 2027-08-10. If uploads/profile.jpg is ever committed, point this back at it and the route
-  // stops mattering. The monogram remains the fallback if the image fails to load.
-  FOUNDER_PHOTO = '/api/image?name=profile';
-
-  // Analytics (BUG-12). Events always go first-party to /api/event. Plausible and GA4 are
-  // optional extras: set PLAUSIBLE_DOMAIN to the live domain to load Plausible automatically,
-  // or drop a GA4 gtag snippet in and every event below mirrors to it with no further wiring.
-  PLAUSIBLE_DOMAIN = '';
-
-  // Cheap bot deterrent for /api/notify-lead (BUG-7): the page knows this string, a drive-by
-  // curl does not. Enforced only when SITE_TOKEN is set on the server, so it can never lock
-  // real leads out by accident. Rotate both sides together.
-  SITE_TOKEN = 'dd-site-2026';
-
-  // Vapi voice agent. PUBLIC web key — safe in the browser. In the Vite build these come from
-  // import.meta.env.VITE_VAPI_PUBLIC_KEY / VITE_VAPI_ASSISTANT_ID (.env, gitignored); this static
-  // build inlines them since there is no bundler to substitute import.meta.env.
-  VAPI_PUBLIC_KEY = 'fd2dddbc-3c7d-4eed-9cea-cf4fc9828d9f';
-  VAPI_ASSISTANT_ID = 'e3c3d544-3023-4725-bc7a-cbe78b35d36c';
-
-  componentDidMount() {
-    this._timers = [];
-    this.initAnalytics();
-    Object.values(this.FRAMES).forEach(src => { const im = new Image(); im.src = src; }); // preload sprite frames
-    // Founder portrait: probed in JS so a missing file never renders a broken image, and never
-    // fires a request during the raw-HTML pass. Drop the photo at uploads/profile.jpg.
-    const fp = new Image();
-    fp.onload = () => this.setState({ founderPhotoOk: true });
-    fp.src = this.FOUNDER_PHOTO;
-
-    this._mq = window.matchMedia('(prefers-reduced-motion: reduce)'); // useReducedMotion equivalent, live-updating
-    this._reduced = this._mq.matches;
-    this._onMq = e => { this._reduced = e.matches; if (e.matches) clearInterval(this._yapTimer); this.forceUpdate(); };
-    if (this._mq.addEventListener) this._mq.addEventListener('change', this._onMq);
-    const heroReady = () => { if (!this.state.heroReady) this.setState({ heroReady: true }); };
-    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(heroReady);
-    this._timers.push(setTimeout(heroReady, 1200)); // cap: never skeleton longer than 1.2s
-    this._demoTotal = this.props.demoSeconds ?? 60;
-    this.setState({ demoUsed: !!localStorage.getItem('dd_demo_used'), formDone: !!localStorage.getItem('dd_form_done'), remaining: this._demoTotal });
-    this.cycleHero();
-    this._onScroll = () => {
-      const y = window.scrollY;
-      const scrolled = y > 60;
-      const showSticky = window.innerWidth < 768 && y > window.innerHeight * 0.9 && !this.state.modal && this.state.toothy !== 'live' && this.state.toothy !== 'connecting';
-      if (scrolled !== this.state.scrolled || showSticky !== this.state.showSticky) this.setState({ scrolled, showSticky });
-    };
-    window.addEventListener('scroll', this._onScroll, { passive: true });
-    this._onKey = (e) => {
-      if (e.key === 'Escape' && this.state.modal) { this.setState({ modal: null }); return; }
-      // Focus trap (react-focus-lock equivalent): Tab cycles inside the open dialog
-      if (e.key === 'Tab' && this.state.modal) {
-        const d = document.querySelector('[role="dialog"]');
-        if (!d) return;
-        const f = Array.from(d.querySelectorAll('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')).filter(el => !el.disabled && el.offsetParent !== null);
-        if (!f.length) return;
-        const first = f[0], last = f[f.length - 1];
-        if (e.shiftKey && (document.activeElement === first || !d.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && (document.activeElement === last || !d.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
-      }
-    };
-    document.addEventListener('keydown', this._onKey);
-    // Exit intent — desktop only, once per session (tweakable via exitIntent prop)
-    this._onMouseOut = (e) => {
-      if ((this.props.exitIntent ?? true) && !e.relatedTarget && e.clientY <= 0 && window.innerWidth >= 1024 &&
-          !sessionStorage.getItem('dd_exit_shown') && !this.state.modal) {
-        sessionStorage.setItem('dd_exit_shown', '1');
-        this.setState({ modal: 'exit' });
-        this.track('exit_intent_shown');
-        this.notifyLead('exit_intent'); // row in Supabase; no owner email unless they left contact details
-      }
-    };
-    document.addEventListener('mouseout', this._onMouseOut);
-    // Scroll reveals (fade + 16px rise, once)
-    if (!this._reduced && 'IntersectionObserver' in window) {
-      // Staggered child reveal: each block's children rise, de-blur, and settle in sequence
-      const els = document.querySelectorAll('[data-reveal]');
-      const ease = 'cubic-bezier(.22,1,.36,1)';
-      els.forEach(el => Array.from(el.children).forEach((ch, i) => {
-        ch.style.opacity = '0';
-        ch.style.transform = 'translateY(28px) scale(.96)';
-        ch.style.filter = 'blur(8px)';
-        ch.style.transition = `opacity .9s ${ease} ${i * 0.14}s, transform .9s ${ease} ${i * 0.14}s, filter .9s ${ease} ${i * 0.14}s`;
-      }));
-      this._rio = new IntersectionObserver(es => es.forEach(en => {
-        if (en.isIntersecting) {
-          Array.from(en.target.children).forEach(ch => { ch.style.opacity = '1'; ch.style.transform = 'none'; ch.style.filter = 'none'; });
-          this._rio.unobserve(en.target);
-        }
-      }), { threshold: 0.2 });
-      els.forEach(el => this._rio.observe(el));
-    }
-    // Count-up statistics
-    const counts = document.querySelectorAll('[data-count]');
-    if ('IntersectionObserver' in window) {
-      this._cio = new IntersectionObserver(es => es.forEach(en => {
-        if (en.isIntersecting) { this._cio.unobserve(en.target); this.animateCount(en.target); }
-      }), { threshold: 0.6 });
-      counts.forEach(el => this._cio.observe(el));
-    }
-    // Toothy idle bubble after 3s in view
-    if ('IntersectionObserver' in window) {
-      const t = document.querySelector('[data-toothy]');
-      if (t) {
-        this._tio = new IntersectionObserver(es => es.forEach(en => {
-          if (en.isIntersecting) {
-            this._tio.unobserve(en.target);
-            this._timers.push(setTimeout(() => {
-              if (this.state.toothy === 'idle' && !this.state.bubble) {
-                this.setState({ bubble: this.state.demoUsed ? "You've had your free call. Want one answering your practice's phone?" : 'Click me. Talk to the actual AI receptionist. 60 seconds, free.' });
-              }
-            }, 3000));
-          }
-        }), { threshold: 0.5 });
-        this._tio.observe(t);
-      }
-    }
-    if (window.matchMedia && window.matchMedia('(hover:hover)').matches) this.initLinkPreviews();
-    // Handle for the automated voice-call tests, which drive the real component rather than a
-    // re-implementation of it. Harmless in production: it exposes no keys and no visitor data.
-    try { window.__ddRoot = this; } catch (e) {}
-
-    // The SDK is an ES module, so it may already be present or still loading. Cover both, and
-    // build the client exactly once for the lifetime of the page (see initVapi).
-    if (window.DentyVapiCtor) this.initVapi();
-    else {
-      this._onVapiReady = () => this.initVapi();
-      window.addEventListener('denty-vapi-ready', this._onVapiReady, { once: true });
-      // If the CDN never answers, the demo quietly falls back to the simulated call.
-      this._timers.push(setTimeout(() => {
-        if (!this._vapi) this.vlog('SDK did not load within 20s; demo will simulate.');
-      }, 20000));
-    }
-  }
-
-  // Development-only diagnostics. Nothing here may carry personal data: no transcripts, no audio,
-  // no keys, no visitor identifiers — only configuration state, device labels and lifecycle.
-  vlog() {
-    if (!this.DEV) return;
-    try { console.log.apply(console, ['[denty-voice]'].concat(Array.prototype.slice.call(arguments))); } catch (e) {}
-  }
-
-  // Is the assistant actually configured? A blank, placeholder or malformed id must never reach
-  // start(): the SDK's assistant argument is optional, so start(undefined) happily creates a call
-  // with no assistant attached — which is precisely the "call exists, no assistant, no transcript"
-  // symptom. Vapi ids are UUIDs, so the shape is worth checking before we spend a call on it.
-  vapiConfigError() {
-    const key = String(this.VAPI_PUBLIC_KEY || '').trim();
-    const id = String(this.VAPI_ASSISTANT_ID || '').trim();
-    const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!key || /^(your|xxx|placeholder)/i.test(key)) return 'The voice demo is not configured yet (missing public key).';
-    if (!id || /^(your|xxx|placeholder)/i.test(id)) return 'The voice demo is not configured yet (missing assistant).';
-    if (!uuid.test(id)) return 'The voice demo is misconfigured (the assistant id is not valid).';
-    return null;
-  }
-
-  // One client per page. Recreating it mid-connection is a known way to lose the microphone
-  // track, so this runs once and the instance is never torn down between calls.
-  initVapi() {
-    if (this._vapi || this._vapiInit) return;
-    const configError = this.vapiConfigError();
-    if (configError) { this.vlog('not initialising:', configError); return; }
-    this._vapiInit = true;
-    try {
-      // alwaysIncludeMicInPermissionPrompt keeps the mic in the browser prompt even when the
-      // call starts muted, so a visitor cannot end up connected with no input track.
-      this._vapi = new window.DentyVapiCtor(this.VAPI_PUBLIC_KEY, undefined,
-        { alwaysIncludeMicInPermissionPrompt: true });
-      this.vlog('client ready · assistant configured:', true);
-
-      // Listeners are attached here and only here. Retrying a failed call reuses this same
-      // instance, so handlers can never stack up and fire twice.
-      this._vapi.on('call-start', () => { this._vapiLive = true; this.goLive(); });
-      this._vapi.on('call-end', () => {
-        this._vapiLive = false;
-        this.releaseMic();
-        if (this.state.toothy === 'live' || this.state.toothy === 'connecting') { clearInterval(this._callTimer); this.finishDemo(); }
-      });
-      this._vapi.on('error', e => {
-        this._vapiLive = false;
-        this.vlog('sdk error:', e && (e.errorMsg || e.message || e));
-        this.failCall("Couldn't connect the call. Please try again.");
-      });
-      // Lifecycle detail the old wrapper never exposed. Invaluable when a call dies at a
-      // specific stage rather than failing outright.
-      this._vapi.on('call-start-progress', ev => this.vlog('start progress:', ev && ev.stage, ev && ev.status));
-      this._vapi.on('call-start-success', ev => this.vlog('start success in', ev && ev.totalDuration, 'ms'));
-      this._vapi.on('call-start-failed', ev => {
-        this.vlog('start FAILED at stage:', ev && ev.stage, ev && ev.error);
-        this.failCall("Couldn't start the call. Please try again.");
-      });
-    } catch (e) {
-      this._vapiInit = false;
-      console.error('Voice SDK init failed; the demo will simulate instead:', e);
-    }
-  }
-
-  // Ask for the microphone explicitly, before the call, and inspect what we actually got.
-  // Doing this ourselves (rather than letting the SDK trigger it mid-connect) means a denial or a
-  // dead device is a clear message instead of a call that connects and hears silence.
-  ensureMic() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      return Promise.resolve({ ok: false, reason: 'unsupported',
-        message: 'This browser cannot access a microphone. Try Chrome, Edge or Safari.' });
-    }
-    // Reuse a live track rather than opening a second one: two streams on one device is how you
-    // get NotReadableError on Windows.
-    if (this._micStream) {
-      const t = this._micStream.getAudioTracks()[0];
-      if (t && t.readyState === 'live' && t.enabled) return Promise.resolve({ ok: true, reused: true });
-      this.releaseMic();
-    }
-    const constraints = { audio: this.state.micDeviceId
-      ? { deviceId: { exact: this.state.micDeviceId }, echoCancellation: true, noiseSuppression: true }
-      : { echoCancellation: true, noiseSuppression: true }, video: false };
-
-    return navigator.mediaDevices.getUserMedia(constraints).then(stream => {
-      this._micStream = stream;
-      const track = stream.getAudioTracks()[0];
-      if (!track) return { ok: false, reason: 'no-track', message: 'No microphone input was found.' };
-      this.vlog('mic granted ·', track.label || '(unnamed device)',
-        '· readyState:', track.readyState, '· enabled:', track.enabled, '· muted:', track.muted);
-      // A track that arrives already ended or disabled will produce a connected call with no
-      // audio, which is the exact Vapi error being investigated.
-      if (track.readyState !== 'live' || !track.enabled) {
-        return { ok: false, reason: 'inactive',
-          message: 'Your microphone is not active. Close other apps using it and try again.' };
-      }
-      if (track.muted) {
-        // `muted` here is the browser telling us the source is not delivering data — usually the
-        // OS has it muted. Warn, but let the call proceed; it can recover mid-call.
-        this.vlog('WARNING: track reports muted — the OS may have the input muted.');
-      }
-      this.setState({ micState: 'granted' });
-      return { ok: true, track };
-    }).catch(err => {
-      const name = (err && err.name) || '';
-      this.vlog('getUserMedia failed:', name);
-      this.setState({ micState: name === 'NotAllowedError' ? 'denied' : 'error' });
-      if (name === 'NotAllowedError' || name === 'SecurityError') {
-        return { ok: false, reason: 'denied',
-          message: 'Microphone access is blocked. Allow it for this site, then try again.' };
-      }
-      if (name === 'NotFoundError' || name === 'OverconstrainedError') {
-        return { ok: false, reason: 'missing',
-          message: 'No microphone was found. Plug one in or pick another input, then try again.' };
-      }
-      if (name === 'NotReadableError' || name === 'AbortError') {
-        return { ok: false, reason: 'busy',
-          message: 'Your microphone is in use by another app. Close it and try again.' };
-      }
-      return { ok: false, reason: 'unknown', message: 'Could not access the microphone. Please try again.' };
-    });
-  }
-
-  // Tracks are released only once a call is genuinely over. Stopping them during setup is another
-  // way to hand the SDK a dead device.
-  releaseMic() {
-    if (!this._micStream) return;
-    try { this._micStream.getTracks().forEach(t => t.stop()); } catch (e) {}
-    this._micStream = null;
-    this.vlog('microphone released');
-  }
-
-  // One place to unwind a failed attempt, so every failure path leaves identical state and the
-  // next click starts genuinely clean.
-  failCall(message) {
-    if (this.state.toothy !== 'connecting' && this.state.toothy !== 'live') return;
-    clearInterval(this._callTimer); clearInterval(this._yapTimer); clearInterval(this._silenceTimer);
-    this._claimed = false; // an attempt that never connected must not burn the free demo
-    this.releaseMic();
-    this.setState({ toothy: 'idle', starting: false, bubble: message });
-    this.track('demo_error', { stage: this.state.toothy });
-  }
-
-  // ---- Instrumentation (BUG-12) ----
-  // One funnel, one taxonomy, three sinks. /api/event is first-party and always on (no cookies,
-  // no personal data — an anonymous per-tab id so steps of the same visit can be joined).
-  // Plausible and GA4 mirror the same events automatically if either is present.
-  initAnalytics() {
-    // Identity is three separate things, and conflating them is what made the old numbers wrong:
-    //   visitor_id  persistent, anonymous, localStorage. Counts PEOPLE and survives tabs.
-    //   session_id  one visit, sessionStorage, with a 30-minute idle rollover so a visit
-    //               interrupted by lunch counts as two sessions instead of one six-hour outlier.
-    //   ip_hash     server-side only, for abuse control. Never identity: IPs rotate on mobile
-    //               networks and are shared across an office.
-    // Both ids are random, carry no personal data, and are never sent anywhere but this site.
-    const rid = () => (window.crypto && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : Math.random().toString(36).slice(2) + Date.now().toString(36);
-    try {
-      this._vid = localStorage.getItem('dd_vid');
-      if (!this._vid) { this._vid = rid(); localStorage.setItem('dd_vid', this._vid); }
-    } catch (e) { this._vid = null; } // storage blocked: fall back to session-only identity
-    try {
-      const IDLE_MS = 30 * 60 * 1000;
-      const last = parseInt(sessionStorage.getItem('dd_sid_at') || '0', 10);
-      this._sid = sessionStorage.getItem('dd_sid');
-      if (!this._sid || !last || (Date.now() - last) > IDLE_MS) this._sid = rid();
-      sessionStorage.setItem('dd_sid', this._sid);
-      sessionStorage.setItem('dd_sid_at', String(Date.now()));
-      this._touchSession = () => { try { sessionStorage.setItem('dd_sid_at', String(Date.now())); } catch (e) {} };
-    } catch (e) { this._sid = 'nostore'; this._touchSession = () => {}; }
-
-    // Campaign tags are parsed once here rather than stored raw and unpicked in SQL later.
-    try {
-      const p = new URLSearchParams(location.search);
-      this._utm = {
-        source: p.get('utm_source') || null,
-        medium: p.get('utm_medium') || null,
-        campaign: p.get('utm_campaign') || null
-      };
-    } catch (e) { this._utm = {}; }
-
-    if (this.PLAUSIBLE_DOMAIN && !window.plausible) {
-      const sc = document.createElement('script');
-      sc.defer = true; sc.dataset.domain = this.PLAUSIBLE_DOMAIN; sc.src = 'https://plausible.io/js/script.js';
-      document.head.appendChild(sc);
-      window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments); };
-    }
-
-    if ('IntersectionObserver' in window) {
-      const hero = document.querySelector('header');
-      if (hero) {
-        this._hio = new IntersectionObserver(es => es.forEach(en => {
-          if (en.isIntersecting) { this._hio.unobserve(en.target); this.track('view_hero'); }
-        }), { threshold: 0.25 });
-        this._hio.observe(hero);
-      }
-    }
-
-    this._t0 = Date.now();
-    this.track('page_view', {
-      referrer_host: (() => { try { return document.referrer ? new URL(document.referrer).hostname : 'direct'; } catch (e) { return 'direct'; } })(),
-      viewport: window.innerWidth < 768 ? 'mobile' : (window.innerWidth < 1200 ? 'tablet' : 'desktop'),
-      utm: location.search.slice(0, 200)
-    });
-
-    // Scroll depth: how far down the page people actually get, once per threshold.
-    this._depth = {}; this._maxDepth = 0;
-    this._onDepth = () => {
-      const doc = document.documentElement;
-      const pct = Math.min(100, Math.round(((window.scrollY + window.innerHeight) / doc.scrollHeight) * 100));
-      if (pct > this._maxDepth) this._maxDepth = pct;
-      [25, 50, 75, 90].forEach(t => {
-        if (pct >= t && !this._depth[t]) { this._depth[t] = true; this.track('scroll_depth', { depth: t }); }
-      });
-    };
-    window.addEventListener('scroll', this._onDepth, { passive: true });
-
-    // Dwell time per section: which parts of the page hold attention. Accumulated while a
-    // section is at least half on screen, and sent as one event at the end of the visit.
-    //
-    // section_view fires the first time each section is actually seen. That used to be inferred
-    // at query time from section_time, which only arrives at the very end of a visit, so the
-    // "reached the demo" funnel step silently missed every session that did not close cleanly.
-    // A reach event has to be its own event.
-    this._dwell = {}; this._dwellFrom = {}; this._seenSection = {};
-    if ('IntersectionObserver' in window) {
-      this._sio = new IntersectionObserver(es => es.forEach(en => {
-        const name = en.target.getAttribute('data-section');
-        if (!name) return;
-        if (en.isIntersecting) {
-          this._dwellFrom[name] = Date.now();
-          if (!this._seenSection[name]) { this._seenSection[name] = true; this.track('section_view', { section: name }); }
-        }
-        else if (this._dwellFrom[name]) {
-          this._dwell[name] = (this._dwell[name] || 0) + (Date.now() - this._dwellFrom[name]);
-          delete this._dwellFrom[name];
-        }
-      }), { threshold: 0.5 });
-      document.querySelectorAll('[data-section]').forEach(el => this._sio.observe(el));
-
-      // CTA impressions: the denominator click-through rate never had. Without it you can only
-      // see which button gets clicked most in absolute terms, which mostly reflects which one
-      // sits highest on the page. Fires once per placement per visit.
-      this._seenCta = {};
-      this._cio = new IntersectionObserver(es => es.forEach(en => {
-        const where = en.target.getAttribute('data-cta');
-        if (!en.isIntersecting || !where || this._seenCta[where]) return;
-        this._seenCta[where] = true;
-        this._cio.unobserve(en.target);
-        this.track('cta_impression', { location: where });
-      }), { threshold: 0.6 });
-      document.querySelectorAll('[data-cta]').forEach(el => this._cio.observe(el));
-    }
-
-    // Video watch time: real seconds watched, plus quarter milestones per clip.
-    // The clip name is read from the element rather than inferred from DOM order — index-based
-    // naming meant reordering the page silently relabelled historical data.
-    this._watch = {};
-    document.querySelectorAll('video').forEach((v, i) => {
-      const clip = v.getAttribute('data-clip') || ('video_' + (i + 1));
-      const w = this._watch[clip] = { seconds: 0, last: 0, marks: {} };
-      v.addEventListener('timeupdate', () => {
-        const d = v.currentTime - w.last;
-        if (d > 0 && d < 1.5) w.seconds += d; // ignore seeks
-        w.last = v.currentTime;
-        if (v.duration) {
-          const pct = Math.round((v.currentTime / v.duration) * 100);
-          [25, 50, 75, 95].forEach(t => {
-            if (pct >= t && !w.marks[t]) { w.marks[t] = true; this.track('video_progress', { clip, percent: t }); }
-          });
-        }
-      });
-      v.addEventListener('seeked', () => { w.last = v.currentTime; });
-    });
-
-    // Total click coverage, via one delegated listener on the document.
-    //
-    // The per-button handlers only fire on the controls someone remembered to wire up: of the
-    // contact links on this page, fewer than half had a handler, so "how many people emailed
-    // me" was unanswerable. Delegation catches everything, including anything added later, and
-    // it keeps working when a control is re-rendered.
-    //
-    // Two events, deliberately:
-    //   element_click  every link and button, for raw interaction counts
-    //   contact_click  WhatsApp, email and phone only, because those are outcomes, not clicks
-    // The existing cta_click handlers still fire and are unaffected: they measure placement
-    // performance, which is a different question from reach.
-    this._onAnyClick = e => {
-      const el = e.target && e.target.closest ? e.target.closest('a,button,[role="button"]') : null;
-      if (!el) return;
-
-      const href = el.getAttribute('href') || '';
-      const section = (el.closest('[data-section]') || {}).getAttribute
-        ? el.closest('[data-section]').getAttribute('data-section') : null;
-
-      // A stable, readable label that survives copy changes better than raw text alone.
-      const label = (el.getAttribute('data-cta') || el.getAttribute('aria-label') ||
-        el.getAttribute('title') || (el.textContent || '').trim().slice(0, 60) || el.tagName).toString();
-
-      let channel = null;
-      if (/^mailto:/i.test(href)) channel = 'email';
-      else if (/^tel:/i.test(href)) channel = 'phone';
-      else if (/(^https?:)?\/\/(wa\.me|api\.whatsapp\.com)/i.test(href)) channel = 'whatsapp';
-
-      this.track('element_click', { label, section: section || 'unknown', kind: channel || (href ? 'link' : 'button') });
-      if (channel) this.track('contact_click', { channel, label, section: section || 'unknown' });
-    };
-    document.addEventListener('click', this._onAnyClick, true); // capture: runs even if a handler stops propagation
-
-    // One summary per visit, on the way out.
-    //
-    // This used to be a one-shot guarded by a flag, fired on the first `visibilitychange →
-    // hidden`. On a phone, switching apps for a second ended the measured visit permanently, so
-    // time on page and scroll depth were systematically undercounted for the mobile majority.
-    //
-    // Now: hiding the page flushes what we have so far, and coming back resumes measuring.
-    // Repeat flushes send only the time accrued since the last one, so a visitor who switches
-    // apps five times contributes five partial summaries that add up to the real total rather
-    // than one truncated one. `_sent` tracks what has already been reported per section.
-    this._sent = {}; this._sentSeconds = 0; this._sentWatch = {};
-    this._flush = final => {
-      const now = Date.now();
-      // Close any open dwell windows without discarding them: the section is still on screen.
-      Object.keys(this._dwellFrom).forEach(n => {
-        this._dwell[n] = (this._dwell[n] || 0) + (now - this._dwellFrom[n]);
-        this._dwellFrom[n] = now;
-      });
-      const delta = {};
-      Object.keys(this._dwell).forEach(n => {
-        const whole = Math.round(this._dwell[n] / 1000);
-        const already = this._sent[n] || 0;
-        if (whole > already) { delta[n] = whole - already; this._sent[n] = whole; }
-      });
-      if (Object.keys(delta).length) this.track('section_time', delta);
-
-      Object.keys(this._watch).forEach(clip => {
-        const whole = Math.round(this._watch[clip].seconds);
-        const already = this._sentWatch[clip] || 0;
-        if (whole > already + 0.5) {
-          this.track('video_watch', { clip, seconds: whole - already });
-          this._sentWatch[clip] = whole;
-        }
-      });
-
-      const total = Math.round((now - this._t0) / 1000);
-      if (total > this._sentSeconds) {
-        this.track('session_end', {
-          seconds: total - this._sentSeconds,
-          max_depth: this._maxDepth,
-          final: !!final
-        });
-        this._sentSeconds = total;
-      }
-    };
-    this._onLeave = () => this._flush(true);
-    window.addEventListener('pagehide', this._onLeave);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') this._flush(false);
-      else { this._t0 = Date.now() - this._sentSeconds * 1000; this._touchSession(); } // resume measuring
-    });
-  }
-
-  track(name, props) {
-    try {
-      const p = props || {};
-      if (window.plausible) window.plausible(name, { props: p });
-      if (window.gtag) window.gtag('event', name, p);
-      if (this._touchSession) this._touchSession(); // any activity keeps the session alive
-      const body = JSON.stringify({
-        event: name, props: p,
-        vid: this._vid, sid: this._sid, utm: this._utm || {},
-        path: location.pathname, ref: document.referrer || '', ts: Date.now()
-      });
-      // Beacon survives the page being closed mid-event (exit intent, outbound Calendly click).
-      if (navigator.sendBeacon) navigator.sendBeacon('/api/event', new Blob([body], { type: 'application/json' }));
-      else fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
-    } catch (e) { /* analytics must never break the page */ }
-  }
-
-  openBookingFrom(where) {
-    this.track('cta_click', { location: where });
-    this.track('form_open', { location: where, step: this.state.step });
-    this.setState({ modal: 'booking', formError: '' });
-  }
-
-  // Debounced: dragging a slider is one intent, not forty events.
-  trackCalc(field) {
-    clearTimeout(this._calcT);
-    this._calcT = setTimeout(() => this.track('calc_interact', { field }), 800);
-    this._timers.push(this._calcT);
-  }
-
-  // ---- Lead delivery ----
-  leadPayload(source) {
-    const s = this.state;
-    return {
-      name: s.bName, practice_name: s.bPractice, email: s.bEmail, phone: s.bPhone,
-      country: s.bCountry, monthly_call_volume: s.bVolume, locations: s.bLocations,
-      website: s.bWebsite, // honeypot: server drops anything with this filled
-      source,
-      // Attribution rides along so a lead can be tied back to the visit and campaign that
-      // produced it. The direct-to-Supabase fallback ignores the fields it has no columns for.
-      vid: this._vid, sid: this._sid, utm: this._utm || {}, ref: document.referrer || ''
-    };
-  }
-
-  // BUG-3: a completed demo call is the strongest buying signal on the page and used to reach
-  // nobody. Fired once per source per session; failures stay silent for the visitor.
-  notifyLead(source) {
-    this._sentSources = this._sentSources || {};
-    if (this._sentSources[source]) return;
-    this._sentSources[source] = true;
-    try {
-      fetch('/api/notify-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-dd-site': this.SITE_TOKEN },
-        body: JSON.stringify(this.leadPayload(source)),
-        keepalive: true
-      }).catch(() => {});
-    } catch (e) { /* nothing the visitor should ever see */ }
-  }
-
-  // Citation hover previews: microlink screenshot card, vanilla equivalent of the LinkPreview
-  // component (spring-in card above the link, subtle x-follow on mousemove). No dependencies.
-  initLinkPreviews() {
-    const links = document.querySelectorAll('[data-linkpreview]');
-    if (!links.length) return;
-    const card = document.createElement('div');
-    card.setAttribute('aria-hidden', 'true');
-    card.style.cssText = 'position:fixed;z-index:90;pointer-events:none;opacity:0;transform:translate(-50%,10px) scale(.7);transition:opacity .28s cubic-bezier(.22,1,.36,1),transform .32s cubic-bezier(.34,1.56,.64,1);background:#FFFFFF;border:1px solid #E8E4DA;border-radius:12px;padding:4px;box-shadow:0 18px 44px rgba(10,26,47,0.2)';
-    const img = document.createElement('img');
-    img.style.cssText = 'display:block;width:200px;height:125px;object-fit:cover;object-position:top;border-radius:8px;background:#F1EEE6';
-    img.alt = '';
-    const cap = document.createElement('div');
-    cap.style.cssText = 'font-size:11px;color:#5A6E86;padding:5px 4px 2px;text-align:center;font-family:Inter,system-ui,sans-serif';
-    card.appendChild(img); card.appendChild(cap);
-    document.body.appendChild(card);
-    this._lpCard = card;
-    let xTarget = 0, xCur = 0;
-    const tick = () => { xCur += (xTarget - xCur) * 0.14; card.style.marginLeft = xCur.toFixed(1) + 'px'; this._lpRaf = requestAnimationFrame(tick); };
-    links.forEach(a => {
-      a.addEventListener('mouseenter', () => {
-        const url = a.getAttribute('data-linkpreview');
-        const r = a.getBoundingClientRect();
-        img.src = 'https://api.microlink.io/?' + new URLSearchParams({ url, screenshot: 'true', meta: 'false', embed: 'screenshot.url', 'viewport.width': '800', 'viewport.height': '500' }).toString();
-        cap.textContent = url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
-        card.style.left = (r.left + r.width / 2) + 'px';
-        card.style.top = Math.max(8, r.top - 178) + 'px';
-        xTarget = 0; xCur = 0; card.style.marginLeft = '0px';
-        card.style.opacity = '1';
-        card.style.transform = 'translate(-50%,0) scale(1)';
-        if (!this._lpRaf) tick();
-      });
-      a.addEventListener('mousemove', e => {
-        const r = a.getBoundingClientRect();
-        xTarget = (e.clientX - (r.left + r.width / 2)) / 2;
-      });
-      a.addEventListener('mouseleave', () => {
-        card.style.opacity = '0';
-        card.style.transform = 'translate(-50%,10px) scale(.7)';
-        if (this._lpRaf) { cancelAnimationFrame(this._lpRaf); this._lpRaf = null; }
-      });
-    });
-  }
-
-  componentWillUnmount() {
-    (this._timers || []).forEach(clearTimeout);
-    clearInterval(this._callTimer);
-    clearInterval(this._yapTimer);
-    window.removeEventListener('scroll', this._onScroll);
-    document.removeEventListener('keydown', this._onKey);
-    document.removeEventListener('mouseout', this._onMouseOut);
-    if (this._mq && this._mq.removeEventListener) this._mq.removeEventListener('change', this._onMq);
-    [this._rio, this._cio, this._tio, this._hio, this._sio].forEach(o => o && o.disconnect());
-    window.removeEventListener('scroll', this._onDepth);
-    window.removeEventListener('pagehide', this._onLeave);
-    if (this._lpRaf) cancelAnimationFrame(this._lpRaf);
-    if (this._lpCard) this._lpCard.remove();
-    clearInterval(this._silenceTimer);
-    if (this._onVapiReady) window.removeEventListener('denty-vapi-ready', this._onVapiReady);
-    // Only tear the call down if one is genuinely live. Listeners are removed and the microphone
-    // released here because the component is going away — never mid-connection.
-    if (this._vapi) {
-      try { this._vapi.removeAllListeners(); } catch (e) {}
-      if (this._vapiLive) { try { Promise.resolve(this._vapi.stop()).catch(() => {}); } catch (e) {} }
-    }
-    this.releaseMic();
-  }
-
-  animateCount(el) {
-    const end = parseFloat(el.dataset.count);
-    const fmt = v => Math.round(v).toLocaleString('en-US');
-    const final = fmt(end);
-    if (this._reduced) { el.textContent = final; return; }
-
-    // The count grows the STRING as well as the number: "0" -> "8,000" is four characters
-    // wider, and the stat around it reads "$<count>–$10,000". On a phone that whole line
-    // fits on one row at "$0–$10,000" and needs two at "$8,000–$10,000", so the line count
-    // flips partway through the count and the block jumps — worse on Android, where Chrome
-    // re-runs font boosting when the layout changes.
-    //
-    // Fix: keep the rendered width constant for the whole animation by drawing the
-    // characters not yet reached as hidden copies of the real ones. Identical glyphs in the
-    // identical font means the width is exact without measuring anything, so it stays
-    // correct when Fraunces finishes loading and swaps the metrics underneath us.
-    //
-    // Desktop columns are wide enough that the line never re-wraps, and there the number
-    // growing outward from centre is the nicer read, so this is scoped to narrow layouts.
-    const hold = window.matchMedia('(max-width:900px)').matches;
-    let live = null;
-    if (hold) {
-      // A hidden copy of the FINAL string holds the box open; the running value is painted
-      // over it, out of flow, so it cannot contribute width. Reserving with the real final
-      // glyphs rather than a measured pixel value means this stays exact when Fraunces
-      // finishes loading and the metrics change underneath us, and it does not depend on
-      // the font carrying tabular figures.
-      const ghost = document.createElement('span');
-      ghost.textContent = final;
-      ghost.style.visibility = 'hidden';
-      ghost.setAttribute('aria-hidden', 'true');
-      live = document.createElement('span');
-      live.style.cssText = 'position:absolute;left:0;right:0;top:0;text-align:center';
-      el.style.position = 'relative';
-      el.style.display = 'inline-block';
-      el.textContent = '';
-      el.append(ghost, live);
-    }
-    const paint = v => {
-      if (hold) live.textContent = v; else el.textContent = v;
-    };
-
-    const t0 = performance.now(), dur = 3400;
-    const step = t => {
-      const p = Math.min(1, (t - t0) / dur);
-      paint(fmt(end * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) requestAnimationFrame(step);
-      else if (hold) {                          // collapse back to plain text
-        el.textContent = final;
-        el.style.position = ''; el.style.display = '';
-      }
-    };
-    paint('0');
-    requestAnimationFrame(step);
-  }
-
-  cycleHero() {
-    const durs = [2400, 4200, 2800];
-    const tick = () => {
-      this.setState(s => {
-        const nextPhase = (s.heroPhase + 1) % 3;
-        return { heroPhase: nextPhase, heroIdx: nextPhase === 0 ? (s.heroIdx + 1) % this.CALLERS.length : s.heroIdx };
-      }, () => this._timers.push(setTimeout(tick, durs[this.state.heroPhase])));
-    };
-    this._timers.push(setTimeout(tick, durs[0]));
-  }
-
-  scrollToEl(id) {
-    const el = document.getElementById(id);
-    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 20, behavior: this._reduced ? 'auto' : 'smooth' });
-  }
-
-  // ---- Demo call ----
-  // Live voice via the Vapi HTML script-tag SDK (loaded in helmet, initialized in componentDidMount).
-  // Clicking Toothy starts a real in-browser call on the visitor's microphone. Duration limits and
-  // end messages are handled on the assistant side; the client countdown is a visual + safety net.
-  // If the SDK hasn't loaded (offline preview), a simulated call plays instead. Never a raw error.
-  startDemo() {
-    const s = this.state;
-    // Two guards, not one: `toothy` covers the visible call states, `starting` covers the gap
-    // between the click and the first state change, where a fast double-click used to slip
-    // through and create a second call.
-    if (s.toothy === 'live' || s.toothy === 'connecting' || s.starting) return;
-    this.setState({ starting: true });
-    // After the form is in, the gate lifts: let them call and test the receptionist right here.
-    if (s.demoUsed && !s.formDone) {
-      this.setState({ toothy: 'limited', bubble: "You've had your free call. Want one answering your practice's phone?", modal: 'booking' });
-      this.track('demo_blocked', { by: 'device' });
-      return;
-    }
-    const total = this.props.demoSeconds ?? 60;
-    this.setState({ toothy: 'connecting', bubble: 'Connecting…', remaining: total });
-    this.gateDemo().then(gate => {
-      if (this.state.toothy !== 'connecting') return; // visitor navigated away mid-check
-      if (!gate.ok && gate.reason !== 'already_demoed') {
-        // Our own gate could not answer. Refuse this attempt so an outage cannot uncap voice
-        // spend, but leave no mark on the visitor — they get a retry, not a spent demo.
-        this.failCall("We couldn't start the demo just now. Give it a moment and try again.");
-        this.track('demo_blocked', { by: gate.reason || 'unavailable' });
-        return;
-      }
-      if (!gate.ok) {
-        try { localStorage.setItem('dd_demo_used', '1'); } catch (e) {}
-        this.setState({ toothy: 'limited', demoUsed: true, modal: 'booking',
-          bubble: "Looks like this line already had its free call. Want one answering your practice's phone?" });
-        this.track('demo_blocked', { by: 'ip' });
-        return;
-      }
-      // Configuration is checked before anything else: better an honest message than a call with
-      // no assistant on it.
-      const configError = this.vapiConfigError();
-      if (configError && this._vapi) { this.failCall(configError); return; }
-
-      this.setState({ bubble: 'Checking your microphone…' });
-      this.ensureMic().then(mic => {
-        if (this.state.toothy !== 'connecting') { this.releaseMic(); return; } // they navigated away
-        if (!mic.ok) {
-          this.setState({ starting: false });
-          this.failCall(mic.message);
-          this.track('demo_blocked', { by: 'mic', reason: mic.reason });
-          return;
-        }
-
-        this.setState({ bubble: 'Calling…' });
-        this.track('demo_start');
-
-        if (!this._vapi) { // SDK unavailable (offline preview): simulate rather than show an error
-          this._timers.push(setTimeout(() => this.goLive(), 1600));
-          return;
-        }
-
-        // start() is async and the assistant argument is optional. The old code called it inside
-        // a try/catch and returned immediately, so a rejected promise escaped the catch, the
-        // fallback never ran, and the UI sat on "Connecting…" forever. Both paths are handled now,
-        // and the assistant id is always passed explicitly.
-        let started;
-        try { started = this._vapi.start(this.VAPI_ASSISTANT_ID); }
-        catch (e) { this.vlog('start threw synchronously:', e); this.failCall("Couldn't start the call. Please try again."); return; }
-
-        Promise.resolve(started).then(call => {
-          // A null result means no call was created — never treat that as connected.
-          if (!call) { this.vlog('start resolved without a call'); this.failCall("Couldn't start the call. Please try again."); return; }
-          this.vlog('call created ·', call && call.id ? 'id received' : 'no id');
-          // Connected state is driven by the SDK's call-start event, never by start() resolving.
-        }).catch(e => {
-          this.vlog('start rejected:', e && (e.message || e));
-          this.failCall("Couldn't connect the call. Please try again.");
-        });
-      });
-    });
-  }
-
-  // BUG-2: the only gate used to be a localStorage flag any visitor could clear. The real check
-  // lives in /api/demo-session (one call per hashed IP); localStorage stays as the instant,
-  // no-round-trip layer above it.
-  //
-  // Returns { ok, reason } rather than a bare boolean, because the two ways a call can be
-  // refused need opposite handling. 'already_demoed' is the visitor's own second attempt and
-  // should stick. 'unavailable' means OUR lookup failed — blocking that attempt caps voice
-  // spend during an outage, but it must never mark the visitor as having used a demo they
-  // never got. A transport error still fails open: a hot lead is not turned away because our
-  // endpoint hiccuped.
-  gateDemo() {
-    if (this.state.formDone) return Promise.resolve({ ok: true }); // already a lead: let them keep testing
-    try {
-      return fetch('/api/demo-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
-        .then(r => (r.ok ? r.json() : null))
-        .then(j => {
-          if (!j) return { ok: true };
-          this._gateToken = j.token || '';
-          return j.approved === false ? { ok: false, reason: j.reason || 'blocked' } : { ok: true };
-        })
-        .catch(() => ({ ok: true }));
-    } catch (e) { return Promise.resolve({ ok: true }); }
-  }
-
-  // Spends the demo, once, at the moment the call connects — not when the button is clicked.
-  // A denied microphone or a dropped connection therefore costs the visitor nothing.
-  // Carries the short-lived token minted by the check above, which ties this claim to a gate
-  // decision made seconds ago for the same IP.
-  claimDemo() {
-    if (this._claimed || this.state.formDone) return;
-    this._claimed = true;
-    try {
-      fetch('/api/demo-session', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ claim: true, token: this._gateToken || '' }), keepalive: true
-      }).catch(() => {});
-    } catch (e) {}
-  }
-
-  goLive() {
-    if (this.state.toothy !== 'connecting') return;
-    this.setState({ toothy: 'live', starting: false, bubble: '' });
-    this.watchMicLevel();
-    this.claimDemo(); // the call is actually connected — only now does it count as their demo
-    if (!this._reduced) this._yapTimer = setInterval(() => this.setState(st => ({ yapIdx: ((st.yapIdx || 0) + 1) % this.YAP_CYCLE.length })), 150);
-    this._callTimer = setInterval(() => {
-      this.setState(st => {
-        const r = st.remaining - 1;
-        if (r <= 0) { clearInterval(this._callTimer); this.hangUp(); return { remaining: 0 }; }
-        return { remaining: r, bubble: r === 10 ? '10 seconds left' : st.bubble };
-      });
-    }, 1000);
-  }
-
-  // The reported Vapi failure is "the assistant received no customer audio". The SDK exposes the
-  // live input level, so we can notice that from the visitor's side and say so, instead of them
-  // talking into a dead microphone for sixty seconds and concluding the product does not work.
-  watchMicLevel() {
-    clearInterval(this._silenceTimer);
-    if (!this._vapi || typeof this._vapi.getLocalAudioLevel !== 'function') return;
-    let quiet = 0, heard = false;
-    this._silenceTimer = setInterval(() => {
-      if (this.state.toothy !== 'live') { clearInterval(this._silenceTimer); return; }
-      let level = 0;
-      try { level = this._vapi.getLocalAudioLevel() || 0; } catch (e) { return; }
-      if (level > 0.01) { heard = true; quiet = 0; if (this.state.micWarn) this.setState({ micWarn: false }); return; }
-      quiet++;
-      // Eight seconds of silence before we say anything: people pause, and nobody wants a warning
-      // for thinking. Only warn if we have never heard them at all.
-      if (quiet === 8 && !heard) {
-        this.vlog('no local audio detected after 8s — input may be muted or wrong device');
-        this.setState({ micWarn: true });
-      }
-    }, 1000);
-  }
-
-  hangUp() {
-    clearInterval(this._callTimer);
-    clearInterval(this._silenceTimer);
-    // stop() is async; the call-end listener performs the teardown once it has actually ended, so
-    // the microphone is released after the call rather than during it.
-    if (this._vapi && this._vapiLive) {
-      try { Promise.resolve(this._vapi.stop()).catch(() => {}); return; } catch (e) {}
-    }
-    this.releaseMic();
-    this.finishDemo();
-  }
-
-  // Naming the actual control beats "check your browser settings". Once a visitor has denied the
-  // microphone, most browsers will not prompt again, so they have to be told where the switch is.
-  micInstructions() {
-    const ua = navigator.userAgent || '';
-    const ios = /iPad|iPhone|iPod/.test(ua);
-    if (/Firefox/.test(ua)) return 'Click the microphone icon in the address bar, remove the block, then reload the page and try again.';
-    if (ios) return 'Open Settings, then Safari, then Microphone, and allow this site. Then reload the page.';
-    if (/Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua)) return 'Open Safari, then Settings for This Website, set Microphone to Allow, then reload the page.';
-    if (/Android/.test(ua)) return 'Tap the lock icon beside the address bar, open Permissions, allow the microphone, then reload the page.';
-    return 'Click the lock or microphone icon at the left of the address bar, set the microphone to Allow, then reload the page.';
-  }
-
-  // Opening a panel is a real interaction worth measuring: it tells us which part of the console
-  // practice owners actually want to see before they commit.
-  pickDash(i) {
-    if (this.state.dashActive === i) return;
-    this.setState({ dashActive: i });
-    const shot = this.DASH_SHOTS[i];
-    this.track('cta_click', { location: 'dashboard_' + (shot ? shot.id : i) });
-  }
-
-  // Give the frame the screenshot's own aspect ratio the moment it loads. These are full-page
-  // captures whose dimensions are not known when the markup is written, so measuring beats
-  // guessing: a fixed box would crop a tall capture, and a letterboxed one would waste half the
-  // panel on a wide one.
-  sizeDash(e) {
-    const img = e && (e.target || e.currentTarget);
-    if (!img || !img.naturalWidth || !img.naturalHeight) return;
-    const frame = img.closest ? img.closest('.dd-dash-frame') : null;
-    if (frame) frame.style.setProperty('--ar', (img.naturalWidth / img.naturalHeight).toFixed(4));
-    // A very tall capture scrolls inside its frame rather than stretching the page; a short one
-    // simply shows in full. Either way the whole image is reachable and none of it is cut off.
-    const scroller = img.parentElement;
-    if (scroller && img.naturalHeight / img.naturalWidth < 1.2) scroller.style.maxHeight = 'none';
-  }
-
-  // Called from the mic-denied panel. Clears the error and runs the whole start path again against
-  // the same client instance, so no listeners are duplicated.
-  retryDemo() {
-    this.setState({ micState: 'unknown', micWarn: false, bubble: '' });
-    this.startDemo();
-  }
-
-  currentFrame() {
-    const s = this.state;
-    if (s.toothy === 'live' || s.toothy === 'connecting') return this.YAP_CYCLE[s.yapIdx || 0];
-    if (s.toothy === 'ended' || s.toothy === 'limited') return 'happy';
-    return s.bubble ? 'happy' : 'neutral';
-  }
-
-  componentDidUpdate() {
-    // Focus management: move focus into an opening dialog, restore it on close
-    if (this.state.modal !== this._prevModal) {
-      if (this.state.modal) {
-        this._lastFocus = document.activeElement;
-        setTimeout(() => {
-          const d = document.querySelector('[role="dialog"]');
-          if (!d) return;
-          const f = d.querySelector('input, select, button:not([aria-label="Close"]), a[href]');
-          (f || d).focus();
-        }, 80);
-      } else if (this._lastFocus && this._lastFocus.focus) { this._lastFocus.focus(); }
-      this._prevModal = this.state.modal;
-    }
-    // Sprite src is set imperatively — a {{ }} hole in an img src fires a bogus fetch during raw HTML parse.
-    const el = document.getElementById('denty-sprite');
-    if (el) {
-      const src = this.FRAMES[this.currentFrame()];
-      if (el.getAttribute('src') !== src) el.setAttribute('src', src);
-    }
-    const fpEl = document.getElementById('founder-photo');
-    if (fpEl && fpEl.getAttribute('src') !== this.FOUNDER_PHOTO) fpEl.setAttribute('src', this.FOUNDER_PHOTO);
-  }
-
-  finishDemo() {
-    if (this.state.toothy === 'ended') return;
-    clearInterval(this._yapTimer);
-    localStorage.setItem('dd_demo_used', '1');
-    this.setState({ toothy: 'ended', demoUsed: true, bubble: 'That was the same receptionist your patients would reach.' });
-    this.track('demo_complete', { seconds: (this._demoTotal || 60) - this.state.remaining });
-    this.notifyLead('demo_call');
-    // Post-form calls: once the conversation ends, bring the form popup back up.
-    if (this.state.formDone) this._timers.push(setTimeout(() => { if (!this.state.modal) this.setState({ modal: 'booking' }); }, 1400));
-  }
-
-  // ---- Booking modal ----
-  EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
-  // BUG-10: every step now says what it wants instead of silently refusing to advance.
-  STEP_PROMPTS = [
-    'Your name, so we know who we’re talking to.',
-    'Your practice’s name, so we can look it up before the call.',
-    'Pick a country to continue.',
-    'Pick a rough call volume to continue.',
-    'How many locations? Enter at least 1.',
-    'That email doesn’t look right. Try something like you@practice.com.'
-  ];
-
-  valid(step) {
-    const s = this.state;
-    return [s.bName, s.bPractice, s.bCountry, s.bVolume, s.bLocations, s.bEmail][step] !== '' || step > 5;
-  }
-
-  refuse(msg) {
-    this.setState({ formError: msg, shake: true });
-    clearTimeout(this._shakeT);
-    this._shakeT = setTimeout(() => this.setState({ shake: false }), 460);
-    this._timers.push(this._shakeT);
-  }
-
-  next() {
-    const s = this.state;
-    if (s.step === 5) {
-      if (!this.EMAIL_RE.test(String(s.bEmail).trim())) {
-        this.refuse(this.STEP_PROMPTS[5]);
-        this.track('form_error', { step: 6, field: 'email' });
-        return;
-      }
-      // Lead delivery: /api/notify-lead inserts into Supabase and emails the owner via Resend.
-      localStorage.setItem('dd_form_done', '1');
-      this.setState({ step: 6, sendState: 'sending', formDone: true, formError: '' });
-      this.track('form_step_5');
-      this.track('form_submit', { volume: s.bVolume, locations: s.bLocations, country: s.bCountry, demoed: !!s.demoUsed });
-      this.submitLead();
-    } else if (this.valid(s.step)) {
-      this.setState({ step: s.step + 1, formError: '' });
-      this.track('form_step_' + (s.step + 1));
-    } else {
-      this.refuse(this.STEP_PROMPTS[s.step]);
-      this.track('form_error', { step: s.step + 1 });
-    }
-  }
-
-  submitLead() {
-    const payload = this.leadPayload('form');
-    try {
-      // Primary: serverless route (Supabase insert + Resend email to the owner's inbox).
-      fetch('/api/notify-lead', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-dd-site': this.SITE_TOKEN }, body: JSON.stringify(payload) })
-        .then(r => r.json())
-        .then(j => { if (j && j.ok) this.setState({ sendState: 'sent' }); else { this.insertDirect(payload); } })
-        .catch(() => this.insertDirect(payload));
-    } catch (e) { this.setState({ sendState: 'queued' }); }
-  }
-
-  insertDirect(payload) {
-    // Fallback when no serverless runtime exists: write the lead straight to Supabase from the
-    // browser, under the insert-only RLS policy.
-    //
-    // The row is built column by column rather than by spreading the payload. PostgREST rejects
-    // the whole insert if it sees a key with no matching column, and the payload deliberately
-    // carries fields the table does not have: the honeypot, the nested utm object, the raw
-    // referrer. (This previously destructured `website` out and then sent the original payload
-    // anyway, so every fallback insert was being rejected.)
-    if (payload.website) return; // bot: drop it here too
-    const u = payload.utm || {};
-    let referrerHost = null;
-    if (payload.ref) { try { referrerHost = new URL(payload.ref).hostname.replace(/^www\./, ''); } catch (e) { referrerHost = null; } }
-    const core = {
-      name: payload.name, practice_name: payload.practice_name, email: payload.email,
-      phone: payload.phone, country: payload.country,
-      monthly_call_volume: payload.monthly_call_volume, locations: payload.locations,
-      source: payload.source
-    };
-    const attributed = Object.assign({}, core, {
-      visitor_id: payload.vid || null, session_id: payload.sid || null,
-      utm_source: u.source || null, utm_medium: u.medium || null, utm_campaign: u.campaign || null,
-      referrer_host: referrerHost
-    });
-    const post = row => fetch(this.SUPABASE_URL + '/rest/v1/leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', apikey: this.SUPABASE_PUBLISHABLE_KEY, Authorization: 'Bearer ' + this.SUPABASE_PUBLISHABLE_KEY, Prefer: 'return=minimal' },
-      body: JSON.stringify(row)
-    });
-    try {
-      // If the attribution columns are not there yet (page deployed ahead of the migration),
-      // retry with the columns the table has always had. Losing the campaign tag is a small
-      // cost; losing the lead is not.
-      post(attributed)
-        .then(r => r.ok ? r : post(core))
-        .then(r => this.setState({ sendState: r.ok ? 'saved' : 'queued' }))
-        .catch(() => this.setState({ sendState: 'queued' }));
-    } catch (e) { this.setState({ sendState: 'queued' }); }
-  }
-
-  // ---- Pricing card 3D tilt + glare (spring-smoothed, hover-capable pointers only) ----
-  _tiltEnabled() {
-    return !this._reduced && window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
-  }
-  _tiltMove(e) {
-    const el = this._tiltEl;
-    if (!el || !this._tiltEnabled()) return;
-    const r = el.getBoundingClientRect(), max = 12;
-    const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
-    this._tiltTarget = { rx: (0.5 - py) * max, ry: (px - 0.5) * max };
-    if (this._glareEl) this._glareEl.style.background = `radial-gradient(circle at ${(px * 100).toFixed(1)}% ${(py * 100).toFixed(1)}%, #0A1A2F, transparent 50%)`;
-    this._tiltRun();
-  }
-  _tiltLeave() {
-    if (!this._tiltEl) return;
-    this._tiltTarget = { rx: 0, ry: 0 };
-    this._tiltRun();
-  }
-  _tiltRun() {
-    if (this._tiltRaf) return;
-    const st = this._tiltState || (this._tiltState = { rx: 0, ry: 0, vx: 0, vy: 0 });
-    const k = 200, d = 15, m = 0.3, dt = 1 / 60; // SPRING_MOUSE: stiffness 200, damping 15, mass 0.3
-    const step = () => {
-      const t = this._tiltTarget || { rx: 0, ry: 0 }, el = this._tiltEl;
-      st.vx += ((t.rx - st.rx) * k - st.vx * d) / m * dt; st.rx += st.vx * dt;
-      st.vy += ((t.ry - st.ry) * k - st.vy * d) / m * dt; st.ry += st.vy * dt;
-      if (el) el.style.transform = `perspective(1000px) rotateX(${st.rx.toFixed(3)}deg) rotateY(${st.ry.toFixed(3)}deg)`;
-      const settled = Math.abs(t.rx - st.rx) < 0.02 && Math.abs(t.ry - st.ry) < 0.02 && Math.abs(st.vx) < 0.02 && Math.abs(st.vy) < 0.02;
-      if (settled) {
-        st.rx = t.rx; st.ry = t.ry; st.vx = 0; st.vy = 0;
-        if (el) el.style.transform = t.rx === 0 && t.ry === 0 ? '' : `perspective(1000px) rotateX(${t.rx}deg) rotateY(${t.ry}deg)`;
-        this._tiltRaf = 0;
-      } else {
-        this._tiltRaf = requestAnimationFrame(step);
-      }
-    };
-    this._tiltRaf = requestAnimationFrame(step);
-  }
-
-  componentDidCatch(err) { console.error('Boundary caught:', err); this.setState({ crashed: true }); }
-
-  renderVals() {
-    const fallback = { crashed: true, appOk: false, reloadPage: () => location.reload() };
-    if (this.state.crashed) return fallback;
-    try { return { crashed: false, appOk: true, ...this._vals() }; }
-    catch (e) { console.error('renderVals failed, showing fallback:', e); return fallback; }
-  }
-
-  // ROI calculator bounds. Kept in one place so the number inputs, the range
-  // sliders and the clamp below can never drift apart.
-  CALC = {
-    size:  { min: 1,   max: 10   },
-    calls: { min: 5,   max: 200  },
-    value: { min: 50,  max: 3000 }
-  };
-
-  // Fields hold raw strings so a half-typed or momentarily empty box doesn't fight
-  // the user. Clamp only when computing; normalise the text on blur.
-  _calcNum(raw, key) {
-    const b = this.CALC[key];
-    const n = parseInt(String(raw).replace(/[^\d]/g, ''), 10);
-    if (!Number.isFinite(n)) return key === 'value' ? (this.props.firstVisitValue ?? 850) : b.min;
-    return Math.max(b.min, Math.min(b.max, n));
-  }
-
-  _vals() {
-    const s = this.state;
-    const c = this.CALLERS[s.heroIdx];
-    const total = this._demoTotal || (this.props.demoSeconds ?? 60);
-    const rate = this.props.bookingRate ?? 0.30;   // share of missed calls that are booking opportunities
-    const MISSED_RATE = 0.17;                      // unanswered share — low end of the cited 17–38%
-    const WORK_DAYS = 5, WEEKS = 52;
-
-    const calcSizeN = this._calcNum(s.calcSize, 'size');
-    const calcCallsN = this._calcNum(s.calcCalls, 'calls');
-    const calcValueN = this._calcNum(s.calcValue, 'value');
-
-    const callsYear = calcSizeN * calcCallsN * WORK_DAYS * WEEKS;
-    const missedYear = Math.round(callsYear * MISSED_RATE);
-    const lost = Math.round(missedYear * rate * calcValueN);
-    const bars = n => Array.from({ length: n }, (_, i) => ({ delay: (i * 0.11 % 0.9).toFixed(2) + 's' }));
-    // FAQ order is deliberate: compliance first (the #1 US dental objection), then
-    // the "is it obviously a robot" fear, then the hidden-cost fear, then accuracy,
-    // then the two comparison questions, then logistics and terms.
-    // NOTE FOR BENNY: the HIPAA answer and the contracts/data answer below make no
-    // certification claims by design. Have your own counsel read both before launch.
-    const faqData = [
-      { q: 'Is this HIPAA-compliant?', a: "Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We'll walk you through exactly how data flows on your strategy call, and we're happy to sign a BAA with the voice platform if your practice requires one." },
-      { q: "Will patients know it's AI?", a: "Some ask. The voice is natural enough that most don't. It never pretends to be human when asked directly. It says it's the practice's automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM." },
-      { q: 'What does usage roughly cost monthly?', a: 'Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us, and nothing else is billed monthly unless you choose a care plan.' },
-      { q: 'What if it mishears something, or books the wrong details?', a: "It confirms every detail that matters. Name, phone number, and appointment time are read back to the caller before anything is booked. If a caller needs something outside its script, it takes a message and flags it for your staff instead of guessing. And when something does slip through, it slips through where you can see it: the appointment sits in your calendar like any other, so your team fixes it in seconds and we tune the script so it doesn't happen twice." },
-      { q: 'How is this different from an answering service?', a: "An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list, and every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier." },
-      { q: 'Does it replace my front desk?', a: "No. It catches what they physically can't: after-hours calls, lunch rushes, the second line while they're checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself." },
-      { q: 'Will this work with Dentrix, Eaglesoft or Open Dental?', a: "Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes. That is the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn't, Denty still books into a calendar your team already lives in." },
-      { q: 'How fast is go-live?', a: 'Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access.' },
-      { q: 'Contracts, cancellation, and data?', a: "No long-term contract. The setup fee is one-time, and care plans cancel anytime: the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don't receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we'll have it in place before a single patient call is answered. Ask us to delete anything you've given us and it's deleted." },
-      { q: "How much does an AI receptionist for a dental practice cost?", a: "Setup is $2,000, one time. That covers the voice AI configured to your practice, your calendar, call scripting for your services and insurance list, testing and go-live. You can split it: $1,000 up front and the remaining $1,000 only once a real patient is booked into your calendar within 14 days of go-live — if that doesn't happen, you don't owe it. After that the only running cost is voice usage on your own platform account, billed at cost, typically $0.10–$0.15 per minute of live conversation, which lands most practices between $60 and $150 a month. Ongoing care plans are optional at $149 or $299 a month and cancel anytime." },
-      { q: "Can it answer calls after hours, at lunch, and on weekends?", a: "That is the entire point. A practice answering phones roughly 40 hours a week is unreachable for the other 128, and the calls that land in those hours are the ones your marketing already paid for. It answers on the first ring at 7 PM, on Saturday, over lunch, and on the second line while your front desk is checking a patient in. There is no separate after-hours mode to switch on: it is the same receptionist, all 168 hours." },
-      { q: "What happens if a patient calls with a dental emergency?", a: "It follows the rules you set, and it does not make clinical judgements. You tell us what counts as urgent for your practice and what should happen: route the caller to your on-call number, give them your emergency instructions, book them into the first available slot, or take the details and flag them immediately. Anything outside the script gets escalated rather than guessed at, and every call is transcribed and logged so your team sees exactly what was said." },
-      { q: "Can it handle multiple callers at the same time?", a: "Yes. Several callers can be on the line at once and each one is answered on the first ring — no hold queue, no busy signal, no voicemail. This is the part a single receptionist physically cannot do: when a campaign lands or a Monday morning rush hits, the third and fourth callers get the same answer as the first." }
-    ];
-    const vols = ['<200', '200–500', '500–1,000', '1,000+'];
-    return {
-      // nav
-      navBg: s.scrolled ? 'rgba(10,26,47,0.88)' : 'rgba(10,26,47,0)',
-      navFg: s.scrolled ? '#FAF9F6' : '#0A1A2F',
-      // hero loop
-      heroLoading: !s.heroReady,
-      hp0: !!s.heroReady && s.heroPhase === 0, hp1: !!s.heroReady && s.heroPhase === 1, hp2: !!s.heroReady && s.heroPhase === 2,
-      heroTag: c.tag, heroL1: c.l1, heroL2: c.l2, heroBooked: c.booked, heroCap: c.cap,
-      heroBars: bars(10), demoBars: bars(12),
-      // calculator — raw strings drive the number boxes, clamped numbers drive the sliders
-      calcSize: s.calcSize, calcCalls: s.calcCalls, calcValue: s.calcValue,
-      calcSizeN, calcCallsN, calcValueN,
-      setCalcSize: e => { this.setState({ calcSize: e.target.value }); this.trackCalc('locations'); },
-      setCalcCalls: e => { this.setState({ calcCalls: e.target.value }); this.trackCalc('calls_per_day'); },
-      setCalcValue: e => { this.setState({ calcValue: e.target.value }); this.trackCalc('patient_value'); },
-      blurCalcSize: () => this.setState({ calcSize: String(this._calcNum(this.state.calcSize, 'size')) }),
-      blurCalcCalls: () => this.setState({ calcCalls: String(this._calcNum(this.state.calcCalls, 'calls')) }),
-      blurCalcValue: () => this.setState({ calcValue: String(this._calcNum(this.state.calcValue, 'value')) }),
-      calcMissedWeek: Math.round(missedYear / WEEKS).toLocaleString('en-US'),
-      calcMissedYear: missedYear.toLocaleString('en-US'),
-      lostYear: '$' + lost.toLocaleString('en-US'),
-      // "New patients" is the unit dentists actually think in — same maths as the dollar figure.
-      lostPatients: Math.round(missedYear * rate).toLocaleString('en-US'),
-      // BUG-8: the number inputs take their type from here so the pre-hydration HTML parse
-      // never sees "{{ }}" inside a type="number" value attribute (4 console warnings gone).
-      numType: 'number',
-      // Carries the demo into the handoff: the Calendly link is tagged with how they got there,
-      // so a booked call can be traced back to "they talked to it first".
-      calendlyUrl: this.CALENDLY_URL + (s.demoUsed ? '?utm_source=digidental&utm_medium=site&utm_content=after_demo' : '?utm_source=digidental&utm_medium=site&utm_content=form'),
-      // toothy
-
-      bubbleOn: !!s.bubble, bubble: s.bubble,
-      tLive: s.toothy === 'live', tEnded: s.toothy === 'ended',
-      ringOn: s.toothy === 'live' || s.toothy === 'connecting',
-      // The mascot is not clickable while a call is being set up or is already running.
-      tBusy: s.starting || s.toothy === 'connecting' || s.toothy === 'live',
-      micBlocked: s.micState === 'denied',
-      micWarn: !!s.micWarn && s.toothy === 'live',
-      micHelp: this.micInstructions(),
-      ringColor: s.remaining <= 10 && s.toothy === 'live' ? '#0F8B80' : '#5A6E86',
-      ringOffset: Math.round(427 * (1 - s.remaining / total)),
-      remaining: s.remaining,
-      startDemo: () => this.startDemo(),
-      retryDemo: () => this.retryDemo(),
-      endDemo: () => this.hangUp(),
-      // faq
-      // Indices into faqData, not copies of it: HIPAA, PMS compatibility, go-live speed.
-      // Editing an answer in one place changes it everywhere it appears.
-      faqTop: [0, 6, 7].map(i => faqData[i]).filter(Boolean).map(f => ({ q: f.q, a: f.a })),
-      faqs: faqData.map((f, i) => ({ ...f, open: s.faqOpen === i, icon: s.faqOpen === i ? '−' : '+', toggle: () => this.setState({ faqOpen: s.faqOpen === i ? -1 : i }) })),
-      // pricing card tilt
-      tiltRef: el => { this._tiltEl = el; },
-      glareRef: el => { this._glareEl = el; },
-      tiltMove: e => this._tiltMove(e),
-      tiltLeave: () => this._tiltLeave(),
-      // modals + navigation
-      mBooking: s.modal === 'booking', mPrivacy: s.modal === 'privacy', mTerms: s.modal === 'terms', mExit: s.modal === 'exit',
-      // Every booking CTA carries where it was clicked, so drop-off can be read per placement.
-      openBooking: () => this.openBookingFrom('other'),
-      openBookingNav: () => this.openBookingFrom('nav'),
-      openBookingHero: () => this.openBookingFrom('hero'),
-      openBookingSection: () => this.openBookingFrom('before_after'),
-      openBookingCalc: () => this.openBookingFrom('calculator'),
-      openBookingPostDemo: () => this.openBookingFrom('post_demo'),
-      openBookingSticky: () => this.openBookingFrom('sticky_mobile'),
-      openBookingFinal: () => this.openBookingFrom('final_cta'),
-      navDemo: e => { e && e.preventDefault(); this.track('cta_click', { location: 'nav_demo' }); this.scrollToEl('demo'); },
-      stickyDemo: () => { this.track('cta_click', { location: 'sticky_demo' }); this.scrollToEl('demo'); },
-      trackWhatsappHero: () => this.track('cta_click', { location: 'hero_whatsapp' }),
-      trackCalendlyPricing: () => this.track('calendly_click', { location: 'pricing' }),
-      trackCalendlyModal: () => this.track('calendly_click', { location: 'form_complete' }),
-      trackCalendlyExit: () => this.track('calendly_click', { location: 'exit_intent' }),
-      // Founder card: the portrait swaps itself for the monogram if the file is not there yet.
-      hasSocialProof: this.SOCIAL_PROOF.length > 0,
-      socialProof: this.SOCIAL_PROOF.map(sp => ({ quote: sp.quote, name: sp.name, practice: sp.practice })),
-      dashShots: this.DASH_SHOTS.map((d, i) => ({
-        id: d.id, title: d.title, note: d.note,
-        src: '/api/image?name=' + d.id,
-        alt: 'Digi Dental dashboard: ' + d.title.toLowerCase(),
-        active: s.dashActive === i,
-        pick: () => this.pickDash(i),
-        // Runs on the image's own load event, which is the only moment the true dimensions are
-        // known. Nothing in the layout assumes a ratio before this.
-        sized: e => this.sizeDash(e)
-      })),
-      founderPhotoOn: !!s.founderPhotoOk,
-      founderMonogramOn: !s.founderPhotoOk,
-      trackFounderWhatsapp: () => this.track('cta_click', { location: 'founder_whatsapp' }),
-      trackFounderEmail: () => this.track('cta_click', { location: 'founder_email' }),
-      trackFounderLinkedin: () => this.track('cta_click', { location: 'founder_linkedin' }),
-      trackFounderPortfolio: () => this.track('cta_click', { location: 'founder_portfolio' }),
-      trackVsl: () => this.track('video_play', { clip: 'vsl' }),
-      trackDemoVideo: () => this.track('video_play', { clip: 'demo_recording' }),
-      openPrivacy: e => { e && e.preventDefault(); this.setState({ modal: 'privacy' }); },
-      openTerms: e => { e && e.preventDefault(); this.setState({ modal: 'terms' }); },
-      closeModal: () => this.setState({ modal: null }),
-      stopProp: e => e.stopPropagation(),
-      dismissExit: () => this.setState({ modal: null }),
-      tryDemoFromExit: () => { this.track('exit_intent_demo'); this.setState({ modal: null }); this.scrollToEl('demo'); },
-      scrollToToothy: e => { e && e.preventDefault(); this.track('cta_click', { location: 'hero_demo' }); this.scrollToEl('demo'); },
-      showSticky: s.showSticky,
-      scrolled: s.scrolled,
-      backToTop: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
-      // booking steps
-      st0: s.step === 0, st1: s.step === 1, st2: s.step === 2, st3: s.step === 3, st4: s.step === 4, st5: s.step === 5, st6: s.step === 6,
-      stNav: s.step < 6,
-      dots: Array.from({ length: 6 }, (_, i) => ({ bg: i <= s.step ? '#0F8B80' : '#D8D2C4' })),
-      bName: s.bName, bPractice: s.bPractice, bCountry: s.bCountry, bLocations: s.bLocations, bEmail: s.bEmail, bPhone: s.bPhone,
-      setName: e => this.setState({ bName: e.target.value, formError: '' }),
-      setPractice: e => this.setState({ bPractice: e.target.value, formError: '' }),
-      setCountry: e => { this.setState({ bCountry: e.target.value, step: e.target.value ? 3 : 2, formError: '' }); if (e.target.value) this.track('form_step_3'); },
-      setLocations: e => this.setState({ bLocations: e.target.value, formError: '' }),
-      setEmail: e => this.setState({ bEmail: e.target.value, formError: '' }),
-      setPhone: e => this.setState({ bPhone: e.target.value }),
-      bWebsite: s.bWebsite,
-      setWebsite: e => this.setState({ bWebsite: e.target.value }),
-      bookingKey: e => { if (e.key === 'Enter') this.next(); },
-      volumeChips: vols.map(v => ({
-        label: v,
-        border: s.bVolume === v ? '#0F8B80' : '#D8D2C4',
-        bg: s.bVolume === v ? '#0F8B80' : '#FFFFFF',
-        color: s.bVolume === v ? '#FAF9F6' : '#0A1A2F',
-        pick: () => { this.setState({ bVolume: v, step: 4, formError: '' }); this.track('form_step_4'); }
-      })),
-      // Inline validation feedback (BUG-10)
-      hasFormError: !!s.formError, formError: s.formError,
-      emailInvalid: !!s.formError && s.step === 5,
-      emailBorder: (!!s.formError && s.step === 5) ? '#B4453C' : '#D8D2C4',
-      nextAnim: s.shake ? 'dd-shake .45s cubic-bezier(.36,.07,.19,.97) both' : 'none',
-      next: () => this.next(),
-      back: () => this.setState({ step: Math.max(0, s.step - 1) }),
-      backColor: s.step === 0 ? 'transparent' : '#5A6E86',
-      nextLabel: s.step === 5 ? 'Submit' : 'Continue',
-      // step 6: qualification verdict + delivery status
-      qualifyTitle: (['200–500', '500–1,000', '1,000+'].includes(s.bVolume) || parseInt(s.bLocations, 10) > 1) ? "You're a fit." : 'Worth twenty minutes.',
-      // Someone who has already talked to the receptionist gets that acknowledged, not repeated at.
-      qualifyLead: s.demoUsed ? "You've already heard exactly what your patients would hear. " : '',
-      qualifyBody: ['200–500', '500–1,000', '1,000+'].includes(s.bVolume)
-        ? `At ${s.bVolume} calls a month, even a small miss rate is real money. Pick a time below; on the call we'll map exactly where yours are going.`
-        : (parseInt(s.bLocations, 10) > 1
-          ? `Across ${s.bLocations} locations, missed calls multiply fast. Pick a time below; on the call we'll map exactly where yours are going.`
-          : 'Under 200 calls a month, the math still holds: five missed calls a week is roughly $66,000 a year at conservative numbers. The call will tell you if it makes sense, no pressure either way.'),
-      sentNote: s.sendState === 'sent' ? 'Your details just landed in our inbox. We reply within one business day.'
-        : (s.sendState === 'saved' ? 'Details received. We reply within one business day.'
-        : (s.sendState === 'sending' ? 'Sending your details to our inbox…' : 'Details saved. We reply within one business day.'))
-    };
-  }
-}
+// Both pages share one implementation, in /dd-logic.js — see the header comment there
+// for why. DCLogic is a parameter of the function the runtime evaluates this in, not a
+// global, which is why it is handed to the factory rather than read off window.
+const Component = DDLogic.create(DCLogic);
 </script>
 </body>
 </html>

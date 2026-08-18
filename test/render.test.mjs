@@ -7,6 +7,10 @@
  * branch and every unresolved {{ hole }} is visible until CSS hides them. Second, that the
  * dashboard panels respond to clicks and *not* to the cursor passing over them.
  *
+ * Both pages are exercised. They share one stylesheet and one logic class, so a rule or a
+ * method that is correct on `/` and broken on `/how-it-works/` is exactly the regression a
+ * single-page test would have missed.
+ *
  * Run: node test/render.test.mjs
  */
 import { chromium } from 'playwright-core';
@@ -41,11 +45,14 @@ const server = http.createServer((req, res) => {
   // Stand in for the storage redirect so the panels have real images to size themselves to.
   if (u.startsWith('/api/image')) { res.writeHead(200, { ...extra, 'Content-Type': 'image/png' }); return res.end(SPRITE); }
   if (u.startsWith('/api/')) { res.writeHead(200, { ...extra, 'Content-Type': 'application/json' }); return res.end('{"ok":true}'); }
-  const f = path.join(ROOT, u === '/' ? 'index.html' : u);
-  if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end('nf'); }
+  // Directory-index resolution, the way Vercel serves static output: /how-it-works/ and
+  // /how-it-works both come from how-it-works/index.html.
+  let f = path.join(ROOT, u === '/' ? 'index.html' : u);
+  if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
+  if (!fs.existsSync(f)) { res.writeHead(404); return res.end('nf'); }
   const ext = path.extname(f);
   const type = ext === '.html' ? 'text/html' : ext === '.js' ? 'text/javascript'
-    : ext === '.png' ? 'image/png' : 'text/plain';
+    : ext === '.css' ? 'text/css' : ext === '.png' ? 'image/png' : 'text/plain';
   res.writeHead(200, { ...extra, 'Content-Type': type });
   res.end(fs.readFileSync(f));
 });
@@ -59,7 +66,7 @@ const check = (name, pass, detail = '') => {
 
 const browser = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox'] });
 
-async function open({ js = true, viewport = { width: 1280, height: 900 } } = {}) {
+async function open({ at = '/', js = true, viewport = { width: 1280, height: 900 } } = {}) {
   const ctx = await browser.newContext({ javaScriptEnabled: js, viewport });
   const page = await ctx.newPage();
   const errors = [];
@@ -77,7 +84,7 @@ async function open({ js = true, viewport = { width: 1280, height: 900 } } = {})
     await page.route('**/@vapi-ai/**', route =>
       route.fulfill({ status: 200, contentType: 'text/javascript', body: 'export default class{on(){}start(){}stop(){}};' }));
   }
-  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}${at}`, { waitUntil: 'domcontentloaded' });
   if (js) {
     await page.waitForFunction(() => !!window.__ddRoot, { timeout: 15000 }).catch(() => {});
     await page.waitForTimeout(1600);
@@ -86,44 +93,64 @@ async function open({ js = true, viewport = { width: 1280, height: 900 } } = {})
 }
 
 // ============================================================ the no-JavaScript view
-{
-  const { page, ctx } = await open({ js: false });
+// Both pages, because the split is exactly the kind of change that quietly leaves one of
+// them rendering the crash boundary or a page full of {{ holes }} to an AI crawler.
+const PAGES = [
+  { name: 'home', at: '/', minChars: 5000 },
+  { name: 'deep', at: '/how-it-works/', minChars: 9000 },
+];
+
+for (const p of PAGES) {
+  const { page, ctx } = await open({ at: p.at, js: false });
   const text = await page.evaluate(() => document.body.innerText);
   const flat = text.replace(/\s+/g, ' ').trim();
 
-  check('crawler sees substantial copy without JS', flat.length > 12000, `${flat.length} chars`);
+  check(`${p.name}: crawler sees substantial copy without JS`, flat.length > p.minChars, `${flat.length} chars`);
 
   // sc-if renders every branch pre-hydration, so the error boundary used to be the first
   // thing on the page. If it comes back, an AI crawler's opening line is "this page had
   // trouble rendering".
-  check('error boundary is not in the crawler view', !/momentary hiccup/i.test(text),
+  check(`${p.name}: error boundary is not in the crawler view`, !/momentary hiccup/i.test(text),
     /momentary hiccup/i.test(text) ? 'crash markup is visible!' : 'hidden');
-  check('page opens on real content', /Digi Dental/.test(flat.slice(0, 120)), flat.slice(0, 60));
+  check(`${p.name}: page opens on real content`, /Digi Dental/.test(flat.slice(0, 120)), flat.slice(0, 60));
 
   const holes = text.match(/\{\{[^}]{0,60}\}\}/g) || [];
-  check('no template syntax leaks as text', holes.length === 0, holes.slice(0, 5).join(' ') || 'clean');
-
-  // The FAQ is rendered from faqData by a loop, so without JS it is an empty template.
-  // The <noscript> mirror is what carries it to non-rendering crawlers.
-  const faqSchema = JSON.parse(
-    fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8')
-      .match(/<script type="application\/ld\+json">\n([\s\S]*?)\n<\/script>/)[1])['@graph']
-    .find(n => n['@type'] === 'FAQPage').mainEntity;
-  const missing = faqSchema.filter(q => !flat.includes(q.name.replace(/\s+/g, ' ').trim()));
-  check('every FAQ question is readable without JS', missing.length === 0,
-    missing[0]?.name || `${faqSchema.length} questions present`);
-  const missingA = faqSchema.filter(q => !flat.includes(q.acceptedAnswer.text.slice(0, 60).replace(/\s+/g, ' ').trim()));
-  check('every FAQ answer is readable without JS', missingA.length === 0,
-    missingA[0]?.name || `${faqSchema.length} answers present`);
+  check(`${p.name}: no template syntax leaks as text`, holes.length === 0, holes.slice(0, 5).join(' ') || 'clean');
 
   const h1 = await page.evaluate(() => document.querySelectorAll('h1').length);
-  check('exactly one h1 in the crawler view', h1 === 1, `${h1}`);
+  check(`${p.name}: exactly one h1 in the crawler view`, h1 === 1, `${h1}`);
+
+  // Both pages have to reach the other one with a real <a href>, or a non-rendering crawler
+  // never discovers the second document at all.
+  const hrefs = await page.evaluate(() => [...document.querySelectorAll('a[href]')].map(a => a.getAttribute('href')));
+  const wanted = p.name === 'home' ? '/how-it-works/' : '/';
+  check(`${p.name}: links to the other page without JS`,
+    hrefs.some(h => h === wanted || (wanted === '/how-it-works/' && h.startsWith('/how-it-works/'))),
+    `${hrefs.length} links`);
+
+  if (p.name === 'deep') {
+    // The FAQ is rendered from faqData by a loop, so without JS it is an empty template.
+    // The <noscript> mirror is what carries it to non-rendering crawlers.
+    const faqSchema = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'how-it-works/index.html'), 'utf8')
+        .match(/<script type="application\/ld\+json">\n([\s\S]*?)\n<\/script>/)[1])['@graph']
+      .find(n => n['@type'] === 'FAQPage').mainEntity;
+    const missing = faqSchema.filter(q => !flat.includes(q.name.replace(/\s+/g, ' ').trim()));
+    check('every FAQ question is readable without JS', missing.length === 0,
+      missing[0]?.name || `${faqSchema.length} questions present`);
+    const missingA = faqSchema.filter(q => !flat.includes(q.acceptedAnswer.text.slice(0, 60).replace(/\s+/g, ' ').trim()));
+    check('every FAQ answer is readable without JS', missingA.length === 0,
+      missingA[0]?.name || `${faqSchema.length} answers present`);
+  }
   await ctx.close();
 }
 
 // ============================================================ landmarks after hydration
-{
-  const { page, ctx, errors, csp } = await open();
+// Section counts are asserted per page: `/` is the five-block hand-raiser, `/how-it-works/`
+// is the deep dive. If a section silently stops rendering, the analytics that key off
+// data-section go quiet rather than erroring, so the count is the alarm.
+for (const [name, at, sections] of [['home', '/', 5], ['deep', '/how-it-works/', 8]]) {
+  const { page, ctx, errors, csp } = await open({ at });
   const lm = await page.evaluate(() => ({
     main: document.querySelectorAll('main').length,
     nav: document.querySelectorAll('nav').length,
@@ -132,24 +159,66 @@ async function open({ js = true, viewport = { width: 1280, height: 900 } } = {})
     mainInSection: !!document.querySelector('section main'),
     sections: document.querySelectorAll('[data-section]').length,
   }));
-  check('exactly one <main> landmark', lm.main === 1, `${lm.main}`);
-  check('footer is page-level, not inside a section', lm.footerInSection === false,
+  check(`${name}: exactly one <main> landmark`, lm.main === 1, `${lm.main}`);
+  check(`${name}: footer is page-level, not inside a section`, lm.footerInSection === false,
     lm.footerInSection ? 'nested — loses the contentinfo landmark' : 'body-level');
-  check('main is not nested in a section', lm.mainInSection === false);
-  check('all sections still tracked', lm.sections === 9, `${lm.sections}`);
-  check('no page errors', errors.length === 0, errors[0] || 'none');
+  check(`${name}: main is not nested in a section`, lm.mainInSection === false);
+  check(`${name}: all sections still tracked`, lm.sections === sections, `${lm.sections} of ${sections}`);
+  check(`${name}: no page errors`, errors.length === 0, errors[0] || 'none');
 
   const overflow = await page.evaluate(() =>
     document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  check('no horizontal overflow on desktop', overflow <= 0, `${overflow}px`);
+  check(`${name}: no horizontal overflow on desktop`, overflow <= 0, `${overflow}px`);
 
   // The test server replays vercel.json's real headers, so the CSP is enforced here exactly as
   // in production. This caught a policy that blanked the entire page: the dc-runtime compiles
   // each logic class from a string, so without 'unsafe-eval' nothing mounts at all.
   const blocked = csp.filter(m => !/fonts\.googleapis/.test(m));
-  check('no CSP violations under the production policy', blocked.length === 0, blocked[0]?.slice(0, 140) || 'clean');
-  check('app actually mounted under CSP', lm.main === 1 && lm.sections === 9,
+  check(`${name}: no CSP violations under the production policy`, blocked.length === 0, blocked[0]?.slice(0, 140) || 'clean');
+  check(`${name}: app actually mounted under CSP`, lm.main === 1 && lm.sections === sections,
     `main ${lm.main}, sections ${lm.sections}`);
+
+  // The nav is the site's only always-visible route to the other page.
+  const desktopLinks = await page.evaluate(() =>
+    [...document.querySelectorAll('.dd-navdesk a')].map(a => a.getAttribute('href')));
+  check(`${name}: desktop nav offers the deep-dive routes`,
+    ['/how-it-works/', '/how-it-works/#pricing', '/how-it-works/#faq', '/how-it-works/#demo']
+      .every(h => desktopLinks.includes(h)), desktopLinks.join(' '));
+  await ctx.close();
+}
+
+// ============================================================ the mobile nav menu
+// Below 900px the links collapse behind one control. A menu that opens onto nothing, or
+// that cannot be closed from the keyboard, is worse than no menu.
+{
+  const { page, ctx, errors } = await open({ at: '/', viewport: { width: 390, height: 844 } });
+  const burgerVisible = await page.evaluate(() => {
+    const b = document.querySelector('.dd-navburger');
+    return !!b && getComputedStyle(b).display !== 'none';
+  });
+  check('mobile: the menu control is visible', burgerVisible);
+  const deskHidden = await page.evaluate(() =>
+    getComputedStyle(document.querySelector('.dd-navdesk')).display === 'none');
+  check('mobile: the desktop link row is hidden', deskHidden);
+  check('mobile: no panel before it is opened', (await page.locator('#dd-nav-panel').count()) === 0);
+
+  await page.evaluate(() => document.querySelector('.dd-navburger').click());
+  await page.waitForTimeout(400);
+  const links = await page.evaluate(() =>
+    [...document.querySelectorAll('#dd-nav-panel a')].map(a => a.getAttribute('href')));
+  check('mobile: opening the menu reveals every route', links.length >= 5, links.join(' '));
+  check('mobile: the menu reaches the deep page', links.includes('/how-it-works/'), links.join(' '));
+  const expanded = await page.evaluate(() => document.querySelector('.dd-navburger').getAttribute('aria-expanded'));
+  check('mobile: the control reports its state', expanded === 'true', `aria-expanded=${expanded}`);
+
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  check('mobile: Escape closes the menu', (await page.locator('#dd-nav-panel').count()) === 0);
+
+  const overflow = await page.evaluate(() =>
+    document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  check('mobile: nav causes no horizontal overflow', overflow <= 0, `${overflow}px`);
+  check('mobile nav: no page errors', errors.length === 0, errors[0] || 'none');
   await ctx.close();
 }
 
@@ -159,7 +228,7 @@ async function open({ js = true, viewport = { width: 1280, height: 900 } } = {})
   // "$<count>–$10,000". On a phone that line fits one row early in the count and needs two
   // by the end, so it re-wraps mid-animation and the block jumps. The fix holds the box open
   // with a hidden copy of the final string and paints the running value over it, out of flow.
-  const { page, ctx, errors } = await open({ viewport: { width: 390, height: 844 } });
+  const { page, ctx, errors } = await open({ at: '/', viewport: { width: 390, height: 844 } });
   await page.evaluate(() => document.querySelector('[data-section="cost"]').scrollIntoView());
 
   // Drive the shipped animateCount directly so the sampling window cannot miss the short
@@ -220,7 +289,7 @@ for (const [label, viewport, collapsedIsZero] of [
   ['desktop', { width: 1280, height: 900 }, false],
   ['mobile', { width: 390, height: 844 }, true],
 ]) {
-  const { page, ctx, errors } = await open({ viewport });
+  const { page, ctx, errors } = await open({ at: '/how-it-works/', viewport });
   await page.evaluate(() => document.querySelector('[data-section="dashboard"]').scrollIntoView());
   await page.waitForTimeout(1400);
 

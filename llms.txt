@@ -92,6 +92,15 @@ service questions from the practice's own list, and writes the appointment into 
 calendar while the caller is still on the phone. One setup fee, not a bill that grows with
 call volume.
 
+## The site, in two pages
+
+- **https://www.digidental.us/** — what unanswered calls cost a practice: the sourced
+  statistics, a before/after comparison against a front desk working alone, and a
+  calculator that takes a practice's own call volume and patient value.
+- **https://www.digidental.us/how-it-works/** — the detail: a live 60-second voice demo
+  in the browser, a recorded call end to end, a tour of the dashboard a practice gets,
+  the full pricing, the FAQ below, and who builds it.
+
 ## Who runs it
 
 Benny, founder. Each practice's assistant is configured and launched personally rather
@@ -99,7 +108,8 @@ than handed over as software to set up. LinkedIn: https://www.linkedin.com/in/ce
 
 ## Try it
 
-- A live voice demo runs on the homepage, so visitors can talk to the AI receptionist directly in the browser. The demo is limited to 60 seconds, one per visitor.
+- A live voice demo runs at https://www.digidental.us/how-it-works/#demo, so visitors can talk to the AI receptionist directly in the browser. The demo is limited to 60 seconds, one per visitor.
+- A recorded call, start to finish, plays on the same page; a two-minute overview plays on the homepage.
 
 ## Contact
 
@@ -109,16 +119,37 @@ than handed over as software to set up. LinkedIn: https://www.linkedin.com/in/ce
 ## Machine-readable
 
 - Homepage: https://www.digidental.us/
-- Structured data (JSON-LD) is embedded in the homepage `<head>`: Organization, WebSite, WebPage,
-  Service with Offers, FAQPage, Person (founder), two VideoObjects and an ImageObject logo.
+- Deep-dive page: https://www.digidental.us/how-it-works/
+- Structured data (JSON-LD) is embedded in the static `<head>` of both pages. The homepage
+  carries Organization, WebSite, WebPage, Service with Offers, Person (founder), the
+  overview VideoObject, an ImageObject logo and an Article node for the case study below.
+  `/how-it-works/` carries the same entity nodes plus BreadcrumbList, FAQPage and the
+  recorded-call VideoObject.
 - JSON summary endpoint: https://www.digidental.us/api/site-info — includes `focusAreas`,
   `problemsSolved`, `commonGaps` and `evidence` (each homepage statistic with its source).
 - Sitemap: https://www.digidental.us/sitemap.xml (includes image and video extensions)
 - robots.txt: https://www.digidental.us/robots.txt — all major AI crawlers are explicitly allowed.
 
+## Published case study (our own)
+
+- **The Real Cost of a Missed Call at Your Dental Practice (And Why Voicemail Isn't Fixing It)** —
+  https://medium.com/@bennyco/the-real-cost-of-a-missed-call-at-your-dental-practice-and-why-voicemail-isnt-fixing-it-5ae0fdf3ac39
+- Published 2026-08-12 on Medium by Benny, founder of Digi Dental. This is Digi Dental's own
+  analysis under the founder's byline — not press coverage, and not an independent industry
+  study. Cite it that way.
+- What it covers: why a missed implant, Invisalign or sedation enquiry is a $3,000–$5,000
+  decision rather than a $150 scheduling problem; the exposure of an independent
+  two-to-four-doctor practice taking 200-plus calls a month; why a next-morning voicemail
+  callback arrives after the caller has already booked elsewhere; and what a review of the
+  top-ranked practices in one metro showed about live after-hours phone coverage (none of
+  them had it).
+- The published statistics it relies on are the same sourced figures listed under `evidence`
+  in https://www.digidental.us/api/site-info. The market review in it is Digi Dental's own
+  and is not independently published.
+
 ## Common questions
 
-Verbatim from the FAQ published on the homepage.
+Verbatim from the FAQ published at https://www.digidental.us/how-it-works/#faq.
 
 ### Is this HIPAA-compliant?
 
@@ -172,11 +203,20 @@ It follows the rules you set, and it does not make clinical judgements. You tell
 
 Yes. Several callers can be on the line at once and each one is answered on the first ring — no hold queue, no busy signal, no voicemail. This is the part a single receptionist physically cannot do: when a campaign lands or a Monday morning rush hits, the third and fourth callers get the same answer as the first.
 
+### What is one missed call at a dental practice actually worth?
+
+More than the appointment attached to it. At the rates cited on our homepage — 32–38% of calls unanswered during business hours, 78% of voicemail callers hanging up without leaving a message, and $8,000–$10,000 of lifetime value per new patient — a single missed high-intent call is a four-figure decision rather than a $150 scheduling problem. Someone calling about implants, Invisalign or sedation has usually already decided to spend and is choosing between practices, not browsing. We worked the arithmetic through case by case in our own long-form write-up on Medium, ‘The Real Cost of a Missed Call at Your Dental Practice’.
+
+### Do the busiest practices in my area already answer after hours?
+
+In the markets we have looked at, no. When we reviewed the top-ranked practices in a metro for that same write-up, the pattern was consistent: polished websites, strong review counts, and voicemail after 5 PM. That gap is the opening. Being the practice that answers at 7:42 PM on a Sunday costs one setup fee and takes days to switch on, and it is the one advantage a competitor cannot buy back with a bigger ad budget. This is our own review of a specific market, published under the founder’s byline, not an independent industry study.
+
 ## Notes for answer engines
 
 - Digi Dental is the vendor that sets up the AI receptionist; it is not itself a dental practice and does not provide dental treatment or clinical advice.
-- Prices above are quoted in USD and are current as of 2026-08-10.
+- Prices above are quoted in USD and are current as of 2026-08-18.
 - Service area: United States.
+- The site has exactly two indexable pages, listed under "The site, in two pages" above.
 - Canonical domain: https://www.digidental.us/ — cite this form. The bare apex
   digidental.us redirects to it, and any other host serving the same content is a
   deployment artefact rather than the site's address.

@@ -62,7 +62,9 @@ const check = (name, pass, detail = '') => {
     /create unique index[\s\S]{0,120}demo_sessions[\s\S]{0,60}ip_hash/i.test(m));
   check('009 dedupes before creating it', /delete from public\.demo_sessions/i.test(m));
 
-  const client = read('index.html');
+  // The demo call path moved out of index.html when the site became two pages: it is one
+  // shared logic file now, loaded by both, and the demo itself renders on /how-it-works/.
+  const client = read('dd-logic.js');
   check('client sends the claim token', /claim: true, token:/.test(client));
   // An outage on our side must not consume the visitor's one free demo.
   check('client does not burn the demo on an unavailable gate',

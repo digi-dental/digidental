@@ -1,8 +1,25 @@
-# Digi Dental — one-page conversion funnel
+# Digi Dental — two-page conversion funnel
 
-Single-page site selling a done-for-you AI receptionist for dental practices.
-Design + full front-end lives in `index.html` (open in a browser, or deploy the
-repo to Vercel — the root serves it automatically).
+Site selling a done-for-you AI receptionist for dental practices. Two pages, and
+only two:
+
+| URL | File | Job |
+| --- | --- | --- |
+| `/` | `index.html` | Raise a hand. Hero, what missed calls cost (sourced), before/after, the ROI calculator, one CTA. |
+| `/how-it-works/` | `how-it-works/index.html` | Convince a researcher. Live voice demo, recorded call, dashboard tour, full pricing, FAQ, the case study, the founder, final CTA. |
+
+Both pages load the same two shared files, which is what keeps them one site
+rather than two lookalikes:
+
+- **`dd.css`** — the entire stylesheet, linked from each page's static `<head>`
+  (render-blocking there on purpose: the pre-hydration rules at the bottom of the
+  file only work if they are in force during the raw-HTML pass).
+- **`dd-logic.js`** — the entire logic class, exposed as `DDLogic.create(DCLogic)`.
+  Each page's `<script data-dc-script>` is one line. The FAQ text, the pricing
+  numbers, the booking flow and the legal copy exist once, here, so they cannot
+  drift between the two pages. Page-specific behaviour keys off
+  `document.documentElement.dataset.page` (`home` | `deep`).
+
 Repo scaffolding for the production build (React + Vite + Tailwind + Vercel functions + Supabase):
 
 - `api/demo-session.ts` — one-demo-per-IP gate (called by `startDemo()` before every demo call)
@@ -18,12 +35,25 @@ Repo scaffolding for the production build (React + Vite + Tailwind + Vercel func
 Canonical origin: **`https://www.digidental.us`**. The bare apex `digidental.us`
 is an A record to Vercel (`216.198.79.1`) which 308-redirects to `www`.
 
-The page renders client-side, so anything inside `<x-dc>` (including `<helmet>`)
+The pages render client-side, so anything inside `<x-dc>` (including `<helmet>`)
 is invisible to crawlers that don't run JavaScript. All crawler-facing tags
-therefore live in the **static `<head>`** of `index.html`: title, description,
-canonical, robots, hreflang, Open Graph/Twitter, and a JSON-LD `@graph` of nine
-nodes — Organization, WebSite, WebPage, Service with offers, FAQPage, Person
-(founder, an E-E-A-T signal), two VideoObjects and an ImageObject logo.
+therefore live in the **static `<head>`** of each page: title, description,
+canonical, robots, hreflang, Open Graph/Twitter, and a JSON-LD `@graph`.
+
+The entity nodes — Organization, WebSite, Service with offers, Person (founder,
+an E-E-A-T signal), ImageObject logo and the Article node for the case study — are
+**byte-identical on both pages**, and a test enforces that: two copies that drift
+describe two organisations. What differs is the page-specific part. `/` adds its
+own WebPage and the overview VideoObject; `/how-it-works/` adds its WebPage, a
+BreadcrumbList, the FAQPage, and the recorded-call VideoObject. FAQPage is
+deliberately only on the page that renders the FAQ — marking up an answer the
+visitor cannot see is a structured-data violation.
+
+**Two pages, two intents.** `/` targets the brand and category term; `/how-it-works/`
+targets the research queries (how it works, what it costs, is it HIPAA-compliant,
+does it work with Dentrix). Titles and descriptions are asserted to differ, because
+two pages fighting over one query is the classic way a split makes rankings worse
+rather than better.
 
 Supporting files served from the root: `robots.txt` (search engines + ~20 named
 AI crawlers, points at the sitemap), `sitemap.xml` (with image **and video**
@@ -47,23 +77,60 @@ the rules can only match before hydration, so they are provably inert for anyone
 running JavaScript. Do not widen those selectors.
 
 The FAQ is rendered from `faqData` by a loop, so it does not exist pre-hydration
-at all. A `<noscript>` mirror carries the identical text, generated from the page's
-own FAQPage schema and pinned by tests. Result: **17,457 characters of clean
-crawler-readable copy, zero template syntax, all nine Q&As.**
+at all. A `<noscript>` mirror on `/how-it-works/` carries the identical text,
+generated from that page's own FAQPage schema and pinned by tests. Both pages come
+out clean: no template syntax, no crash boundary, and every Q&A readable.
 
 True SSR would need a build step or a server framework; this is the progressive-
-enhancement equivalent for a single static file.
+enhancement equivalent for static files.
 
-**`npm run test:seo` guards all of it.** 55 static checks: one canonical origin
-across every file, no dangling JSON-LD `@id`s, the FAQ schema matching the FAQ
-the visitor actually sees, one `<h1>` with no skipped levels, every `<img>` with
-alt and reserved layout space, complete OG/Twitter cards with `og:image`
-dimensions matching the real file, and admin/API kept out of robots.txt. SEO
-decays silently; nothing here throws on its own.
+**`npm run test:seo` guards all of it.** 154 static checks, most of them run against
+**both** pages: each canonical pointing at its own URL, self-referencing hreflang,
+no dangling JSON-LD `@id`s, entity nodes identical across pages, the FAQ schema
+matching both `faqData` and the visible FAQ, one `<h1>` per page with no skipped
+levels, every `<img>` with alt and reserved layout space, **no relative image paths**
+(a subdirectory page turns `uploads/x.png` into a 404), complete OG/Twitter cards,
+the two pages linking to each other in both directions, every nav anchor existing on
+the page it points at, and admin/API kept out of robots.txt. SEO decays silently;
+nothing here throws on its own.
 
-Note: `index.html` is regenerated by Claude Design exports. A fresh export
+### The three FAQ copies
+`faqData` in `dd-logic.js` is the source. Two hand-written copies exist because
+crawlers need them: the FAQPage schema in `how-it-works/index.html`'s `<head>`, and
+the `<noscript>` mirror below the FAQ section. `npm run test:seo` fails if any of the
+three drifts, and also if `llms.txt` stops republishing a question. **Change all of
+them together.**
+
+Note: the HTML is regenerated by Claude Design exports. A fresh export
 **overwrites the static `<head>`** — re-apply the SEO block after each sync, then
 run `npm run test:seo` to confirm nothing was lost.
+
+## The cited case study
+The one piece of Digi Dental writing that lives off this domain:
+[The Real Cost of a Missed Call at Your Dental Practice](https://medium.com/@bennyco/the-real-cost-of-a-missed-call-at-your-dental-practice-and-why-voicemail-isnt-fixing-it-5ae0fdf3ac39),
+published on Medium under Benny's byline.
+
+It earns its place in the SEO/AEO surface because it is a **second indexable document
+making the same claims with the same numbers** — which is what an answer engine
+corroborates a vendor's own page against. It is wired in six places, all from the single
+`CASE_STUDY` constant in `dd-logic.js`:
+
+1. An `Article` node in both pages' JSON-LD, `@id`'d to the Medium URL, authored by the
+   `#founder` entity and `about` the `#service`.
+2. `citation` on both `WebPage` nodes; `subjectOf` on `Service`.
+3. `https://medium.com/@bennyco` in the founder's `sameAs` (a profile, so it belongs
+   there — the article itself does not).
+4. A visible cited-source card on `/` (in the cost section) and on `/how-it-works/`
+   (its own `#case-study` section), plus a footer link on both pages.
+5. A section in `llms.txt` and a `publications` array in `/api/site-info`.
+6. Two FAQ entries drawn from it, which is what turns it into answer-engine coverage
+   for "what is a missed call worth" and "do the top practices answer after hours".
+
+**It is ours, and every surface says so.** Not press, not an independent industry
+study — Digi Dental's own analysis under the founder's byline. Tests assert that
+wording stays in `llms.txt`, `/api/site-info` and the page copy, because the site's
+whole credibility argument is built on sourced numbers and an honest demo, and one
+overclaimed citation would undo both.
 
 ## Dashboard preview accordion
 Four screenshots in `[data-section="dashboard"]`, one open at a time.
@@ -116,7 +183,8 @@ record, so nothing needs re-verifying when a hostname changes.
 
 If DNS verification is blocked for any reason, the fallback is a
 `<meta name="google-site-verification" content="…">` in the static `<head>` of
-`index.html`, directly under the canonical link. That only verifies the exact
+`index.html`, directly under the canonical link (a URL-prefix property covers
+`/how-it-works/` too, since it sits under the same prefix). That only verifies the exact
 URL prefix it is served from, which is why DNS is preferred.
 
 ## Where real keys go
@@ -139,7 +207,8 @@ transport errors deliberately **fail open**, because a hot lead must never be tu
 by our own hiccup. `localStorage` remains as the instant, no-round-trip layer above it.
 
 ## Analytics
-Every funnel step fires through `track()` in `index.html`. Three sinks, one taxonomy:
+Every funnel step fires through `track()` in `dd-logic.js`, on both pages. Every event
+carries `path`, so the two pages are separable in the data. Three sinks, one taxonomy:
 
 1. `/api/event` → the `site_events` table. Always on, no third-party tracker.
    **Apply `supabase/APPLY_TO_SUPABASE.sql` first** (migrations `005`, `006` and `007` in one
@@ -149,7 +218,7 @@ Every funnel step fires through `track()` in `index.html`. Three sinks, one taxo
    `supabase/APPLY_008_ONLY.sql`. Each is ~10 KB and prints the functions it created, so a
    truncated paste is visible rather than silent. (`002` and `003` are
    superseded by `005`; they are kept only as history and must not be run.)
-2. Plausible — set `PLAUSIBLE_DOMAIN` in `index.html` to the live domain and the script
+2. Plausible — set `PLAUSIBLE_DOMAIN` in `dd-logic.js` to the live domain and the script
    loads itself; every event mirrors automatically.
 3. GA4 — drop a `gtag` snippet in and every event mirrors to it. Nothing else to wire.
 
@@ -164,7 +233,7 @@ Three separate ideas, deliberately not conflated:
 
 Both ids are random and carry no personal data. `ip_hash` used to double as the visitor
 count, which was wrong in both directions: IPs rotate on mobile networks and are shared
-across an office. The privacy copy in `index.html` discloses the stored identifier.
+across an office. The privacy copy in `dd-logic.js` (`LEGAL.privacy`) discloses the stored identifier.
 
 ### Taxonomy
 Events carry a `category` so a whole class can be filtered without matching on names. The
@@ -239,8 +308,10 @@ journey drill-down, and the lead table with attribution.
 - Needs migrations `005` and `006` applied, otherwise there is nothing to read.
 
 ## Voice demo (Vapi)
-The in-browser demo call uses the official **`@vapi-ai/web` SDK, pinned to an exact version** in
-the `<head>` of `index.html`.
+The in-browser demo call uses the official **`@vapi-ai/web` SDK, pinned to an exact version**, loaded
+from the `<helmet>` block of `how-it-works/index.html` — the only page with a demo on it, and
+therefore the only page that should pay for the module. `/` never loads it, and `dd-logic.js`
+skips the whole Vapi path when `PAGE !== 'deep'`.
 
 > It previously loaded `cdn.jsdelivr.net/gh/VapiAI/html-script-tag@**latest**`. An unpinned
 > dependency means every page load takes whatever upstream published last, so the call path can
@@ -248,7 +319,7 @@ the `<head>` of `index.html`.
 > `error-assistant-did-not-receive-customer-audio`. Change the pinned version deliberately, and
 > test a real call afterwards. Never go back to a floating tag.
 
-**Configuration.** `VAPI_PUBLIC_KEY` and `VAPI_ASSISTANT_ID` are class properties in `index.html`
+**Configuration.** `VAPI_PUBLIC_KEY` and `VAPI_ASSISTANT_ID` are class properties in `dd-logic.js`
 (mirrored by `VITE_VAPI_PUBLIC_KEY` / `VITE_VAPI_ASSISTANT_ID` in `.env` for a bundled build).
 The public web key is the *only* Vapi key that may appear client-side; a private/server key must
 never be in the browser. The assistant id is validated as a UUID before any call: if it is
@@ -314,23 +385,24 @@ and the expiry stops mattering. The founder portrait uses the same route.
 ## Before launch checklist
 No `PLACEHOLDER` strings remain in rendered copy. What is still open, in priority order:
 
-1. **Legal review.** The Privacy and Terms modals in `index.html`, the HIPAA FAQ answer and
+1. **Legal review.** The Privacy and Terms copy in `dd-logic.js` (`LEGAL`), the HIPAA FAQ answer and
    the contracts/data FAQ answer are final, honest copy that claims no certification — but
-   they have not been read by a lawyer. Both modals carry a `LEGAL REVIEW REQUIRED` comment
+   they have not been read by a lawyer. The `LEGAL` block carries a `LEGAL REVIEW REQUIRED` comment
    listing exactly what to check (subprocessors, jurisdiction sections, entity name and
    governing law, which are deliberately not invented).
 2. **Commercial promises.** The split start is confirmed: $1,000 up front, the second $1,000
    due only if a real patient is booked within 14 days of go-live. It appears in the pricing
-   section, the Terms modal, `llms.txt` and `api/site-info.ts` — change all four together.
+   section, `LEGAL.terms` in `dd-logic.js`, `llms.txt` and `api/site-info.ts` — change all four together.
    The go-live line is deliberately a speed claim with **no refund remedy**, because that
-   promise was never confirmed; the comment above the badge in `index.html` has the exact
+   promise was never confirmed; the comment above the badge on both pages has the exact
    wording to turn it into a real guarantee if you decide to stand behind one.
 3. **Care-plan pricing.** $149/mo and $299/mo are carried over unverified from the previous
-   copy. Confirm they are current before the next push; if they changed, update `index.html`,
-   the JSON-LD offers, `llms.txt` and `api/site-info.ts`.
+   copy. Confirm they are current before the next push; if they changed, update the pricing
+   section in `how-it-works/index.html`, the JSON-LD offers on **both** pages, `llms.txt` and
+   `api/site-info.ts`.
 4. **Resend sender.** Verify a domain in Resend and set `RESEND_FROM`; until then leads send
    from `onboarding@resend.dev` and land in spam.
-5. **Supabase publishable key.** The browser-fallback key in `index.html` is a new-style
+5. **Supabase publishable key.** The browser-fallback key in `dd-logic.js` is a new-style
    `sb_publishable_…` key, which really is that short. Confirm it with the curl in the comment
    above it: 401 means replace it, 403 means it is fine and RLS is working.
 6. **Founder block.** Replace the monogram with a real photo and rewrite the two sentences in

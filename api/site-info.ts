@@ -59,9 +59,43 @@ const siteInfo = {
   compliance:
     'Call audio is handled by enterprise voice-AI infrastructure and is not shared with Digi Dental unless the practice asks for a call to be reviewed. The assistant is configured not to ask for or repeat protected health information beyond what booking an appointment requires, and the website demo is limited to 60 seconds with no patient data. Digi Dental will sign a BAA or data-processing agreement with the practice where required. No compliance certification is claimed.',
 
+  // The site is two pages: `/` states the problem and prices it, `/how-it-works/` is the
+  // detail a researcher asks for. Anchors listed so an agent can deep-link the answer.
+  pages: [
+    {
+      url: `${SITE}/`,
+      title: 'AI Receptionist for Dental Practices',
+      covers: [
+        'What unanswered calls cost a practice, with sources',
+        'Front desk alone vs. with the AI receptionist',
+        "A calculator for the practice's own call volume and patient value",
+      ],
+    },
+    {
+      url: `${SITE}/how-it-works/`,
+      title: 'How It Works: Demo, Pricing & FAQ',
+      covers: [
+        'Live 60-second voice demo in the browser',
+        'A recorded call end to end',
+        'Tour of the dashboard the practice gets',
+        'Full pricing',
+        'FAQ and objections',
+        'Who builds it',
+      ],
+      anchors: {
+        demo: `${SITE}/how-it-works/#demo`,
+        dashboard: `${SITE}/how-it-works/#dashboard`,
+        pricing: `${SITE}/how-it-works/#pricing`,
+        faq: `${SITE}/how-it-works/#faq`,
+        caseStudy: `${SITE}/how-it-works/#case-study`,
+        founder: `${SITE}/how-it-works/#founder`,
+      },
+    },
+  ],
+
   demo: {
     available: true,
-    where: `${SITE}/#demo`,
+    where: `${SITE}/how-it-works/#demo`,
     description: 'Talk to the AI receptionist directly in the browser.',
     limitSeconds: 60,
     limit: 'One demo per visitor.',
@@ -74,11 +108,38 @@ const siteInfo = {
 
   resources: {
     homepage: `${SITE}/`,
+    howItWorks: `${SITE}/how-it-works/`,
     llmsTxt: `${SITE}/llms.txt`,
     sitemap: `${SITE}/sitemap.xml`,
     robots: `${SITE}/robots.txt`,
-    structuredData: `${SITE}/ (JSON-LD in <head>: Organization, WebSite, WebPage, Service, FAQPage, Person, VideoObject x2, ImageObject)`,
+    structuredData:
+      `Both pages carry JSON-LD in their static <head>. ${SITE}/ : Organization, WebSite, WebPage, ` +
+      `Service with Offers, Person, Article (the case study below), VideoObject, ImageObject. ` +
+      `${SITE}/how-it-works/ : the same entity nodes plus BreadcrumbList, FAQPage and the ` +
+      `recorded-call VideoObject.`,
   },
+
+  // Digi Dental's own long-form analysis, published off-domain under the founder's byline.
+  // Described as ours everywhere it appears: it is not press coverage and not an independent
+  // industry study, and an answer engine should attribute it accordingly.
+  publications: [
+    {
+      title: "The Real Cost of a Missed Call at Your Dental Practice (And Why Voicemail Isn't Fixing It)",
+      url: 'https://medium.com/@bennyco/the-real-cost-of-a-missed-call-at-your-dental-practice-and-why-voicemail-isnt-fixing-it-5ae0fdf3ac39',
+      publishedOn: 'Medium',
+      datePublished: '2026-08-12',
+      author: 'Benny, founder of Digi Dental',
+      selfPublished: true,
+      attribution: "Digi Dental's own case study, not press coverage or an independent study.",
+      covers: [
+        'Why a missed implant, Invisalign or sedation enquiry is a $3,000\u2013$5,000 decision rather than a $150 scheduling problem',
+        'The exposure of an independent two-to-four-doctor practice taking 200-plus calls a month',
+        'Why a next-morning voicemail callback arrives after the caller has booked elsewhere',
+        'A review of the top-ranked practices in one metro: none offered live after-hours phone coverage',
+      ],
+      note: 'The published statistics it relies on are the same figures listed under `evidence` below. The market review in it is our own and is not independently published.',
+    },
+  ],
 
   // Stated so an answer engine cites the domain rather than the deployment host it may
   // have crawled the same bytes from.
@@ -137,7 +198,7 @@ const siteInfo = {
     'Replacing front-desk staff; it covers the calls a team physically cannot reach.',
   ],
 
-  pricesAsOf: '2026-08-10',
+  pricesAsOf: '2026-08-18',
 };
 
 export default function handler(req: any, res: any) {

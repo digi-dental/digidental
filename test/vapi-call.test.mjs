@@ -1,10 +1,13 @@
 /**
  * Voice-demo call path tests.
  *
- * The site is a single static HTML file with no build step, so these tests load index.html in a
- * real browser, stub `navigator.mediaDevices.getUserMedia` and the Vapi SDK constructor, and then
- * drive the actual component. Nothing is re-implemented here: the code under test is the code
- * that ships.
+ * The site has no build step, so these tests load the real page in a real browser, stub
+ * `navigator.mediaDevices.getUserMedia` and the Vapi SDK constructor, and then drive the actual
+ * component. Nothing is re-implemented here: the code under test is the code that ships.
+ *
+ * The demo lives on /how-it-works/, not on `/`: the home page raises a hand, the deep page is
+ * where someone talks to the receptionist. That page is also the only one that loads the voice
+ * SDK at all, so pointing these tests at `/` would silently test a page with no call path on it.
  *
  * Run: node test/vapi-call.test.mjs
  */
@@ -17,6 +20,8 @@ const ROOT = process.cwd();
 const NM = process.env.DD_TEST_MODULES || path.join(ROOT, 'node_modules');
 const CHROME = process.env.DD_CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const PORT = 8231;
+// The page that actually hosts the live demo.
+const DEMO_PATH = '/how-it-works/';
 
 const server = http.createServer((req, res) => {
   const u = decodeURIComponent(req.url.split('?')[0]);
@@ -24,8 +29,11 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ ok: true, approved: true }));
   }
-  const f = path.join(ROOT, u === '/' ? 'index.html' : u);
-  if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end('nf'); }
+  // Directory-index resolution, the way Vercel serves static output: /how-it-works/ and
+  // /how-it-works both come from how-it-works/index.html.
+  let f = path.join(ROOT, u === '/' ? 'index.html' : u);
+  if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
+  if (!fs.existsSync(f)) { res.writeHead(404); return res.end('nf'); }
   const ext = path.extname(f);
   const type = ext === '.html' ? 'text/html' : ext === '.js' ? 'text/javascript'
     : ext === '.png' ? 'image/png' : 'application/octet-stream';
@@ -113,7 +121,7 @@ async function boot(opts = {}) {
     };
   }, { mic: opts.mic || 'ok', sdk: opts.sdk });
 
-  const url = `http://127.0.0.1:${PORT}/` + (opts.assistantId === null ? '?__noassistant=1' : '');
+  const url = `http://127.0.0.1:${PORT}${DEMO_PATH}` + (opts.assistantId === null ? '?__noassistant=1' : '');
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
   // Wait for the component to mount rather than for the network to go quiet: third-party
   // requests are aborted here, so 'networkidle' never arrives.

@@ -1,0 +1,41 @@
+# What must NOT be uploaded to the deployment.
+#
+# Vercel serves this repo's root as the static site, so anything committed here is
+# reachable at https://www.digidental.us/<path> unless it is listed below. That was
+# already true while the repo was private — the deployment never cared about GitHub
+# visibility — so /supabase/APPLY_TO_SUPABASE.sql and /test/security.test.mjs were
+# fetchable by anyone who guessed the path. Making the repo public did not create the
+# exposure; it removed the guessing.
+#
+# None of this is a credential leak: every key in these files is either a browser key
+# that ships in dd-logic.js anyway, or a `process.env` reference. It is the full
+# database schema, the RLS policies and the security test suite being served off the
+# marketing domain, which tells an attacker exactly what to probe for free.
+#
+# Nothing here is read at runtime. There is no `build` script in package.json, so
+# Vercel runs no build step and excluding the test suite cannot break one. api/,
+# lib/, package.json, vercel.json and every asset the pages reference are all
+# deliberately absent from this list.
+
+# Database schema, RLS policies and migrations — applied by hand in the Supabase
+# dashboard, never by the deployment.
+supabase/
+
+# Test suites. They run in CI and locally, against the repo, never against the deploy.
+test/
+
+# Local maintenance scripts (npm run seo:submit).
+scripts/
+
+# Internal docs: open TODOs, launch checklist, the things still awaiting legal review.
+# Public on GitHub on purpose; no reason to also serve them from the sales domain.
+README.md
+SEO-LAUNCH-CHECKLIST.md
+
+# Variable names only, no values — but there is nothing for a visitor here either.
+.env.example
+
+# Repo tooling and a stray editor artefact.
+.github/
+.thumbnail
+.gitignore

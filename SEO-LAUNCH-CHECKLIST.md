@@ -29,6 +29,19 @@ record, and survives any change to the HTML.
 
 ---
 
+## 1b. Both pages, not just the homepage
+
+The site is two indexable documents now. Everywhere below that says "the site", check both:
+
+| URL | Targets |
+| --- | --- |
+| `https://www.digidental.us/` | brand + category ("AI receptionist for dental practices") |
+| `https://www.digidental.us/how-it-works/` | research intent — how it works, what it costs, HIPAA, Dentrix/Eaglesoft/Open Dental, after-hours |
+
+In GSC, request indexing for **both** URLs, and watch that they do not start trading places on
+the same query: if `/how-it-works/` ever outranks `/` for the bare brand term, the two titles
+have drifted too close together and the homepage title is the one to fix.
+
 ## 2. Bing Webmaster Tools — feeds Copilot and ChatGPT search
 
 1. https://www.bing.com/webmasters → add `https://www.digidental.us`.
@@ -38,7 +51,8 @@ record, and survives any change to the HTML.
    **uncomment the tag**. It ships commented on purpose: a meta tag with an empty `content`
    is a verification attempt that fails, and Bing reports the site as unverified without
    explaining why.
-3. Submit `sitemap.xml`.
+3. Submit `sitemap.xml`. It now lists **two** URLs — `/` and `/how-it-works/` — so confirm both
+   are picked up rather than assuming a green tick means the whole site.
 4. Run `npm run seo:submit`. That pushes the URL list to IndexNow, which Bing, Copilot, Yandex,
    Seznam and Naver all consume. Expect `HTTP 200` or `202`.
    - `403` means the key file is unreachable — check `https://www.digidental.us/ff9001e018464afabaaf0dbf8c193fa5.txt`
@@ -73,8 +87,15 @@ winnable precisely because nothing is entrenched there.
   **Business service**, *not* anything dental: this is a vendor to practices, not a practice.
   Set it up as a service-area business listing the Arizona metros. Link the website.
 - **LinkedIn** — post once from the founder profile linking `https://www.digidental.us/` and
-  `https://www.digidental.us/#demo`. The profile is already in the site's `sameAs`, so the
-  link back completes the entity association in both directions.
+  `https://www.digidental.us/how-it-works/#demo`. The profile is already in the site's `sameAs`,
+  so the link back completes the entity association in both directions.
+- **Medium** — the case study at
+  `https://medium.com/@bennyco/the-real-cost-of-a-missed-call-at-your-dental-practice-and-why-voicemail-isnt-fixing-it-5ae0fdf3ac39`
+  is the site's only off-domain document. Two things make it count: the article body should
+  link back to `https://www.digidental.us/` and `https://www.digidental.us/how-it-works/`
+  (the site already links out to it, and a citation that only runs one way is half a signal),
+  and the Medium profile's website field should point at the canonical `www.` URL. The
+  founder's `sameAs` already lists `https://medium.com/@bennyco`.
 - **Facebook page** — same, and confirm the page's website field points at the canonical
   `www.` URL rather than the apex.
 - **Directories** worth the time: Product Hunt, Capterra / G2 (dental practice-management

@@ -1,0 +1,234 @@
+/* =============================================================================
+   Digi Dental — the whole stylesheet, for both pages.
+
+   The site is two documents (`/` and `/how-it-works/`) that share a nav, a footer,
+   two dialogs and a visual language. There is no build step, so a single linked
+   stylesheet is what keeps them the same site rather than two lookalikes.
+
+   Loaded from the static <head> of each page rather than injected by the runtime:
+   it is render-blocking there, which is exactly what the pre-hydration rules at the
+   bottom of this file need in order to work at all.
+   ============================================================================= */
+
+/* The voice SDK injects its own floating call button. We drive the call from the
+   mascot instead, so its widget is never shown. */
+#vapi-support-btn,#vapi-btn{display:none !important}
+html{scroll-behavior:smooth}
+/* Anchors land under a fixed 66px bar without this. Applies to every linkable
+   section on both pages, including arrivals from the other page's nav. */
+[id]{scroll-margin-top:96px}
+body{margin:0;background:#FAF9F6;color:#0A1A2F;font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#0F8B80;text-decoration:none}
+a:hover{color:#0B6E66;text-decoration:underline}
+input,select,button,textarea{font-family:inherit}
+@keyframes toothy-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes toothy-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.12)}}
+@keyframes dd-bar{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+@keyframes dd-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes dd-fadeup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dd-pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes dd-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes dd-shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+/* ===== Navigation =========================================================
+   The site is two pages now, so the bar has to say so. Above 900px it is the full
+   set — How it works, Pricing, FAQ, the demo pill, the booking button. Below that
+   the links collapse into a panel behind one control, because five items and a
+   wordmark do not fit on a 360px phone and squeezing them there is how a nav ends
+   up with a 28px tap target. The booking button stays visible at every width: it
+   is the only thing on the bar that is worth a tap on a phone. */
+.dd-navmark{font-family:'Fraunces',serif;font-weight:600;font-size:21px;letter-spacing:-0.02em;line-height:1;white-space:nowrap;transition:color .35s ease}
+.dd-navcta{background:#0F8B80;color:#FAF9F6;border:none;border-radius:8px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px rgba(10,26,47,0.18)}
+.dd-navcta-full{display:none}
+.dd-navcta-min{display:inline}
+@media (min-width:900px){
+  .dd-navcta{padding:11px 22px}
+  .dd-navcta-full{display:inline}
+  .dd-navcta-min{display:none}
+}
+/* Small phones: the bar is the one place on the site where 20px of padding is worth more
+   as tap target than as air. */
+@media (max-width:400px){
+  .dd-navmark{font-size:19px}
+  .dd-navcta{padding:10px 14px;font-size:13.5px}
+}
+.dd-navdesk{display:none}
+.dd-navburger{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;flex-shrink:0;background:none;border:1px solid rgba(138,155,181,0.4);border-radius:10px;cursor:pointer;padding:0}
+@media (min-width:900px){
+  .dd-navdesk{display:flex;align-items:center;gap:clamp(14px,2.2vw,26px)}
+  .dd-navburger{display:none}
+}
+/* The panel is positioned under the bar rather than inside it, so opening it cannot
+   change the bar's height and shove the page down. */
+.dd-navpanel{position:fixed;top:66px;left:0;right:0;z-index:49;background:rgba(10,26,47,0.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid #22344E;padding:14px clamp(16px,4vw,32px) 24px;display:flex;flex-direction:column;gap:2px;box-shadow:0 24px 60px rgba(0,0,0,0.35);animation:dd-fadeup .28s cubic-bezier(.22,1,.36,1) both}
+@media (min-width:900px){.dd-navpanel{display:none}}
+.dd-navpanel a{display:block;padding:15px 4px;font-size:16px;font-weight:500;color:#FAF9F6;border-bottom:1px solid #1B2E47}
+.dd-navpanel a:hover{color:#3FBFA9;text-decoration:none}
+.dd-navpanel a[aria-current="page"]{color:#3FBFA9}
+/* ===== Desktop layout =====================================================
+   The page was authored mobile-first and kept mobile's narrow column on large
+   screens. Every rule here is additive and gated behind a min-width query, so
+   the mobile rendering below 900px is byte-for-byte what it was. */
+.dd-wrap{width:100%;max-width:1180px;margin:0 auto}
+@media (min-width:1440px){.dd-wrap{max-width:1300px}}
+.dd-hero{display:flex;flex-direction:column;align-items:center;gap:72px;width:100%}
+.dd-hero-copy{display:flex;flex-direction:column;align-items:center;gap:28px;max-width:820px}
+.dd-hero-demo{width:min(720px,94vw);min-height:230px}
+.dd-hero-links{justify-content:center}
+@media (min-width:1024px){
+  .dd-hero{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,0.98fr);align-items:center;gap:clamp(40px,5vw,80px);text-align:left}
+  .dd-hero-copy{align-items:flex-start;max-width:none}
+  .dd-hero-copy h1,.dd-hero-copy p{text-align:left}
+  .dd-hero-cta{align-items:flex-start !important}
+  .dd-hero-links{justify-content:flex-start}
+  .dd-hero-demo{width:100%;justify-self:end}
+}
+/* The four cost statistics stay in the original 2x2 block. Four across read as a thin
+   ribbon of percentages on a wide screen; capping the grid keeps the pairs balanced. */
+.dd-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:110px clamp(48px,7vw,120px);align-items:start;max-width:1060px;margin:0 auto;width:100%}
+.dd-split{display:flex;flex-direction:column;gap:40px;width:100%;align-items:center}
+@media (min-width:980px){
+  .dd-split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,0.85fr);align-items:center;gap:clamp(40px,5vw,72px)}
+  .dd-split>*{width:100%}
+  .dd-split-side{text-align:left}
+  .dd-split-side .dd-center{align-items:flex-start;text-align:left}
+}
+/* Founder card: square portrait with the note overlapping it on desktop. */
+.dd-founder{display:flex;flex-direction:column;align-items:stretch;gap:0}
+/* ---- Dashboard accordion -------------------------------------------------
+   One panel open, the rest collapsed to a vertical labelled rail. Mobile stacks them
+   full-width, because a 60px rail on a phone is a nuisance rather than a feature.
+   `--ar` is written per panel from the image's natural size once it loads, so the frame
+   always matches the real screenshot and never crops it. */
+.dd-dash{display:flex;flex-direction:column;gap:14px;margin-top:38px}
+.dd-dash-panel{
+  position:relative;display:block;width:100%;text-align:left;padding:0;
+  background:#FFFFFF;border:1px solid #E8E4DA;border-radius:18px;overflow:hidden;
+  cursor:pointer;font:inherit;color:inherit;
+  box-shadow:0 10px 30px rgba(10,26,47,0.06);
+  transition:border-color .3s ease, box-shadow .3s ease;
+}
+.dd-dash-panel:hover,.dd-dash-panel[aria-selected="true"]{border-color:#0F8B80;box-shadow:0 16px 40px rgba(10,26,47,0.12)}
+.dd-dash-panel:focus-visible{outline:2px solid #0F8B80;outline-offset:3px}
+
+/* Mobile: a vertical accordion. The rail is the always-visible header you tap; the body
+   below it opens. 0fr -> 1fr animates to the content's real height, which plain `height`
+   cannot do and `max-height` only fakes (a guessed ceiling makes the easing arrive early
+   and stutter). Same duration and curve as the desktop width transition. */
+.dd-dash-rail{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:18px 20px;text-align:left;
+  font-size:15px;font-weight:600;letter-spacing:0.01em;color:#0A1A2F
+}
+.dd-dash-rail::after{
+  content:'';flex:0 0 auto;width:10px;height:10px;margin-right:4px;
+  border-right:2px solid #0F8B80;border-bottom:2px solid #0F8B80;
+  transform:rotate(45deg) translateY(-3px);
+  transition:transform .55s cubic-bezier(.22,1,.36,1)
+}
+.dd-dash-panel[aria-selected="true"] .dd-dash-rail::after{transform:rotate(-135deg) translateY(2px)}
+.dd-dash-body{
+  display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows .55s cubic-bezier(.22,1,.36,1)
+}
+.dd-dash-panel[aria-selected="true"] .dd-dash-body{grid-template-rows:1fr}
+.dd-dash-inner{display:block;overflow:hidden;min-height:0}
+.dd-dash-frame{display:block;background:#0A1A2F;position:relative}
+.dd-dash-bar{display:flex;gap:6px;align-items:center;padding:10px 14px;background:#12263F;border-bottom:1px solid #22344E}
+.dd-dash-bar i{width:9px;height:9px;border-radius:50%;background:#3D4F66;display:block}
+.dd-dash-scroll{
+  display:block;width:100%;
+  /* Cap the visible height so a 5000px capture does not become the whole page, and let the
+     rest scroll inside the frame. The image is never scaled to fit or cropped. */
+  max-height:min(70vh,560px);overflow-y:auto;overflow-x:hidden;background:#0A1A2F;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin
+}
+.dd-dash-scroll img{display:block;width:100%;height:auto;border:0;
+  /* Reserve space before the bytes arrive, or the frame is 0px tall and the whole
+     section jumps when each capture loads. sizeDash() overwrites --ar with the real
+     ratio on load, so the placeholder is only ever wrong for one frame. */
+  aspect-ratio:var(--ar,16/10)}
+.dd-dash-cap{display:block;padding:16px 20px;background:#FFFFFF}
+.dd-dash-cap strong{display:block;font-size:16px;color:#0A1A2F;font-weight:600;margin-bottom:4px}
+.dd-dash-cap span{display:block;font-size:14px;line-height:1.6;color:#4A5C72}
+
+@media (min-width:1000px){
+  /* Desktop: the accordion proper. Collapsed panels shrink to a rail with a rotated label. */
+  .dd-dash{flex-direction:row;align-items:stretch;gap:12px;height:600px}
+  .dd-dash-panel{width:74px;flex:0 0 auto;transition:width .55s cubic-bezier(.22,1,.36,1),border-color .3s ease,box-shadow .3s ease}
+  .dd-dash-panel[aria-selected="true"]{width:100%;flex:1 1 auto}
+  /* Desktop animates width, not height: hand the body back to normal flow so the grid
+     transition above cannot fight the width transition. */
+  .dd-dash-body{display:block;grid-template-rows:none;transition:none}
+  .dd-dash-inner{overflow:visible}
+  .dd-dash-panel .dd-dash-frame,
+  .dd-dash-panel .dd-dash-cap{opacity:0;transition:opacity .3s ease .1s;pointer-events:none}
+  .dd-dash-panel[aria-selected="true"] .dd-dash-frame,
+  .dd-dash-panel[aria-selected="true"] .dd-dash-cap{opacity:1;pointer-events:auto}
+  .dd-dash-panel[aria-selected="true"] .dd-dash-rail{display:none}
+  .dd-dash-rail{
+    position:absolute;inset:0;padding:0;
+    writing-mode:vertical-rl;transform:rotate(180deg);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:600;letter-spacing:0.04em;color:#4A5C72;white-space:nowrap
+  }
+  .dd-dash-rail::after{display:none}
+  .dd-dash-scroll{max-height:496px}
+}
+@media (prefers-reduced-motion:reduce){
+  .dd-dash-panel,.dd-dash-body,.dd-dash-rail::after{transition:none}
+}
+.dd-founder-photo{width:100%;aspect-ratio:1;border-radius:24px;overflow:hidden;background:#12263F;flex-shrink:0}
+.dd-founder-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.dd-founder-card{background:#FAF9F6;color:#0A1A2F;border-radius:24px;padding:clamp(24px,4vw,34px);box-shadow:0 30px 70px rgba(0,0,0,0.45);margin-top:-40px;position:relative;z-index:2}
+@media (min-width:900px){
+  .dd-founder{display:flex;flex-direction:row;align-items:center;gap:0}
+  .dd-founder-photo{width:min(420px,42%);aspect-ratio:1}
+
+/* ============ Pre-JS view: what non-rendering crawlers actually read ============
+   Googlebot executes JavaScript. GPTBot, ClaudeBot and PerplexityBot largely do not —
+   they read the HTML as served. The dc-runtime keeps its content as real markup, so the
+   copy IS in the raw file, but two things pollute it before the runtime takes over:
+
+     1. <sc-if> is a directive, not a conditional at the HTML level. With no JS, EVERY
+        branch renders — so the error-boundary markup ("A momentary hiccup. This page had
+        trouble rendering.") was the first thing an AI crawler read on the page.
+     2. Unresolved {{ holes }} render as literal text, dropping fragments of template
+        syntax into the extracted copy.
+
+   All three rules are scoped to `x-dc` / `sc-if` / `sc-for`, which the runtime REMOVES
+   from the DOM once it mounts. So these selectors can only ever match before hydration:
+   they are inert for anyone running JavaScript, and no rule here affects the rendered
+   site. This file is linked from the static <head>, so it is in force during the raw
+   pass — that is the whole reason these rules are not injected with the rest. */
+
+/* The error boundary is not the page. Hide it until the runtime is driving. */
+x-dc sc-if[value*="crashed"] { display: none !important; }
+
+/* Dynamic values — call widget, calculator output, demo status, form state. Never
+   marketing copy, so hiding them costs a crawler nothing and removes the noise. */
+x-dc [data-dyn] { display: none !important; }
+
+/* Loop bodies are templates, not content: with no JS they render once with {{ f.q }}
+   style holes intact. The FAQ they stand in for is mirrored in <noscript> on the deep
+   page, so nothing is lost by hiding the unrendered template. */
+x-dc sc-for { display: none !important; }
+
+/* ===== Dashboard proof, home page ==========================================
+   The home page shows one screenshot as evidence and sends researchers to the
+   full accordion tour on /how-it-works/. Same browser-chrome frame as the tour,
+   so the two read as the same artefact rather than two different products. */
+.dd-proof{display:grid;grid-template-columns:1fr;gap:clamp(24px,4vw,44px);align-items:center;width:100%}
+@media (min-width:980px){.dd-proof{grid-template-columns:minmax(0,1.25fr) minmax(0,0.75fr)}}
+/* The shell carries the card treatment; the frame and scroller inside it are the very
+   same .dd-dash-* elements the tour uses, so sizeDash() finds what it expects and the
+   capture is measured, never cropped. */
+.dd-proof-shell{border:1px solid #E8E4DA;border-radius:18px;overflow:hidden;box-shadow:0 18px 44px rgba(10,26,47,0.12);min-width:0}
+
+/* ===== Cited source card ===================================================
+   Used for the Medium case study. Deliberately reads as a citation, not a
+   testimonial: it is our own writing, and the card says so. */
+.dd-cite{display:block;border:1px solid #E8E4DA;border-left:3px solid #0F8B80;border-radius:14px;background:#FFFFFF;padding:clamp(20px,3vw,28px);text-decoration:none;color:inherit;transition:border-color .25s ease,box-shadow .3s cubic-bezier(.22,1,.36,1),transform .3s cubic-bezier(.22,1,.36,1)}
+.dd-cite:hover{border-color:#0F8B80;text-decoration:none;box-shadow:0 16px 40px rgba(10,26,47,0.1);transform:translateY(-2px)}
+.dd-cite-kicker{display:block;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A93A1;margin-bottom:10px}
+.dd-cite-title{display:block;font-family:'Fraunces',serif;font-size:clamp(1.05rem,2.2vw,1.3rem);font-weight:600;line-height:1.35;color:#0A1A2F;letter-spacing:-0.015em}
+.dd-cite-meta{display:block;font-size:13.5px;color:#5A6E86;margin-top:12px;line-height:1.6}

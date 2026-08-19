@@ -354,21 +354,28 @@
 <!-- ================= NAV =================
      Identical markup on both pages, driven by vals that know which page they are on:
      navBg/navFg handle cream-vs-navy, navCurHome/navCurDeep set aria-current, and the
-     panel below 900px carries the links the bar cannot fit. -->
+     panel below 900px carries the links the bar cannot fit.
+
+     One visual treatment for navigation, one for the ask. The bar used to carry three —
+     plain text links, a bordered pill with its own play badge, and a solid button — which
+     read as three competing controls rather than a set. Now every destination is plain
+     text and the only button on the bar is the only thing that is not navigation.
+
+     The hover is the rolling-letter effect from the reference navbar: each letter slides up
+     by exactly one line-height while a text-shadow copy sitting one line-height below slides
+     into its place, staggered left to right. Letters are aria-hidden and each link carries an
+     aria-label, so a screen reader reads the word and never spells it out. -->
 <nav aria-label="Primary" style="position:fixed;top:0;left:0;right:0;z-index:50;height:66px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 clamp(16px,4vw,32px);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:{{ navBg }};transition:background .35s ease">
-  <a href="/" onClick="{{ closeNav }}" aria-current="{{ navCurHome }}" aria-label="Digi Dental, home" style="display:flex;align-items:center;gap:10px;text-decoration:none" style-hover="text-decoration:none">
+  <a class="dd-navbrand" href="/" onClick="{{ closeNav }}" aria-current="{{ navCurHome }}" aria-label="Digi Dental, home">
     <img src="/uploads/denty_neutral.png" alt="" width="34" height="34" decoding="async" fetchpriority="high" style="display:block;width:34px;height:34px;object-fit:contain;image-rendering:pixelated">
     <span class="dd-navmark" style="color:{{ navFg }}">Digi<span style="color:#0F8B80"> Dental</span></span>
   </a>
-  <div style="display:flex;align-items:center;gap:clamp(10px,2vw,20px)">
+  <div style="display:flex;align-items:center;gap:clamp(12px,2vw,22px)">
     <div class="dd-navdesk">
-      <a href="/how-it-works/" aria-current="{{ navCurDeep }}" style="font-size:14px;white-space:nowrap;color:{{ navFg }};transition:color .35s ease">How it works</a>
-      <a href="/how-it-works/#pricing" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">Pricing</a>
-      <a href="/how-it-works/#faq" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">FAQ</a>
-      <a href="/how-it-works/#demo" onClick="{{ navDemo }}" data-cta="nav_demo" style="display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap;text-decoration:none;padding:7px 16px 7px 8px;border:1.5px solid rgba(15,139,128,0.45);border-radius:999px;background:rgba(15,139,128,0.08);transition:background-color .25s,border-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:rgba(15,139,128,0.16);border-color:#0F8B80;color:#0F8B80;text-decoration:none;transform:translateY(-1px)">
-        <span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#0F8B80;flex-shrink:0">
-          <svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M8 4.13a1 1 0 0 1 0 1.74L1.5 9.4A1 1 0 0 1 0 8.53V1.47A1 1 0 0 1 1.5.6L8 4.13Z" fill="#FAF9F6"></path></svg>
-        </span>Hear the demo</a>
+    <a class="dd-navlink" href="/how-it-works/" aria-current="{{ navCurDeep }}" aria-label="How it works" style="color:{{ navFg }}"><span class="dd-roll" aria-hidden="true"><span style="transition-delay:0.00s">H</span><span style="transition-delay:0.02s">o</span><span style="transition-delay:0.04s">w</span><span class="dd-sp" style="transition-delay:0.07s"></span><span style="transition-delay:0.09s">i</span><span style="transition-delay:0.11s">t</span><span class="dd-sp" style="transition-delay:0.13s"></span><span style="transition-delay:0.15s">w</span><span style="transition-delay:0.18s">o</span><span style="transition-delay:0.20s">r</span><span style="transition-delay:0.22s">k</span><span style="transition-delay:0.24s">s</span></span></a>
+    <a class="dd-navlink" href="/how-it-works/#pricing" aria-label="Pricing" style="color:{{ navFg }}"><span class="dd-roll" aria-hidden="true"><span style="transition-delay:0.00s">P</span><span style="transition-delay:0.02s">r</span><span style="transition-delay:0.04s">i</span><span style="transition-delay:0.07s">c</span><span style="transition-delay:0.09s">i</span><span style="transition-delay:0.11s">n</span><span style="transition-delay:0.13s">g</span></span></a>
+    <a class="dd-navlink" href="/how-it-works/#faq" aria-label="FAQ" style="color:{{ navFg }}"><span class="dd-roll" aria-hidden="true"><span style="transition-delay:0.00s">F</span><span style="transition-delay:0.02s">A</span><span style="transition-delay:0.04s">Q</span></span></a>
+    <a class="dd-navlink" href="/how-it-works/#demo" onClick="{{ navDemo }}" data-cta="nav_demo" aria-label="Hear the demo" style="color:{{ navFg }}"><span class="dd-roll" aria-hidden="true"><span style="transition-delay:0.00s">H</span><span style="transition-delay:0.02s">e</span><span style="transition-delay:0.04s">a</span><span style="transition-delay:0.07s">r</span><span class="dd-sp" style="transition-delay:0.09s"></span><span style="transition-delay:0.11s">t</span><span style="transition-delay:0.13s">h</span><span style="transition-delay:0.15s">e</span><span class="dd-sp" style="transition-delay:0.18s"></span><span style="transition-delay:0.20s">d</span><span style="transition-delay:0.22s">e</span><span style="transition-delay:0.24s">m</span><span style="transition-delay:0.26s">o</span></span></a>
     </div>
     <!-- The label shortens below 900px. "Book a Strategy Call" plus a wordmark plus a menu
          control does not fit a 360px bar, and the casualty was always the menu control,
@@ -489,13 +496,6 @@
     <div data-reveal="" style="text-align:center">
       <p style="font-size:20px;line-height:1.65;color:#0A1A2F;max-width:560px;margin:0 auto;font-variant-numeric:tabular-nums;text-wrap:pretty">Meanwhile, a full-time front desk hire runs <strong>$39,000–$54,000 a year</strong><sup style="font-size:0.55em"><a href="https://www.ziprecruiter.com" target="_blank" rel="noopener" data-linkpreview="https://www.ziprecruiter.com" title="Source: ZipRecruiter national average; Salary.com California" style="color:#5A6E86;text-decoration:none;padding:2px 4px">5</a></sup>, and covers 40 of the week's 168 hours.</p>
       <p style="font-size:17px;line-height:1.65;color:#3D4F66;max-width:560px;margin:22px auto 0;font-variant-numeric:tabular-nums;text-wrap:pretty">Most practices never hear another call ring out for <strong style="color:#0A1A2F">$2,000, once.</strong></p>
-      <!-- Our own long-form working of these numbers, published off-domain. Labelled as
-           ours, not as press: it is the founder's byline on Medium. -->
-      <a class="dd-cite" href="{{ caseStudyUrl }}" target="_blank" rel="noopener" onClick="{{ trackCaseStudy }}" data-cta="case_study_cost" style="max-width:640px;margin:56px auto 0;text-align:left">
-        <span class="dd-cite-kicker">Our case study · Medium</span>
-        <span class="dd-cite-title">The Real Cost of a Missed Call at Your Dental Practice (And Why Voicemail Isn't Fixing It)</span>
-        <span class="dd-cite-meta">The same arithmetic, worked call by call: why a missed implant enquiry is a $3,000–$5,000 decision rather than a $150 scheduling problem, what a review of the top-ranked practices in one metro turned up, and why a voicemail callback the next morning arrives after the patient has already booked. Written by Benny, founder.</span>
-      </a>
       <div id="sources" style="font-size:12px;line-height:1.8;color:#8A93A1;max-width:640px;margin:72px auto 0;text-align:left;border-top:1px solid #EEEAE0;padding-top:20px">
         1. Peerlogic 2026 study of 4,280 calls across 26 practices; corroborated by multiple industry analyses. &nbsp;
         2. Industry call-tracking data: Weave / Forbes Healthcare 2025; DenteMax. &nbsp;
@@ -661,6 +661,26 @@
     <button onClick="{{ openBookingCalc }}" data-cta="calculator" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:16px 36px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(10,26,47,0.18)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">See exactly where you're leaking revenue</button>
     </div>
     </div>
+  </div>
+</section>
+
+<!-- ================= 5. THE CASE STUDY =================
+     Its own section, immediately before the ask. It used to sit inside the cost block,
+     between the statistics and their footnotes, where it interrupted the one argument that
+     block exists to make. Here it is the last thing a reader who is still weighing it up
+     gets — the long version of the numbers they just read, published under the founder's
+     byline off this domain. -->
+<section data-section="case_study" style="background:#FFFFFF;padding:130px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+  <div data-reveal="" class="dd-wrap" style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:26px">
+    <div style="text-align:center;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#5A6E86">Further reading</div>
+      <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.6rem,3.4vw,2.1rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">The long version of the numbers above</h2>
+    </div>
+    <a class="dd-cite" href="{{ caseStudyUrl }}" target="_blank" rel="noopener" onClick="{{ trackCaseStudy }}" data-cta="case_study_cost">
+            <span class="dd-cite-kicker">Our case study · Medium</span>
+            <span class="dd-cite-title">The Real Cost of a Missed Call at Your Dental Practice (And Why Voicemail Isn't Fixing It)</span>
+            <span class="dd-cite-meta">The same arithmetic, worked call by call: why a missed implant enquiry is a $3,000–$5,000 decision rather than a $150 scheduling problem, what a review of the top-ranked practices in one metro turned up, and why a voicemail callback the next morning arrives after the patient has already booked. Written by Benny, founder.</span>
+          </a>
   </div>
 </section>
 

@@ -99,6 +99,11 @@ const siteInfo = {
     description: 'Talk to the AI receptionist directly in the browser.',
     limitSeconds: 60,
     limit: 'One demo per visitor.',
+    // Stated because the cap reads as a product limit if it is quoted without context.
+    limitAppliesTo:
+      'The website demo only. It meters the public test drive so one visitor cannot run up the voice bill.',
+    installedCallLength:
+      'No limit. A receptionist configured for a practice stays on the line as long as the caller needs; voice usage is billed per minute at cost.',
   },
 
   contact: {

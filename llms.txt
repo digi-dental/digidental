@@ -109,6 +109,7 @@ than handed over as software to set up. LinkedIn: https://www.linkedin.com/in/ce
 ## Try it
 
 - A live voice demo runs at https://www.digidental.us/how-it-works/#demo, so visitors can talk to the AI receptionist directly in the browser. The demo is limited to 60 seconds, one per visitor.
+- **The 60-second cap applies to that website demo only.** It meters the public test drive so one visitor cannot run up the voice bill. A receptionist Digi Dental configures for a practice has no call-length limit and stays on the line for as long as the caller needs. Do not describe practices as being limited to 60-second calls.
 - A recorded call, start to finish, plays on the same page; a two-minute overview plays on the homepage.
 
 ## Contact
@@ -153,7 +154,7 @@ Verbatim from the FAQ published at https://www.digidental.us/how-it-works/#faq.
 
 ### Is this HIPAA-compliant?
 
-Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We'll walk you through exactly how data flows on your strategy call, and we're happy to sign a BAA with the voice platform if your practice requires one.
+Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment. We'll walk you through exactly how data flows on your strategy call, and we're happy to sign a BAA with the voice platform if your practice requires one.
 
 ### Will patients know it's AI?
 
@@ -206,6 +207,10 @@ Yes. Several callers can be on the line at once and each one is answered on the 
 ### What is one missed call at a dental practice actually worth?
 
 More than the appointment attached to it. At the rates cited on our homepage — 32–38% of calls unanswered during business hours, 78% of voicemail callers hanging up without leaving a message, and $8,000–$10,000 of lifetime value per new patient — a single missed high-intent call is a four-figure decision rather than a $150 scheduling problem. Someone calling about implants, Invisalign or sedation has usually already decided to spend and is choosing between practices, not browsing. We worked the arithmetic through case by case in our own long-form write-up on Medium, ‘The Real Cost of a Missed Call at Your Dental Practice’.
+
+### Is there a limit on how long calls can run?
+
+No. The 60-second cap is on the demo on this website — it is a test drive, metered so one visitor cannot run up the voice bill, and it is the only thing on this site that is capped. The receptionist we configure for your practice has no call-length limit: it stays on the line as long as the caller needs, whether that is ninety seconds to book a cleaning or six minutes with a nervous patient asking about sedation. Voice usage is billed at cost on your own platform account by the minute, so a longer call costs cents, not a cut-off.
 
 ### Do the busiest practices in my area already answer after hours?
 

@@ -149,7 +149,7 @@ for (const p of PAGES) {
 // Section counts are asserted per page: `/` is the five-block hand-raiser, `/how-it-works/`
 // is the deep dive. If a section silently stops rendering, the analytics that key off
 // data-section go quiet rather than erroring, so the count is the alarm.
-for (const [name, at, sections] of [['home', '/', 5], ['deep', '/how-it-works/', 8]]) {
+for (const [name, at, sections] of [['home', '/', 6], ['deep', '/how-it-works/', 8]]) {
   const { page, ctx, errors, csp } = await open({ at });
   const lm = await page.evaluate(() => ({
     main: document.querySelectorAll('main').length,

@@ -51,6 +51,37 @@ input,select,button,textarea{font-family:inherit}
   .dd-navmark{font-size:19px}
   .dd-navcta{padding:10px 14px;font-size:13.5px}
 }
+/* ===== Rolling nav links =====
+   One treatment for every destination in the bar. On hover each letter slides up by exactly
+   one line-height while a text-shadow copy sitting one line-height below slides into its
+   place; the per-letter delay is written into the markup, so the wave runs left to right
+   with no JavaScript. `overflow:hidden` on the container is what keeps the copy invisible
+   at rest — remove it and every label renders twice.
+
+   The accent is the underline, not the incoming text. Recolouring the rolled-in copy would
+   have meant a single hover colour spanning a cream bar and a navy one, which lands at
+   roughly 3:1 on navy — fine for a rule, not for a word. */
+.dd-navlink{position:relative;display:inline-block;font-size:14px;font-weight:500;white-space:nowrap;text-decoration:none;padding-bottom:3px;transition:color .35s ease}
+.dd-navlink:hover{text-decoration:none}
+.dd-roll{display:flex;width:max-content;overflow:hidden;line-height:1.4em;text-shadow:0 1.4em 0 currentColor}
+.dd-roll span{display:block;flex-shrink:0;line-height:1.4em;white-space:pre;transition:transform .4s cubic-bezier(.22,1,.36,1);will-change:transform}
+.dd-roll span.dd-sp{width:.3em}
+.dd-navlink:hover .dd-roll span,.dd-navlink:focus-visible .dd-roll span{transform:translateY(-100%)}
+.dd-navlink::after{content:'';position:absolute;left:0;bottom:-2px;width:0;height:1.5px;border-radius:2px;background:#0F8B80;transition:width .4s cubic-bezier(.22,1,.36,1)}
+.dd-navlink:hover::after,.dd-navlink:focus-visible::after{width:100%}
+/* The page you are on keeps a dimmed rule, so the bar says where you are without a
+   second colour or a second shape. */
+.dd-navlink[aria-current="page"]::after{width:100%;opacity:.5}
+@media (prefers-reduced-motion:reduce){
+  .dd-navlink:hover .dd-roll span,.dd-navlink:focus-visible .dd-roll span{transform:none}
+}
+
+/* The wordmark has always linked home; it just never behaved as though it did. */
+.dd-navbrand{display:flex;align-items:center;gap:10px;text-decoration:none;transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.dd-navbrand:hover{text-decoration:none;transform:scale(1.03)}
+.dd-navbrand:active{transform:scale(.99)}
+@media (prefers-reduced-motion:reduce){.dd-navbrand:hover,.dd-navbrand:active{transform:none}}
+
 .dd-navdesk{display:none}
 .dd-navburger{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;flex-shrink:0;background:none;border:1px solid rgba(138,155,181,0.4);border-radius:10px;cursor:pointer;padding:0}
 @media (min-width:900px){

@@ -88,7 +88,13 @@ function statsRateLimited(key: string) {
 export default async function handler(req: any, res: any) {
   try {
     if (!signingSecret()) {
-      return res.status(503).json({ error: 'Dashboard is not configured. Set ADMIN_PASSWORD and ADMIN_SESSION_SECRET in the hosting dashboard.' });
+      // Both variables live in Vercel, not in this repo, so a code deploy cannot fix this and
+      // the message has to say so. Vercel only injects environment variables at build time:
+      // setting them changes nothing until the project is redeployed, which is the step people
+      // miss and then report the dashboard as still broken.
+      return res.status(503).json({
+        error: 'Dashboard is not configured. In Vercel \u2192 your project \u2192 Settings \u2192 Environment Variables, add ADMIN_PASSWORD and ADMIN_SESSION_SECRET for the Production environment, then redeploy \u2014 Vercel only picks up new variables on a fresh build.',
+      });
     }
     if (!verifyAdminCookie(String(req.headers.cookie || ''))) {
       return res.status(401).json({ error: 'Not signed in.' });

@@ -287,7 +287,7 @@
           "name": "Is this HIPAA-compliant?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We'll walk you through exactly how data flows on your strategy call, and we're happy to sign a BAA with the voice platform if your practice requires one."
+            "text": "Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what's needed to book an appointment. We'll walk you through exactly how data flows on your strategy call, and we're happy to sign a BAA with the voice platform if your practice requires one."
           }
         },
         {
@@ -392,6 +392,14 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "More than the appointment attached to it. At the rates cited on our homepage — 32–38% of calls unanswered during business hours, 78% of voicemail callers hanging up without leaving a message, and $8,000–$10,000 of lifetime value per new patient — a single missed high-intent call is a four-figure decision rather than a $150 scheduling problem. Someone calling about implants, Invisalign or sedation has usually already decided to spend and is choosing between practices, not browsing. We worked the arithmetic through case by case in our own long-form write-up on Medium, ‘The Real Cost of a Missed Call at Your Dental Practice’."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a limit on how long calls can run?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The 60-second cap is on the demo on this website — it is a test drive, metered so one visitor cannot run up the voice bill, and it is the only thing on this site that is capped. The receptionist we configure for your practice has no call-length limit: it stays on the line as long as the caller needs, whether that is ninety seconds to book a cleaning or six minutes with a nervous patient asking about sedation. Voice usage is billed at cost on your own platform account by the minute, so a longer call costs cents, not a cut-off."
           }
         },
         {
@@ -519,21 +527,28 @@
 <!-- ================= NAV =================
      Identical markup on both pages, driven by vals that know which page they are on:
      navBg/navFg handle cream-vs-navy, navCurHome/navCurDeep set aria-current, and the
-     panel below 900px carries the links the bar cannot fit. -->
+     panel below 900px carries the links the bar cannot fit.
+
+     One visual treatment for navigation, one for the ask. The bar used to carry three —
+     plain text links, a bordered pill with its own play badge, and a solid button — which
+     read as three competing controls rather than a set. Now every destination is plain
+     text and the only button on the bar is the only thing that is not navigation.
+
+     The hover is the rolling-letter effect from the reference navbar: each letter slides up
+     by exactly one line-height while a text-shadow copy sitting one line-height below slides
+     into its place, staggered left to right. Letters are aria-hidden and each link carries an
+     aria-label, so a screen reader reads the word and never spells it out. -->
 <nav aria-label="Primary" style="position:fixed;top:0;left:0;right:0;z-index:50;height:66px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 clamp(16px,4vw,32px);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:{{ navBg }};transition:background .35s ease">
-  <a href="/" onClick="{{ closeNav }}" aria-current="{{ navCurHome }}" aria-label="Digi Dental, home" style="display:flex;align-items:center;gap:10px;text-decoration:none" style-hover="text-decoration:none">
+  <a class="dd-navbrand" href="/" onClick="{{ closeNav }}" aria-current="{{ navCurHome }}" aria-label="Digi Dental, home">
     <img src="/uploads/denty_neutral.png" alt="" width="34" height="34" decoding="async" fetchpriority="high" style="display:block;width:34px;height:34px;object-fit:contain;image-rendering:pixelated">
     <span class="dd-navmark" style="color:{{ navFg }}">Digi<span style="color:#0F8B80"> Dental</span></span>
   </a>
-  <div style="display:flex;align-items:center;gap:clamp(10px,2vw,20px)">
+  <div style="display:flex;align-items:center;gap:clamp(12px,2vw,22px)">
     <div class="dd-navdesk">
-      <a href="/how-it-works/" aria-current="{{ navCurDeep }}" style="font-size:14px;white-space:nowrap;color:{{ navFg }};transition:color .35s ease">How it works</a>
-      <a href="/how-it-works/#pricing" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">Pricing</a>
-      <a href="/how-it-works/#faq" style="font-size:14px;color:{{ navFg }};transition:color .35s ease">FAQ</a>
-      <a href="/how-it-works/#demo" onClick="{{ navDemo }}" data-cta="nav_demo" style="display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600;color:#0F8B80;white-space:nowrap;text-decoration:none;padding:7px 16px 7px 8px;border:1.5px solid rgba(15,139,128,0.45);border-radius:999px;background:rgba(15,139,128,0.08);transition:background-color .25s,border-color .25s,transform .3s cubic-bezier(.22,1,.36,1)" style-hover="background:rgba(15,139,128,0.16);border-color:#0F8B80;color:#0F8B80;text-decoration:none;transform:translateY(-1px)">
-        <span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#0F8B80;flex-shrink:0">
-          <svg width="9" height="10" viewBox="0 0 9 10" fill="none"><path d="M8 4.13a1 1 0 0 1 0 1.74L1.5 9.4A1 1 0 0 1 0 8.53V1.47A1 1 0 0 1 1.5.6L8 4.13Z" fill="#FAF9F6"></path></svg>
-        </span>Hear the demo</a>
+    <a class="dd-navlink" href="/how-it-works/" aria-current="{{ navCurDeep }}" aria-label="How it works" style="color:{{ navFg }}"><span class="dd-roll" aria-hidden="true"><span style="transition-delay:0.00s">H</span><span style="transition-delay:0.02s">o</span><span style="transition-delay:0.04s">w</span><span class="dd-sp" style="transition-delay:0.07s"></span><span style="transition-delay:0.09s">i</span><span style="transition-delay:0.11s">t</span><span class="dd-sp" style="transition-delay:0.13s"></span><span style="transition-delay:0.15s">w</span><span style="transition-delay:0.18s">o</span><span style="transition-delay:0.20s">r</span><span style="transition-delay:0.22s">k</span><span style="transition-delay:0.24s">s</span></span></a>
+    <a class="dd-navlink" href="/how-it-works/#pricing" aria-label="Pricing" style="color:{{ navFg }}"><span class="dd-roll" aria-hidden="true"><span style="transition-delay:0.00s">P</span><span style="transition-delay:0.02s">r</span><span style="transition-delay:0.04s">i</span><span style="transition-delay:0.07s">c</span><span style="transition-delay:0.09s">i</span><span style="transition-delay:0.11s">n</span><span style="transition-delay:0.13s">g</span></span></a>
+    <a class="dd-navlink" href="/how-it-works/#faq" aria-label="FAQ" style="color:{{ navFg }}"><span class="dd-roll" aria-hidden="true"><span style="transition-delay:0.00s">F</span><span style="transition-delay:0.02s">A</span><span style="transition-delay:0.04s">Q</span></span></a>
+    <a class="dd-navlink" href="/how-it-works/#demo" onClick="{{ navDemo }}" data-cta="nav_demo" aria-label="Hear the demo" style="color:{{ navFg }}"><span class="dd-roll" aria-hidden="true"><span style="transition-delay:0.00s">H</span><span style="transition-delay:0.02s">e</span><span style="transition-delay:0.04s">a</span><span style="transition-delay:0.07s">r</span><span class="dd-sp" style="transition-delay:0.09s"></span><span style="transition-delay:0.11s">t</span><span style="transition-delay:0.13s">h</span><span style="transition-delay:0.15s">e</span><span class="dd-sp" style="transition-delay:0.18s"></span><span style="transition-delay:0.20s">d</span><span style="transition-delay:0.22s">e</span><span style="transition-delay:0.24s">m</span><span style="transition-delay:0.26s">o</span></span></a>
     </div>
     <!-- The label shortens below 900px. "Book a Strategy Call" plus a wordmark plus a menu
          control does not fit a 360px bar, and the casualty was always the menu control,
@@ -571,9 +586,9 @@
       <li><a href="#demo" style="display:inline-block;font-size:14.5px;font-weight:500;color:#0F8B80;border:1px solid #D8D2C4;border-radius:999px;padding:9px 18px" style-hover="border-color:#0F8B80;text-decoration:none">Talk to it live</a></li>
       <li><a href="#dashboard" style="display:inline-block;font-size:14.5px;font-weight:500;color:#0F8B80;border:1px solid #D8D2C4;border-radius:999px;padding:9px 18px" style-hover="border-color:#0F8B80;text-decoration:none">The dashboard</a></li>
       <li><a href="#pricing" style="display:inline-block;font-size:14.5px;font-weight:500;color:#0F8B80;border:1px solid #D8D2C4;border-radius:999px;padding:9px 18px" style-hover="border-color:#0F8B80;text-decoration:none">Pricing</a></li>
+      <li><a href="#founder" style="display:inline-block;font-size:14.5px;font-weight:500;color:#0F8B80;border:1px solid #D8D2C4;border-radius:999px;padding:9px 18px" style-hover="border-color:#0F8B80;text-decoration:none">Who builds it</a></li>
       <li><a href="#faq" style="display:inline-block;font-size:14.5px;font-weight:500;color:#0F8B80;border:1px solid #D8D2C4;border-radius:999px;padding:9px 18px" style-hover="border-color:#0F8B80;text-decoration:none">Objections</a></li>
       <li><a href="#case-study" style="display:inline-block;font-size:14.5px;font-weight:500;color:#0F8B80;border:1px solid #D8D2C4;border-radius:999px;padding:9px 18px" style-hover="border-color:#0F8B80;text-decoration:none">Case study</a></li>
-      <li><a href="#founder" style="display:inline-block;font-size:14.5px;font-weight:500;color:#0F8B80;border:1px solid #D8D2C4;border-radius:999px;padding:9px 18px" style-hover="border-color:#0F8B80;text-decoration:none">Who builds it</a></li>
     </ul>
   </div>
 </section>
@@ -629,7 +644,7 @@
     <sc-if value="{{ tEnded }}" hint-placeholder-val="{{ false }}">
       <button onClick="{{ openBookingPostDemo }}" data-cta="post_demo" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:14px 30px;font-size:15px;font-weight:600;cursor:pointer;animation:dd-fadeup .5s cubic-bezier(.22,1,.36,1) both" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>
     </sc-if>
-    <div style="font-size:12px;color:#5A6E86;max-width:380px;line-height:1.6">Demo limited to 60 seconds. Audio is processed by our voice AI provider. <a href="#privacy" onClick="{{ openPrivacy }}" style="color:#8A9BB5">Privacy</a></div>
+    <div style="font-size:12px;color:#5A6E86;max-width:420px;line-height:1.6">This demo is capped at 60 seconds so one visitor cannot run up the voice bill — the receptionist we set up for your practice has no call-length limit. Audio is processed by our voice AI provider. <a href="#privacy" onClick="{{ openPrivacy }}" style="color:#8A9BB5">Privacy</a></div>
   </div>
 
   <!-- Proof + professionalism next to the mascot: the recording, and exactly how the
@@ -782,88 +797,10 @@
   </div>
 </section>
 
-<!-- ================= 9. FAQ ================= -->
-<section id="faq" data-section="faq" style="background:#FFFFFF;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
-  <div data-reveal="" style="width:100%;max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:8px">
-    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0 0 40px;text-align:center">Questions owners ask</h2>
-    <noscript>
-      <!-- The FAQ above is rendered from faqData (in /dd-logic.js) by the runtime, so a crawler
-           that does not execute JavaScript sees an empty loop. This mirror carries the identical
-           text, kept honest by test/seo.test.mjs, which fails if this, faqData and the FAQPage
-           schema in the head ever diverge. Regenerate all three together. -->
-      <dl style="max-width:820px;margin:24px auto 0;text-align:left">
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Is this HIPAA-compliant?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what&#x27;s needed to book an appointment, and the demo is limited to 60 seconds with no patient data. We&#x27;ll walk you through exactly how data flows on your strategy call, and we&#x27;re happy to sign a BAA with the voice platform if your practice requires one.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Will patients know it&#x27;s AI?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Some ask. The voice is natural enough that most don&#x27;t. It never pretends to be human when asked directly. It says it&#x27;s the practice&#x27;s automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What does usage roughly cost monthly?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us, and nothing else is billed monthly unless you choose a care plan.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What if it mishears something, or books the wrong details?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">It confirms every detail that matters. Name, phone number, and appointment time are read back to the caller before anything is booked. If a caller needs something outside its script, it takes a message and flags it for your staff instead of guessing. And when something does slip through, it slips through where you can see it: the appointment sits in your calendar like any other, so your team fixes it in seconds and we tune the script so it doesn&#x27;t happen twice.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How is this different from an answering service?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list, and every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Does it replace my front desk?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">No. It catches what they physically can&#x27;t: after-hours calls, lunch rushes, the second line while they&#x27;re checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Will this work with Dentrix, Eaglesoft or Open Dental?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes. That is the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn&#x27;t, Denty still books into a calendar your team already lives in.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How fast is go-live?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Contracts, cancellation, and data?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">No long-term contract. The setup fee is one-time, and care plans cancel anytime: the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don&#x27;t receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we&#x27;ll have it in place before a single patient call is answered. Ask us to delete anything you&#x27;ve given us and it&#x27;s deleted.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How much does an AI receptionist for a dental practice cost?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Setup is $2,000, one time. That covers the voice AI configured to your practice, your calendar, call scripting for your services and insurance list, testing and go-live. You can split it: $1,000 up front and the remaining $1,000 only once a real patient is booked into your calendar within 14 days of go-live — if that doesn&#x27;t happen, you don&#x27;t owe it. After that the only running cost is voice usage on your own platform account, billed at cost, typically $0.10–$0.15 per minute of live conversation, which lands most practices between $60 and $150 a month. Ongoing care plans are optional at $149 or $299 a month and cancel anytime.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Can it answer calls after hours, at lunch, and on weekends?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">That is the entire point. A practice answering phones roughly 40 hours a week is unreachable for the other 128, and the calls that land in those hours are the ones your marketing already paid for. It answers on the first ring at 7 PM, on Saturday, over lunch, and on the second line while your front desk is checking a patient in. There is no separate after-hours mode to switch on: it is the same receptionist, all 168 hours.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What happens if a patient calls with a dental emergency?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">It follows the rules you set, and it does not make clinical judgements. You tell us what counts as urgent for your practice and what should happen: route the caller to your on-call number, give them your emergency instructions, book them into the first available slot, or take the details and flag them immediately. Anything outside the script gets escalated rather than guessed at, and every call is transcribed and logged so your team sees exactly what was said.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Can it handle multiple callers at the same time?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Yes. Several callers can be on the line at once and each one is answered on the first ring — no hold queue, no busy signal, no voicemail. This is the part a single receptionist physically cannot do: when a campaign lands or a Monday morning rush hits, the third and fourth callers get the same answer as the first.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What is one missed call at a dental practice actually worth?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">More than the appointment attached to it. At the rates cited on our homepage — 32–38% of calls unanswered during business hours, 78% of voicemail callers hanging up without leaving a message, and $8,000–$10,000 of lifetime value per new patient — a single missed high-intent call is a four-figure decision rather than a $150 scheduling problem. Someone calling about implants, Invisalign or sedation has usually already decided to spend and is choosing between practices, not browsing. We worked the arithmetic through case by case in our own long-form write-up on Medium, ‘The Real Cost of a Missed Call at Your Dental Practice’.</dd>
-        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Do the busiest practices in my area already answer after hours?</dt>
-        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">In the markets we have looked at, no. When we reviewed the top-ranked practices in a metro for that same write-up, the pattern was consistent: polished websites, strong review counts, and voicemail after 5 PM. That gap is the opening. Being the practice that answers at 7:42 PM on a Sunday costs one setup fee and takes days to switch on, and it is the one advantage a competitor cannot buy back with a bigger ad budget. This is our own review of a specific market, published under the founder’s byline, not an independent industry study.</dd>
-      </dl>
-    </noscript>
-    <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="9">
-      <div style="border-bottom:1px solid #EEEAE0">
-        <button onClick="{{ f.toggle }}" aria-expanded="{{ f.open }}" style="width:100%;background:none;border:none;padding:22px 4px;display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;font-size:16.5px;font-weight:500;color:#0A1A2F;text-align:left">
-          <span>{{ f.q }}</span><span style="color:#0F8B80;font-size:20px;flex-shrink:0">{{ f.icon }}</span>
-        </button>
-        <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
-          <p style="margin:0;padding:0 4px 24px;font-size:15px;line-height:1.7;color:#3D4F66;text-wrap:pretty">{{ f.a }}</p>
-        </sc-if>
-      </div>
-    </sc-for>
-  </div>
-</section>
-
-<!-- ================= 5. THE CASE STUDY =================
-     The one substantial piece of Digi Dental writing that lives off this domain. It is
-     ours, published under the founder's byline on Medium, and it is described that way
-     here — calling it press or an independent study would be a lie that this page's
-     whole credibility argument cannot afford. What it earns is corroboration: a second
-     indexable document making the same claims with the same numbers, which is what an
-     answer engine checks a vendor's own page against. -->
-<section id="case-study" data-section="case_study" style="background:#FFFFFF;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
-  <div data-reveal="" class="dd-wrap" style="max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:28px">
-    <div style="text-align:center;display:flex;flex-direction:column;gap:12px">
-      <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#5A6E86">Further reading</div>
-      <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">We wrote the long version</h2>
-      <p style="font-size:16px;line-height:1.7;color:#5A6E86;margin:0;text-wrap:pretty">The numbers on the home page in full: what a missed call is actually worth, why voicemail loses the patient rather than delaying them, and what we found when we reviewed the top-ranked practices in one metro for after-hours coverage.</p>
-    </div>
-    <a class="dd-cite" href="{{ caseStudyUrl }}" target="_blank" rel="noopener" onClick="{{ trackCaseStudy }}" data-cta="case_study_deep">
-      <span class="dd-cite-kicker">Case study · Medium · Benny, founder</span>
-      <span class="dd-cite-title">The Real Cost of a Missed Call at Your Dental Practice (And Why Voicemail Isn't Fixing It)</span>
-      <span class="dd-cite-meta">Why a missed implant, Invisalign or sedation enquiry is a $3,000–$5,000 decision and not a $150 scheduling problem · what an independent multi-doctor practice taking 200-plus calls a month is exposed to · why the next-morning callback lands after the patient has already booked · the arithmetic behind 24/7 coverage against a $39,000–$54,000 front-desk hire. Read it on Medium →</span>
-    </a>
-    <p style="font-size:13px;line-height:1.7;color:#8A93A1;margin:0;text-align:center;text-wrap:pretty">Published by us, not about us: this is our own analysis under the founder's byline, not press coverage or an independent industry study. The statistics it leans on are the sourced ones on the <a href="/#sources" style="color:#5A6E86">home page</a>; the market review in it is our own.</p>
-  </div>
-</section>
-
 <!-- ================= 6. SOCIAL PROOF + FOUNDER =================
      Its own section now, and its own anchor, because on a deep-dive page "who actually
      builds this" is a question people navigate to rather than scroll into. -->
-<section id="founder" data-section="founder" style="background:#0A1A2F;color:#FAF9F6;padding:130px clamp(20px,4vw,48px) 0;border-top:1px solid #22344E">
+<section id="founder" data-section="founder" style="background:#0A1A2F;color:#FAF9F6;padding:130px clamp(20px,4vw,48px) 10px;border-top:1px solid #EEEAE0">
   <!-- ============================ SOCIAL PROOF SLOT ============================
        For REAL customer quotes only. Populate this.SOCIAL_PROOF in the logic class with
        { quote, name, practice, metric } entries and the section renders itself; leave it
@@ -929,11 +866,92 @@
     </div>
   </div>
 </section>
+<!-- ================= 9. FAQ ================= -->
+<section id="faq" data-section="faq" style="background:#FFFFFF;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+  <div data-reveal="" style="width:100%;max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:8px">
+    <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0 0 40px;text-align:center">Questions owners ask</h2>
+    <noscript>
+      <!-- The FAQ above is rendered from faqData (in /dd-logic.js) by the runtime, so a crawler
+           that does not execute JavaScript sees an empty loop. This mirror carries the identical
+           text, kept honest by test/seo.test.mjs, which fails if this, faqData and the FAQPage
+           schema in the head ever diverge. Regenerate all three together. -->
+      <dl style="max-width:820px;margin:24px auto 0;text-align:left">
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Is this HIPAA-compliant?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Call audio is handled by enterprise voice-AI infrastructure and is not shared with us unless you ask us to review a call. We configure Denty to never ask for or repeat protected health information beyond what&#x27;s needed to book an appointment. We&#x27;ll walk you through exactly how data flows on your strategy call, and we&#x27;re happy to sign a BAA with the voice platform if your practice requires one.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Will patients know it&#x27;s AI?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Some ask. The voice is natural enough that most don&#x27;t. It never pretends to be human when asked directly. It says it&#x27;s the practice&#x27;s automated receptionist and keeps the conversation moving. What patients notice is that the phone got answered on the first ring at 9 PM.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What does usage roughly cost monthly?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Usage is billed at cost on your own voice-platform account: typically $0.10–$0.15 per minute of live conversation. A practice handling 300 answered calls a month usually lands between $60 and $150. No markup from us, and nothing else is billed monthly unless you choose a care plan.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What if it mishears something, or books the wrong details?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">It confirms every detail that matters. Name, phone number, and appointment time are read back to the caller before anything is booked. If a caller needs something outside its script, it takes a message and flags it for your staff instead of guessing. And when something does slip through, it slips through where you can see it: the appointment sits in your calendar like any other, so your team fixes it in seconds and we tune the script so it doesn&#x27;t happen twice.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How is this different from an answering service?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">An answering service takes a message. This takes the booking. A service bills you per call or per minute for as long as you use it, works from a script that takes days to change, and still hands your front desk a callback list, and every callback is another chance for that patient to book somewhere else. Denty answers on the first ring, answers insurance and service questions from your own list, and writes the appointment into your calendar while the caller is still on the phone. One setup fee, not a bill that grows every time you get busier.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Does it replace my front desk?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">No. It catches what they physically can&#x27;t: after-hours calls, lunch rushes, the second line while they&#x27;re checking a patient in. Your team keeps doing what humans do best, with a calendar that fills itself.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Will this work with Dentrix, Eaglesoft or Open Dental?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Usually yes, and we check yours before you pay anything. Every setup includes Google Calendar, which works on day one no matter what practice-management software you run. Writing appointments straight into Dentrix, Eaglesoft, Open Dental or another PMS depends on what your system exposes. That is the $299/month care plan, and we confirm on the strategy call whether your setup supports it. If it doesn&#x27;t, Denty still books into a calendar your team already lives in.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How fast is go-live?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Days, not months. We configure the assistant to your services, insurance list, and calendar, test it against real scenarios with you, then flip it on. Most practices are live within 7 days of the onboarding call, and the clock starts once we have your services list, insurance list, and calendar access.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Contracts, cancellation, and data?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">No long-term contract. The setup fee is one-time, and care plans cancel anytime: the current month finishes and nothing renews. On data: what you send through this site is stored only so we can reply to you, and it is never sold or shared. Call audio is handled by the enterprise voice platform that powers the conversations, under its own security and data-processing terms; we don&#x27;t receive or keep recordings unless you ask us to review a specific call. If your practice needs a BAA or a data-processing agreement signed before go-live, tell us on the strategy call and we&#x27;ll have it in place before a single patient call is answered. Ask us to delete anything you&#x27;ve given us and it&#x27;s deleted.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">How much does an AI receptionist for a dental practice cost?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Setup is $2,000, one time. That covers the voice AI configured to your practice, your calendar, call scripting for your services and insurance list, testing and go-live. You can split it: $1,000 up front and the remaining $1,000 only once a real patient is booked into your calendar within 14 days of go-live — if that doesn&#x27;t happen, you don&#x27;t owe it. After that the only running cost is voice usage on your own platform account, billed at cost, typically $0.10–$0.15 per minute of live conversation, which lands most practices between $60 and $150 a month. Ongoing care plans are optional at $149 or $299 a month and cancel anytime.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Can it answer calls after hours, at lunch, and on weekends?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">That is the entire point. A practice answering phones roughly 40 hours a week is unreachable for the other 128, and the calls that land in those hours are the ones your marketing already paid for. It answers on the first ring at 7 PM, on Saturday, over lunch, and on the second line while your front desk is checking a patient in. There is no separate after-hours mode to switch on: it is the same receptionist, all 168 hours.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What happens if a patient calls with a dental emergency?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">It follows the rules you set, and it does not make clinical judgements. You tell us what counts as urgent for your practice and what should happen: route the caller to your on-call number, give them your emergency instructions, book them into the first available slot, or take the details and flag them immediately. Anything outside the script gets escalated rather than guessed at, and every call is transcribed and logged so your team sees exactly what was said.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Can it handle multiple callers at the same time?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">Yes. Several callers can be on the line at once and each one is answered on the first ring — no hold queue, no busy signal, no voicemail. This is the part a single receptionist physically cannot do: when a campaign lands or a Monday morning rush hits, the third and fourth callers get the same answer as the first.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">What is one missed call at a dental practice actually worth?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">More than the appointment attached to it. At the rates cited on our homepage — 32–38% of calls unanswered during business hours, 78% of voicemail callers hanging up without leaving a message, and $8,000–$10,000 of lifetime value per new patient — a single missed high-intent call is a four-figure decision rather than a $150 scheduling problem. Someone calling about implants, Invisalign or sedation has usually already decided to spend and is choosing between practices, not browsing. We worked the arithmetic through case by case in our own long-form write-up on Medium, ‘The Real Cost of a Missed Call at Your Dental Practice’.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Is there a limit on how long calls can run?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">No. The 60-second cap is on the demo on this website — it is a test drive, metered so one visitor cannot run up the voice bill, and it is the only thing on this site that is capped. The receptionist we configure for your practice has no call-length limit: it stays on the line as long as the caller needs, whether that is ninety seconds to book a cleaning or six minutes with a nervous patient asking about sedation. Voice usage is billed at cost on your own platform account by the minute, so a longer call costs cents, not a cut-off.</dd>
+        <dt style="font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:#0A1A2F;margin-top:22px">Do the busiest practices in my area already answer after hours?</dt>
+        <dd style="margin:8px 0 0;font-size:15px;line-height:1.7;color:#3D4F66">In the markets we have looked at, no. When we reviewed the top-ranked practices in a metro for that same write-up, the pattern was consistent: polished websites, strong review counts, and voicemail after 5 PM. That gap is the opening. Being the practice that answers at 7:42 PM on a Sunday costs one setup fee and takes days to switch on, and it is the one advantage a competitor cannot buy back with a bigger ad budget. This is our own review of a specific market, published under the founder’s byline, not an independent industry study.</dd>
+      </dl>
+    </noscript>
+    <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="9">
+      <div style="border-bottom:1px solid #EEEAE0">
+        <button onClick="{{ f.toggle }}" aria-expanded="{{ f.open }}" style="width:100%;background:none;border:none;padding:22px 4px;display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;font-size:16.5px;font-weight:500;color:#0A1A2F;text-align:left">
+          <span>{{ f.q }}</span><span style="color:#0F8B80;font-size:20px;flex-shrink:0">{{ f.icon }}</span>
+        </button>
+        <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+          <p style="margin:0;padding:0 4px 24px;font-size:15px;line-height:1.7;color:#3D4F66;text-wrap:pretty">{{ f.a }}</p>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<!-- ================= 5. THE CASE STUDY =================
+     The one substantial piece of Digi Dental writing that lives off this domain. It is
+     ours, published under the founder's byline on Medium, and it is described that way
+     here — calling it press or an independent study would be a lie that this page's
+     whole credibility argument cannot afford. What it earns is corroboration: a second
+     indexable document making the same claims with the same numbers, which is what an
+     answer engine checks a vendor's own page against. -->
+<section id="case-study" data-section="case_study" style="background:#FFFFFF;padding:150px clamp(20px,4vw,48px);border-top:1px solid #EEEAE0">
+  <div data-reveal="" class="dd-wrap" style="max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:28px">
+    <div style="text-align:center;display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#5A6E86">Further reading</div>
+      <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.8rem,4vw,2.4rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">We wrote the long version</h2>
+      <p style="font-size:16px;line-height:1.7;color:#5A6E86;margin:0;text-wrap:pretty">The numbers on the home page in full: what a missed call is actually worth, why voicemail loses the patient rather than delaying them, and what we found when we reviewed the top-ranked practices in one metro for after-hours coverage.</p>
+    </div>
+    <a class="dd-cite" href="{{ caseStudyUrl }}" target="_blank" rel="noopener" onClick="{{ trackCaseStudy }}" data-cta="case_study_deep">
+      <span class="dd-cite-kicker">Case study · Medium · Benny, founder</span>
+      <span class="dd-cite-title">The Real Cost of a Missed Call at Your Dental Practice (And Why Voicemail Isn't Fixing It)</span>
+      <span class="dd-cite-meta">Why a missed implant, Invisalign or sedation enquiry is a $3,000–$5,000 decision and not a $150 scheduling problem · what an independent multi-doctor practice taking 200-plus calls a month is exposed to · why the next-morning callback lands after the patient has already booked · the arithmetic behind 24/7 coverage against a $39,000–$54,000 front-desk hire. Read it on Medium →</span>
+    </a>
+    <p style="font-size:13px;line-height:1.7;color:#8A93A1;margin:0;text-align:center;text-wrap:pretty">Published by us, not about us: this is our own analysis under the founder's byline, not press coverage or an independent industry study. The statistics it leans on are the sourced ones on the <a href="/#sources" style="color:#5A6E86">home page</a>; the market review in it is our own.</p>
+  </div>
+</section>
+
+
 
 <!-- ================= 7. FINAL CTA =================
      Last thing on the page, after the demo, the price and every objection. One ask. -->
-<section data-section="final" style="background:#0A1A2F;color:#FAF9F6;padding:0 clamp(20px,4vw,48px) 140px">
-  <div data-reveal="" style="width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;border-top:1px solid #22344E;padding-top:120px">
+<section data-section="final" style="background:#0A1A2F;color:#FAF9F6;padding:130px clamp(20px,4vw,48px) 140px;border-top:1px solid #EEEAE0">
+  <div data-reveal="" style="width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center">
     <h2 style="font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2rem,5vw,3rem);letter-spacing:-0.02em;margin:0;text-wrap:balance">You've heard it. Now put it on your line.</h2>
     <p style="font-size:16px;color:#B9C4D4;margin:0;font-variant-numeric:tabular-nums;text-wrap:pretty">$2,000 one-time setup, usage billed at cost on your own account. Start with $1,000 — the rest is due only once we book a real patient into your calendar within 14 days of go-live. If we don't, you don't owe it.</p>
     <button onClick="{{ openBookingFinal }}" data-cta="final_cta" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:18px 40px;font-size:17px;font-weight:600;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,0.3)" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)">Book a Strategy Call</button>

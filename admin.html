@@ -613,20 +613,35 @@ input[type=password],input[type=search]{
             <div class="card-body"><div class="rows" id="countries"></div></div>
           </div>
         </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Errors and dead ends</div>
+            <div class="card-desc">Blocked demos, failed calls, form errors, dead links</div></div>
+          <div class="card-body"><div class="tw"><table id="errTable"></table></div></div>
+        </div>
+      </section>
+
+      <!-- ===== PAGES =====
+           Sections and scroll depth live here rather than under Audience: since the split
+           neither means anything without knowing which document it happened on. -->
+      <section class="view" id="v-pages">
+        <div class="stats" id="pageStats"></div>
         <div class="grid g2">
           <div class="card">
-            <div class="card-head"><div class="card-title">Sections</div><div class="card-desc">Reach, median time, and where visits end</div></div>
-            <div class="card-body"><div class="tw"><table id="secTable"></table></div></div>
+            <div class="card-head"><div class="card-title">Traffic by page</div>
+              <div class="card-desc">"Landed" is where the visit began; "crossed" also saw the other page</div></div>
+            <div class="card-body"><div class="tw"><table id="pageTable"></table></div></div>
           </div>
           <div class="card">
-            <div class="card-head"><div class="card-title">Scroll depth</div><div class="card-desc">Share of visitors reaching each point</div></div>
-            <div class="card-body">
-              <div class="rows" id="scroll"></div>
-              <hr class="sep" style="margin:16px 0">
-              <div class="card-title" style="font-size:13px;margin-bottom:9px">Errors and dead ends</div>
-              <div class="tw"><table id="errTable"></table></div>
-            </div>
+            <div class="card-head"><div class="card-title">Scroll depth</div>
+              <div class="card-desc">Per page — the two documents are nothing like the same length</div></div>
+            <div class="card-body"><div id="scrollByPage"></div></div>
           </div>
+        </div>
+        <!-- Full width: seven columns across both pages does not fit half a canvas. -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Sections</div>
+            <div class="card-desc">Reach is against the visitors of the page each section is on</div></div>
+          <div class="card-body"><div class="tw tall"><table id="secTable"></table></div></div>
         </div>
       </section>
 
@@ -671,7 +686,8 @@ input[type=password],input[type=search]{
     audit: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
     play: '<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
     globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
-    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>'
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+    pages: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M8 13h6"/><path d="M8 17h4"/>'
   };
   function icon(n, s) {
     return '<svg width="' + (s || 15) + '" height="' + (s || 15) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICON[n] || '') + '</svg>';
@@ -682,6 +698,10 @@ input[type=password],input[type=search]{
   // to them was pointless; separated, each one gets the whole canvas.
   var NAV = [
     { id: 'overview', t: 'Overview', i: 'gauge' },
+    // The site is two documents now. Which one a visitor is on is a dimension, and the jump
+    // between them is the single largest step in the funnel, so it gets its own view rather
+    // than a row buried in Audience.
+    { id: 'pages', t: 'Pages', i: 'pages' },
     { id: 'clicks', t: 'Clicks', i: 'pointer' },
     { id: 'contact', t: 'Contact', i: 'message' },
     { id: 'funnel', t: 'Funnel', i: 'funnel' },
@@ -857,6 +877,102 @@ input[type=password],input[type=search]{
   }
 
   // ---------- render ----------
+  // ---------- pages ----------
+  // Everything here exists because the site stopped being one document. `case_study` and
+  // `final` are section names on BOTH pages, so before migration 010 those rows were two
+  // different sections added together; reach was measured against every visitor to the site
+  // rather than against the visitors of the page the section is on; and one scroll curve was
+  // averaged across two documents of very different heights.
+  //
+  // All three panels degrade rather than break when 010 has not been applied yet: the payload
+  // simply arrives without a `page` on each row (and with an empty `pages`), and the tables
+  // render exactly as they used to, minus the split.
+  var PAGE_LABEL = { home: 'Home', deep: 'How it works', other: 'Other' };
+  var PAGE_PATH = { home: '/', deep: '/how-it-works/', other: 'elsewhere' };
+  function pageName(p) { return PAGE_LABEL[p] || p || 'Unknown'; }
+
+  function renderPages(d) {
+    var pages = d.pages || [];
+    var home = pages.filter(function (p) { return p.page === 'home'; })[0] || {};
+    var deep = pages.filter(function (p) { return p.page === 'deep'; })[0] || {};
+
+    // Zeroed tiles would read as "no traffic" when the truth is "this split cannot be computed
+    // yet". Say which, and say what to do about it.
+    if (!pages.length) {
+      $('pageStats').innerHTML =
+        '<div class="card" style="grid-column:1/-1;padding:16px"><div class="k" style="font-size:11.5px;color:var(--muted-foreground)">Per-page split unavailable</div>' +
+        '<div class="d" style="font-size:12.5px;margin-top:6px;color:var(--muted-foreground)">' +
+        'Traffic is still being recorded per page — the query that splits it is not installed. Run ' +
+        '<code>supabase/migrations/010_two_page_analytics.sql</code> in the Supabase SQL editor, then reload. ' +
+        'The tables below fall back to the old site-wide totals until then.</div></div>';
+      $('pageTable').innerHTML = '<tbody><tr><td class="empty">Nothing yet.</td></tr></tbody>';
+    } else {
+    // The cross-over rate is the whole point of a two-page funnel: everything past the home
+    // page depends on people making the jump, and nothing on the old dashboard showed it.
+    $('pageStats').innerHTML = [
+      { k: 'Home visitors', v: num(home.visitors), d: num(home.entries) + ' started here' },
+      { k: 'How it works', v: num(deep.visitors), d: num(deep.entries) + ' started here' },
+      { k: 'Crossed over', v: pct(home.crossed_pct), d: num(home.crossed) + ' of ' + num(home.visitors) + ' went deeper' },
+      { k: 'Leads', v: num(deep.leads), d: 'from How it works visitors' }
+    ].map(function (t) {
+      return '<div class="card stat" style="cursor:default">' +
+        '<div class="k">' + esc(t.k) + '</div><div class="v tnum">' + esc(t.v) + '</div>' +
+        '<div class="d">' + esc(t.d) + '</div></div>';
+    }).join('');
+
+    table($('pageTable'),
+      [{ t: 'Page' }, { t: 'Views', n: 1 }, { t: 'Visitors', n: 1 }, { t: 'Landed', n: 1 },
+       { t: 'Crossed', n: 1 }, { t: 'Leads', n: 1 }],
+      pages,
+      function (r) {
+        var cr = Number(r.crossed_pct) || 0;
+        return '<tr><td>' + esc(pageName(r.page)) + ' <small style="opacity:.6">' + esc(PAGE_PATH[r.page] || '') + '</small></td>' +
+          '<td class="n">' + num(r.views) + '</td><td class="n">' + num(r.visitors) + '</td>' +
+          '<td class="n">' + pct(r.entry_pct) + '</td>' +
+          '<td class="n"><span class="badge badge-' + (cr >= 40 ? 'ok' : cr >= 15 ? 'warn' : 'bad') + '">' +
+          pct(r.crossed_pct) + '</span></td><td class="n">' + num(r.leads) + '</td></tr>';
+      });
+    }
+
+    var secs = d.sections || [];
+    var splitSecs = secs.some(function (r) { return r.page; });
+    table($('secTable'),
+      (splitSecs ? [{ t: 'Page' }] : []).concat(
+        [{ t: 'Section' }, { t: 'Reach', n: 1 }, { t: '%', n: 1 }, { t: 'Median', n: 1 }, { t: 'Exit', n: 1 }]),
+      secs,
+      function (r) {
+        var ex = Number(r.exit_pct) || 0;
+        return '<tr>' + (splitSecs ? '<td><span class="badge badge-mute">' + esc(pageName(r.page)) + '</span></td>' : '') +
+          '<td>' + esc(r.section) + '</td><td class="n">' + num(r.reach) + '</td><td class="n">' + pct(r.reach_pct) +
+          '</td><td class="n">' + dur(r.median_seconds) + '</td><td class="n"><span class="badge badge-' +
+          (ex >= 40 ? 'bad' : ex >= 20 ? 'warn' : 'mute') + '">' + pct(r.exit_pct) + '</span></td></tr>';
+      });
+
+    // One bar group per page, in the order the funnel visits them.
+    var scroll = d.scroll || [];
+    var host = $('scrollByPage');
+    host.innerHTML = '';
+    if (!scroll.length) { host.innerHTML = '<div class="empty">Nothing yet.</div>'; return; }
+    var groups = scroll.some(function (r) { return r.page; })
+      ? ['home', 'deep', 'other'].filter(function (g) { return scroll.some(function (r) { return r.page === g; }); })
+      : [null];
+    groups.forEach(function (g, i) {
+      if (g) {
+        var h = document.createElement('div');
+        h.className = 'card-title';
+        h.style.cssText = 'font-size:12px;margin:' + (i ? '18px' : '0') + ' 0 9px';
+        h.textContent = pageName(g);
+        host.appendChild(h);
+      }
+      var box = document.createElement('div');
+      box.className = 'rows';
+      host.appendChild(box);
+      bars(box, scroll.filter(function (r) { return g ? r.page === g : true; }).map(function (r) {
+        return { label: r.depth + '% down', value: Number(r.visitors), right: num(r.visitors), sub: pct(r.pct) };
+      }), 'var(--seq-3)');
+    });
+  }
+
   function render(d) {
     var o = d.overview || {}, ct = d.click_totals || {};
     $('stamp').textContent = 'Last ' + d.range_days + ' days · updated ' + when(d.generated_at);
@@ -953,18 +1069,7 @@ input[type=password],input[type=search]{
       return { label: r.label || 'unknown', value: Number(r.visitors), right: num(r.visitors) };
     }), 'var(--chart-5)');
 
-    table($('secTable'),
-      [{ t: 'Section' }, { t: 'Reach', n: 1 }, { t: '%', n: 1 }, { t: 'Median', n: 1 }, { t: 'Exit', n: 1 }],
-      d.sections || [],
-      function (r) {
-        var ex = Number(r.exit_pct) || 0;
-        return '<tr><td>' + esc(r.section) + '</td><td class="n">' + num(r.reach) + '</td><td class="n">' + pct(r.reach_pct) +
-          '</td><td class="n">' + dur(r.median_seconds) + '</td><td class="n"><span class="badge badge-' +
-          (ex >= 40 ? 'bad' : ex >= 20 ? 'warn' : 'mute') + '">' + pct(r.exit_pct) + '</span></td></tr>';
-      });
-    bars($('scroll'), (d.scroll || []).map(function (r) {
-      return { label: r.depth + '% down', value: Number(r.visitors), right: num(r.visitors), sub: pct(r.pct) };
-    }), 'var(--seq-3)');
+    renderPages(d);
     table($('errTable'),
       [{ t: 'Problem' }, { t: 'Detail' }, { t: 'Hits', n: 1 }],
       d.errors || [],
@@ -1142,6 +1247,7 @@ input[type=password],input[type=search]{
       ['cta_placements', d.cta || []],
       ['clicked_controls', d.clicks || []],
       ['contact_channels', d.contact || []],
+      ['pages', d.pages || []],
       ['sections', d.sections || []],
       ['scroll_depth', d.scroll || []],
       ['video', d.video || []],

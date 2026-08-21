@@ -214,6 +214,13 @@ input,select,button,textarea{font-family:inherit}
 @media (min-width:900px){
   .dd-founder{display:flex;flex-direction:row;align-items:center;gap:0}
   .dd-founder-photo{width:min(420px,42%);aspect-ratio:1}
+}
+/* ^ This brace was missing. Everything below it — .dd-proof, .dd-proof-shell, the .dd-cite
+   card and the pre-hydration crawler rules — was therefore swallowed into the 900px query and
+   never applied on a phone. That is why the dashboard capture rendered as a bare square-cornered
+   rectangle jammed against its own caption, and why the case study rendered as a wall of plain
+   green link text instead of a card. Nothing below is desktop-specific; each rule that needs a
+   width gate carries its own. */
 
 /* ============ Pre-JS view: what non-rendering crawlers actually read ============
    Googlebot executes JavaScript. GPTBot, ClaudeBot and PerplexityBot largely do not —
@@ -249,6 +256,9 @@ x-dc sc-for { display: none !important; }
    full accordion tour on /how-it-works/. Same browser-chrome frame as the tour,
    so the two read as the same artefact rather than two different products. */
 .dd-proof{display:grid;grid-template-columns:1fr;gap:clamp(24px,4vw,44px);align-items:center;width:100%}
+/* Stacked, the gap is the only thing separating a dark screenshot from the kicker that
+   labels it, so it is worth more here than the 24px the clamp bottoms out at. */
+@media (max-width:979px){.dd-proof{gap:34px}}
 @media (min-width:980px){.dd-proof{grid-template-columns:minmax(0,1.25fr) minmax(0,0.75fr)}}
 /* The shell carries the card treatment; the frame and scroller inside it are the very
    same .dd-dash-* elements the tour uses, so sizeDash() finds what it expects and the
@@ -263,3 +273,72 @@ x-dc sc-for { display: none !important; }
 .dd-cite-kicker{display:block;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A93A1;margin-bottom:10px}
 .dd-cite-title{display:block;font-family:'Fraunces',serif;font-size:clamp(1.05rem,2.2vw,1.3rem);font-weight:600;line-height:1.35;color:#0A1A2F;letter-spacing:-0.015em}
 .dd-cite-meta{display:block;font-size:13.5px;color:#5A6E86;margin-top:12px;line-height:1.6}
+/* The destination, said once and shown as an action. Without it the card ends on a
+   paragraph and there is nothing that looks like somewhere to go — which on a phone is
+   how the whole thing read as a block of link-coloured text. */
+.dd-cite-go{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-size:14px;font-weight:600;color:#0F8B80}
+.dd-cite-arrow{
+  width:7px;height:7px;flex:0 0 auto;
+  border-top:1.6px solid currentColor;border-right:1.6px solid currentColor;
+  transform:rotate(45deg);transition:transform .3s cubic-bezier(.22,1,.36,1)
+}
+.dd-cite:hover .dd-cite-arrow{transform:rotate(45deg) translate(2px,-2px)}
+@media (prefers-reduced-motion:reduce){.dd-cite,.dd-cite-arrow{transition:none}}
+/* Phones: the abstract is a summary, not the article. Four lines is enough to decide
+   whether to open it, and the card stays a card instead of becoming the page. */
+@media (max-width:700px){
+  .dd-cite-meta{
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;
+    line-clamp:4;overflow:hidden
+  }
+}
+
+/* ===== Hero demo video =====================================================
+   The two-minute VSL. 16:9 at every width — the ratio is the point, and it is never
+   cropped, letterboxed or stretched to fill a phone screen.
+
+   On a phone the clip sat inside the header's own 20px gutter, which on a 390px screen
+   left it 350px wide and about 197px tall: technically correct and visually a thumbnail.
+   Below 760px it steps out of that gutter to a 10px margin, so it reads as the header's
+   main object rather than an afterthought. The corners stay: the radius only drops from
+   16px to 14px, which is what keeps it a framed video and not a full-bleed panel. */
+.dd-vsl-wrap{margin-top:80px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.dd-vsl{
+  width:min(1180px,100%);aspect-ratio:16/9;border-radius:16px;border:1px solid #E8E4DA;
+  background:#0A1A2F;box-shadow:0 18px 44px rgba(10,26,47,0.1);display:block;object-fit:cover
+}
+.dd-vsl-cap{font-size:13px;color:#5A6E86;text-align:center}
+@media (max-width:760px){
+  /* Negative margins rather than a vw width: the header's gutter is the only thing being
+     cancelled, so there is nothing here for a scrollbar to make wrong. 20px of padding less
+     10px each side leaves the 10px margin. */
+  .dd-vsl-wrap{margin-top:56px;margin-left:-10px;margin-right:-10px;width:auto;gap:14px}
+  .dd-vsl{width:100%;border-radius:14px}
+  .dd-vsl-cap{padding:0 10px}
+}
+
+/* ===== Sources line ========================================================
+   The one line that stands in for the five footnotes under the cost statistics.
+   Reads as a footnote rather than a call to action — this is the smallest, quietest
+   thing on the section, and it should stay that way — but it is a real 44px tap target
+   with a visible affordance, not grey text pretending to be a link. */
+.dd-srcline{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  width:100%;max-width:640px;margin:64px auto 0;
+  padding:15px 4px 15px 0;background:none;border:0;border-top:1px solid #EEEAE0;
+  font:inherit;text-align:left;cursor:pointer;color:#8A93A1;
+  transition:color .25s ease,border-color .25s ease
+}
+.dd-srcline:hover,.dd-srcline:focus-visible{color:#0F8B80;border-top-color:#D8D2C4}
+.dd-srcline:focus-visible{outline:2px solid #0F8B80;outline-offset:4px;border-radius:4px}
+.dd-srcline-t{font-size:13px;letter-spacing:0.02em}
+/* The count and the chevron travel together, so the row reads "5 references ›". */
+.dd-srcline-n{display:flex;align-items:center;gap:9px;flex:0 0 auto;font-size:12.5px;color:#8A93A1}
+.dd-srcline-n::after{
+  content:'';width:7px;height:7px;flex:0 0 auto;
+  border-top:1.5px solid currentColor;border-right:1.5px solid currentColor;
+  transform:rotate(45deg);transition:transform .3s cubic-bezier(.22,1,.36,1)
+}
+.dd-srcline:hover .dd-srcline-n,.dd-srcline:focus-visible .dd-srcline-n{color:#0F8B80}
+.dd-srcline:hover .dd-srcline-n::after{transform:rotate(45deg) translate(2px,-2px)}
+@media (prefers-reduced-motion:reduce){.dd-srcline,.dd-srcline-n::after{transition:none}}

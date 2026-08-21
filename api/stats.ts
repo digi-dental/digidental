@@ -13,6 +13,11 @@
 //   paths      conversion path analysis
 //   breakdown  country / device / city / referrer  (&dim=)
 //
+// The dashboard payload carries `pages` as well: per-document traffic, landing share and the
+// cross-over rate between `/` and `/how-it-works/`. `sections` and `scroll` are keyed by page
+// too — section names are not unique across the two documents (case_study and final exist on
+// both), so before migration 010 those rows were the sum of two different sections.
+//
 // The browser never holds a database credential and raw event rows never leave the server.
 // Requires the admin cookie set by /api/admin-login.
 import { createClient } from '@supabase/supabase-js';
@@ -160,7 +165,7 @@ export default async function handler(req: any, res: any) {
     const [
       overview, funnel, series, cta, sections, video, scroll,
       sources, countries, devices, referrers, errors, paths, leads,
-      contact, clickTotals, clicks, pipeline
+      contact, clickTotals, clicks, pipeline, pages
     ] = await Promise.all([
       rpc('rpc_overview', { days }),
       rpc('rpc_funnel', { days }),
@@ -179,7 +184,11 @@ export default async function handler(req: any, res: any) {
       rpc('rpc_contact', { days }),
       rpc('rpc_click_totals', { days }),
       rpc('rpc_clicks', { days, lim: 40 }),
-      rpc('rpc_pipeline', { days, lim: 300 })
+      rpc('rpc_pipeline', { days, lim: 300 }),
+      // Two pages, so which one a visitor is on is a dimension now, not a constant. Added by
+      // migration 010; until that is applied this one call fails and lands in `degraded`,
+      // which is the whole point of reporting failures per panel rather than per request.
+      rpc('rpc_pages', { days })
     ]);
 
     // If the very first call failed the schema is probably not there yet, which is worth
@@ -187,7 +196,7 @@ export default async function handler(req: any, res: any) {
     // Truncating this list to three used to hide the fourth failure, which made it look like
     // one migration was partly applied when in fact a whole file had not run. Report the
     // distinct causes and say how many panels each affected.
-    const failures = [overview, funnel, series, cta, sections, video, scroll, sources, countries, devices, referrers, errors, paths, leads, contact, clickTotals, clicks, pipeline]
+    const failures = [overview, funnel, series, cta, sections, video, scroll, sources, countries, devices, referrers, errors, paths, leads, contact, clickTotals, clicks, pipeline, pages]
       .map(r => r.error).filter(Boolean) as string[];
     const distinctFailures = Array.from(new Set(failures));
 
@@ -213,7 +222,8 @@ export default async function handler(req: any, res: any) {
       contact: contact.data || [],
       click_totals: clickTotals.data || {},
       clicks: clicks.data || [],
-      pipeline: pipeline.data || []
+      pipeline: pipeline.data || [],
+      pages: pages.data || []
     });
   } catch (e: any) {
     console.error('[stats] handler threw:', e && e.message);

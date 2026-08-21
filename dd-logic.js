@@ -90,12 +90,19 @@ class extends DCLogic {
     { tag: 'New patient, 9:03 PM, Sunday', l1: '\u201CMy crown came off. How soon can someone see me?\u201D', l2: '\u201CMonday 8:00 AM, first slot. Shall I book it?\u201D', booked: 'Booked: Monday 8:00 AM', cap: 'Booked before the week began.' }
   ];
 
-  // Denty sprite frames (user-provided pixel art in uploads/)
+  // Denty sprite frames (user-provided pixel art in uploads/).
+  //
+  // Root-absolute, and they have to be. These are assigned to the live <img> by render(), and
+  // a relative 'uploads/…' resolves against the current directory: fine at '/', but at
+  // '/how-it-works/' it asks for '/how-it-works/uploads/denty_neutral.png' and 404s. The markup
+  // on both pages already writes an absolute src, so the runtime was overwriting a working
+  // path with a broken one — which is why Denty was missing from the live-demo section on the
+  // deep page and present on the home page.
   FRAMES = {
-    neutral: 'uploads/denty_neutral.png',
-    half: 'uploads/denty_half_mouth_yap.png',
-    full: 'uploads/denty_full_mouth_yap.png',
-    happy: 'uploads/denty_happy.png'
+    neutral: '/uploads/denty_neutral.png',
+    half: '/uploads/denty_half_mouth_yap.png',
+    full: '/uploads/denty_full_mouth_yap.png',
+    happy: '/uploads/denty_happy.png'
   };
   YAP_CYCLE = ['neutral', 'half', 'full', 'half'];
 
@@ -1413,6 +1420,7 @@ class extends DCLogic {
       tiltLeave: () => this._tiltLeave(),
       // modals + navigation
       mBooking: s.modal === 'booking', mPrivacy: s.modal === 'privacy', mTerms: s.modal === 'terms', mExit: s.modal === 'exit',
+      mSources: s.modal === 'sources',
       // Every booking CTA carries where it was clicked, so drop-off can be read per placement.
       openBooking: () => this.openBookingFrom('other'),
       openBookingNav: () => this.openBookingFrom('nav'),
@@ -1460,6 +1468,9 @@ class extends DCLogic {
       trackDemoVideo: () => this.track('video_play', { clip: 'demo_recording' }),
       openPrivacy: e => { e && e.preventDefault(); this.setState({ modal: 'privacy' }); },
       openTerms: e => { e && e.preventDefault(); this.setState({ modal: 'terms' }); },
+      // The footnotes to the cost statistics. preventDefault matters on the note-4 superscript,
+      // which is still an <a href="#sources"> so it degrades to an in-page jump with no JS.
+      openSources: e => { e && e.preventDefault(); this.track('cta_click', { location: 'sources' }); this.setState({ modal: 'sources' }); },
       closeModal: () => this.setState({ modal: null }),
       stopProp: e => e.stopPropagation(),
       dismissExit: () => this.setState({ modal: null }),

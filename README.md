@@ -28,6 +28,7 @@ Repo scaffolding for the production build (React + Vite + Tailwind + Vercel func
 - `api/video.ts` — stable URLs for the two marketing videos, so no expiring token lives in the page
 - `api/site-info.ts` — public JSON summary for AI agents (no deps, no secrets)
 - `supabase/migrations/` — `001` leads + demo sessions, `002` site events (+ the KPI queries)
+  … `010` two-page analytics (paste-ready copy: `supabase/APPLY_010_ONLY.sql`)
 - `.env.example` — every required variable, placeholder values only
 - `vercel.json` — response headers for the SEO/AI files (content types, CORS, caching)
 
@@ -218,6 +219,10 @@ carries `path`, so the two pages are separable in the data. Three sinks, one tax
    `supabase/APPLY_008_ONLY.sql`. Each is ~10 KB and prints the functions it created, so a
    truncated paste is visible rather than silent. (`002` and `003` are
    superseded by `005`; they are kept only as history and must not be run.)
+   **Then apply `supabase/APPLY_010_ONLY.sql`** — the split into two pages made three of
+   `006`'s aggregates wrong (see *Two pages, one dataset* below). Nothing breaks while you
+   wait: every event already records the page it happened on, so no history is lost, and the
+   Pages view says the split is unavailable rather than showing zeroes.
 2. Plausible — set `PLAUSIBLE_DOMAIN` in `dd-logic.js` to the live domain and the script
    loads itself; every event mirrors automatically.
 3. GA4 — drop a `gtag` snippet in and every event mirrors to it. Nothing else to wire.
@@ -260,11 +265,42 @@ links on the page had a handler, so "how many people actually emailed me" had no
 `contact_click` carries `channel` (`whatsapp` / `email` / `phone`), and Calendly is folded in
 alongside it by `rpc_contact` so all four routes to you are compared on one footing.
 
+### Two pages, one dataset
+`006` was written when the site was one document, and three of its aggregates quietly assumed
+that. Migration `010` fixes all three, entirely in the reporting layer — no table changes, no
+backfill, every number recomputed from history already stored.
+
+- **Section names are not unique across the two pages.** `case_study` and `final` exist on
+  both. `rpc_sections` grouped on the name alone, so those rows were two different sections
+  added together — reach, median dwell and exits all merged. It is keyed by `(page, section)`
+  now, and the dashboard labels each row with the page.
+- **`reach_pct` divided by every visitor to the site.** A section on `/how-it-works/` can only
+  be seen by the people who got there, so every deep-page section read as underperforming by
+  exactly the share of traffic that never left the home page. The denominator is now that
+  page's own visitors. `rpc_scroll` had the same problem, plus it averaged two documents of
+  very different heights into one curve; it is per page now.
+- **`rpc_funnel` stepped straight from "landed" to "saw the demo section",** and the demo
+  section lives only on the deep page. The largest single drop on the site — people who never
+  make the jump between pages — was invisible, folded into the demo step. There is now a
+  "Reached How it works" step between them.
+
+`rpc_pages` is new: views, visitors, which page a visit *started* on, and the cross-over rate
+between the two. `_dd_page()` maps a stored path to `home` / `deep` / `other` and is tolerant
+of `/how-it-works` without the trailing slash and of `/index.html`.
+
+Anything added to the site later that exists on both pages needs no special handling — the
+page comes from the event's own `path`, not from the section name.
+
 ### The dashboard's own views
 `/admin.html` is one page with real views rather than a long scroll: the sidebar swaps content
 instead of jumping a few hundred pixels. The Overview leads with one large chart that switches
 between visitors, clicks, visits, demos, forms, contacts and leads — every series arrives in a
 single `rpc_series` call, so switching is instant and all of them cover the same days.
+
+**Pages** (`rpc_pages`) is where the two-page funnel is read: traffic per document, which page
+each visit started on, the cross-over rate, and — because neither means anything without
+knowing which document it happened on — section reach and scroll depth, split by page. Every
+panel in it degrades to the old site-wide numbers if `010` has not been applied, and says so.
 
 **Click log** (`rpc_click_log`) is the record behind the click-through rates: one row per click
 with the timestamp, what was clicked, which section, the channel, country/region/city, device,
@@ -279,9 +315,13 @@ source, country, device or campaign.
 `.png` of the current chart, rendered from its own SVG onto a canvas.
 
 ### Aggregation
-All of it happens in Postgres, in the functions created by `006`. `/api/stats` just calls
-them and returns the result, so the payload stays small no matter how many events exist.
-Adding a panel means adding a function, not looping in JavaScript.
+All of it happens in Postgres, in the functions created by `006` and amended by `010`.
+`/api/stats` just calls them and returns the result, so the payload stays small no matter how
+many events exist. Adding a panel means adding a function, not looping in JavaScript.
+
+Failures are reported per panel, not per request: one missing function greys out one card and
+names itself in the banner, rather than failing the whole load. That is what makes it safe to
+ship a dashboard change before its migration has been pasted.
 
 ## Admin dashboard
 `/admin.html` is a private traffic dashboard built to answer 24 specific business questions;

@@ -501,6 +501,30 @@ until the buckets are public and `IMAGE_*_URL` / `VIDEO_*_URL` are set — empty
 breaks every image and both videos. They are download-only and expire 2027-08-10;
 `npm run test:security` pins them to those two files so the count can only go down.
 
+## The booking modal asks by tap, not by keyboard
+
+Six questions, and the three that qualify a lead — country, monthly call volume, number of
+locations — are now ranges you pick rather than fields you fill. Picking is the whole
+interaction: the chip you tap advances the step itself, so those steps carry no Continue
+button to press afterwards. Only the name, the practice, the email and the phone still take
+keys. Country used to be a `<select>`; locations used to be a number input, which asked a
+multi-site owner to be exact about something a range answers just as well.
+
+**The locations labels lead with their number on purpose** — `1`, `2`, `3–5`, `6+`. Two
+places decide whether a lead is multi-site, and both do it by reading the stored string with
+`parseInt(locations, 10) > 1`: the verdict copy in `dd-logic.js` and the qualified flag in
+`api/notify-lead.ts`, which is what colours the lead email and the `form_submit` event.
+`"3–5"` parses to 3 and still qualifies; `"a few"` would not. Relabel these and both stop
+working silently, which is why `test/booking.test.mjs` asserts the parse rather than the
+label.
+
+The last step is two buttons rather than a button and a footnote: pick a strategy-call slot,
+or open WhatsApp. Someone who will not open a calendar will still send a message.
+
+`npm run test:booking` drives the whole flow on both pages in headless Chromium — every tap
+step advancing on its own, the payload that reaches `/api/notify-lead`, and stepping Back
+into a question already answered.
+
 ## Conversion changes
 From the marketing audit. Every one is placement or framing — no commercial term moved.
 

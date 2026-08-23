@@ -342,3 +342,24 @@ x-dc sc-for { display: none !important; }
 .dd-srcline:hover .dd-srcline-n,.dd-srcline:focus-visible .dd-srcline-n{color:#0F8B80}
 .dd-srcline:hover .dd-srcline-n::after{transform:rotate(45deg) translate(2px,-2px)}
 @media (prefers-reduced-motion:reduce){.dd-srcline,.dd-srcline-n::after{transition:none}}
+
+/* ===== Booking chips =======================================================
+   Every qualifying question in the booking modal is a tap now, not a typed answer:
+   country, call volume and locations are ranges you pick, and picking advances the
+   step on its own. Only the name, practice, email and phone steps still take keys.
+
+   The selected state's colours are written inline from dd-logic.js (they are data,
+   not decoration), so the hover rule has to out-specify an inline style — hence the
+   one `!important` here. Everything else lives in the class: a 48px tap target, so a
+   thumb on a phone hits the chip rather than the gap between two of them. */
+.dd-chips{display:flex;flex-wrap:wrap;gap:12px}
+.dd-chip{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:48px;padding:12px 22px;border-radius:999px;
+  font:inherit;font-size:15px;font-weight:500;cursor:pointer;
+  font-variant-numeric:tabular-nums;
+  transition:border-color .25s ease,box-shadow .3s ease,transform .3s cubic-bezier(.22,1,.36,1)
+}
+.dd-chip:hover{border-color:#0F8B80 !important;transform:translateY(-2px);box-shadow:0 8px 20px rgba(10,26,47,0.12)}
+.dd-chip:focus-visible{outline:2px solid #0F8B80;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.dd-chip{transition:none}.dd-chip:hover{transform:none}}

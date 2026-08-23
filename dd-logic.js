@@ -1139,18 +1139,32 @@ class extends DCLogic {
   // ---- Booking modal ----
   EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
   // BUG-10: every step now says what it wants instead of silently refusing to advance.
+  // Indexed by step, so all six entries stay even though the three tap steps can no longer
+  // refuse — you cannot reach Continue from them, and a chip is never half-filled.
   STEP_PROMPTS = [
     'Your name, so we know who we’re talking to.',
     'Your practice’s name, so we can look it up before the call.',
-    'Pick a country to continue.',
-    'Pick a rough call volume to continue.',
-    'How many locations? Enter at least 1.',
+    'Tap the country you’re in to continue.',
+    'Tap a rough call volume to continue.',
+    'Tap how many locations you run to continue.',
     'That email doesn’t look right. Try something like you@practice.com.'
   ];
+
+  // Which steps still ask for typed input. Everything else is a tap, and a tap advances
+  // on its own — so those steps show no Continue button to press afterwards.
+  TYPED_STEPS = [0, 1, 5];
 
   valid(step) {
     const s = this.state;
     return [s.bName, s.bPractice, s.bCountry, s.bVolume, s.bLocations, s.bEmail][step] !== '' || step > 5;
+  }
+
+  // Every button-choice step behaves the same way: record the answer, move straight to
+  // the next step, and fire that step's funnel event. There is deliberately no Continue
+  // click in between — that second click was the friction this form was losing people to.
+  pickStep(field, value, nextStep) {
+    this.setState({ [field]: value, step: nextStep, formError: '' });
+    this.track('form_step_' + nextStep);
   }
 
   refuse(msg) {
@@ -1338,7 +1352,24 @@ class extends DCLogic {
       { q: 'Is there a limit on how long calls can run?', a: "No. The 60-second cap is on the demo on this website — it is a test drive, metered so one visitor cannot run up the voice bill, and it is the only thing on this site that is capped. The receptionist we configure for your practice has no call-length limit: it stays on the line as long as the caller needs, whether that is ninety seconds to book a cleaning or six minutes with a nervous patient asking about sedation. Voice usage is billed at cost on your own platform account by the minute, so a longer call costs cents, not a cut-off." },
       { q: 'Do the busiest practices in my area already answer after hours?', a: "In the markets we have looked at, no. When we reviewed the top-ranked practices in a metro for that same write-up, the pattern was consistent: polished websites, strong review counts, and voicemail after 5 PM. That gap is the opening. Being the practice that answers at 7:42 PM on a Sunday costs one setup fee and takes days to switch on, and it is the one advantage a competitor cannot buy back with a bigger ad budget. This is our own review of a specific market, published under the founder’s byline, not an independent industry study." }
     ];
+    // The three button-choice steps. Ranges, not exact figures: nobody knows their monthly
+    // call count to the call, and asking for one is what made this a typing exercise.
+    //
+    // The locations labels lead with a digit on purpose. Both this file's verdict copy and
+    // api/notify-lead.ts decide "multi-site" with parseInt(locations, 10) > 1, so '3–5'
+    // still reads as 3 and still qualifies. Keep any new label starting with its number.
     const vols = ['<200', '200–500', '500–1,000', '1,000+'];
+    const countries = ['United States', 'Canada', 'United Kingdom', 'Australia', 'New Zealand', 'Ireland', 'Other'];
+    const locs = ['1', '2', '3–5', '6+'];
+    // Selected chips invert to the brand green; the rest stay outlined. Colours are data
+    // here, so they are written inline per chip — .dd-chip in dd.css owns everything else.
+    const chip = (value, picked) => ({
+      label: value,
+      border: picked === value ? '#0F8B80' : '#D8D2C4',
+      bg: picked === value ? '#0F8B80' : '#FFFFFF',
+      color: picked === value ? '#FAF9F6' : '#0A1A2F',
+      pressed: picked === value ? 'true' : 'false'
+    });
     const navSolid = s.scrolled || s.navOpen || this.PAGE === 'deep';
     return {
       // nav
@@ -1435,6 +1466,7 @@ class extends DCLogic {
       trackWhatsappHero: () => this.track('cta_click', { location: 'hero_whatsapp' }),
       trackCalendlyPricing: () => this.track('calendly_click', { location: 'pricing' }),
       trackCalendlyModal: () => this.track('calendly_click', { location: 'form_complete' }),
+      trackWhatsappModal: () => this.track('cta_click', { location: 'form_complete_whatsapp' }),
       trackCalendlyExit: () => this.track('calendly_click', { location: 'exit_intent' }),
       // Founder card: the portrait swaps itself for the monogram if the file is not there yet.
       hasSocialProof: this.SOCIAL_PROOF.length > 0,
@@ -1482,24 +1514,24 @@ class extends DCLogic {
       // booking steps
       st0: s.step === 0, st1: s.step === 1, st2: s.step === 2, st3: s.step === 3, st4: s.step === 4, st5: s.step === 5, st6: s.step === 6,
       stNav: s.step < 6,
+      // Continue only exists where there is something to type. On the chip steps the
+      // choice itself is the Continue, and a dead button beside it would only ask twice.
+      stNext: this.TYPED_STEPS.includes(s.step),
+      stPick: s.step < 6 && !this.TYPED_STEPS.includes(s.step),
       dots: Array.from({ length: 6 }, (_, i) => ({ bg: i <= s.step ? '#0F8B80' : '#D8D2C4' })),
       bName: s.bName, bPractice: s.bPractice, bCountry: s.bCountry, bLocations: s.bLocations, bEmail: s.bEmail, bPhone: s.bPhone,
       setName: e => this.setState({ bName: e.target.value, formError: '' }),
       setPractice: e => this.setState({ bPractice: e.target.value, formError: '' }),
-      setCountry: e => { this.setState({ bCountry: e.target.value, step: e.target.value ? 3 : 2, formError: '' }); if (e.target.value) this.track('form_step_3'); },
-      setLocations: e => this.setState({ bLocations: e.target.value, formError: '' }),
       setEmail: e => this.setState({ bEmail: e.target.value, formError: '' }),
       setPhone: e => this.setState({ bPhone: e.target.value }),
       bWebsite: s.bWebsite,
       setWebsite: e => this.setState({ bWebsite: e.target.value }),
       bookingKey: e => { if (e.key === 'Enter') this.next(); },
-      volumeChips: vols.map(v => ({
-        label: v,
-        border: s.bVolume === v ? '#0F8B80' : '#D8D2C4',
-        bg: s.bVolume === v ? '#0F8B80' : '#FFFFFF',
-        color: s.bVolume === v ? '#FAF9F6' : '#0A1A2F',
-        pick: () => { this.setState({ bVolume: v, step: 4, formError: '' }); this.track('form_step_4'); }
-      })),
+      // Three tap-to-answer steps, one shape. Re-tapping the chip you already chose moves
+      // you on too, so stepping Back and forward again never costs a second decision.
+      countryChips: countries.map(v => ({ ...chip(v, s.bCountry), pick: () => this.pickStep('bCountry', v, 3) })),
+      volumeChips: vols.map(v => ({ ...chip(v, s.bVolume), pick: () => this.pickStep('bVolume', v, 4) })),
+      locationChips: locs.map(v => ({ ...chip(v, s.bLocations), pick: () => this.pickStep('bLocations', v, 5) })),
       // Inline validation feedback (BUG-10)
       hasFormError: !!s.formError, formError: s.formError,
       emailInvalid: !!s.formError && s.step === 5,

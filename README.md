@@ -223,6 +223,23 @@ carries `path`, so the two pages are separable in the data. Three sinks, one tax
    `006`'s aggregates wrong (see *Two pages, one dataset* below). Nothing breaks while you
    wait: every event already records the page it happened on, so no history is lost, and the
    Pages view says the split is unavailable rather than showing zeroes.
+
+   **The order matters, and only in one direction.** `010` reshapes `rpc_sections` and
+   `rpc_scroll` to return a `page` column, and `create or replace` cannot change a
+   function's OUT columns — so `006` (and the catch-all file that contains it) cannot be
+   re-run over a database that already has `010`. Both now refuse up front with a message
+   saying exactly that, before anything is written, rather than dying mid-file on
+   *cannot change return type of existing function*. Refusing is the right outcome in both
+   directions: had the recreate succeeded it would have put the pre-two-page shape back and
+   silently un-split the dashboard, which is worse than an error because nothing would look
+   broken. Rebuilding from scratch: catch-all first, then `APPLY_010_ONLY.sql`.
+   `APPLY_010_ONLY.sql` itself is idempotent — run it as many times as you like.
+
+   While `010` is outstanding the dashboard under-reports the problem, and the banner now
+   says so: only `rpc_pages` is missing outright, so only it errors, while `rpc_sections`
+   and `rpc_scroll` keep answering in their old shape and quietly return both pages
+   combined. One failing panel, three stale ones. The banner also names the file to paste
+   rather than pointing at the directory.
 2. Plausible — set `PLAUSIBLE_DOMAIN` in `dd-logic.js` to the live domain and the script
    loads itself; every event mirrors automatically.
 3. GA4 — drop a `gtag` snippet in and every event mirrors to it. Nothing else to wire.

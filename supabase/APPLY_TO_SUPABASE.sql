@@ -11,6 +11,12 @@
 --   reports them as missing from the schema cache. Re-run this whole file:
 --   it is safe to run twice and will add only what is absent.
 --
+-- ONE EXCEPTION, ONCE 010 IS APPLIED
+--   APPLY_010_ONLY.sql reshapes rpc_sections and rpc_scroll, and the 006 section here
+--   would put the old shape back. Re-running this file after 010 therefore refuses, by
+--   design, with a message saying so and nothing written. Order for a rebuild from
+--   scratch: this file, then APPLY_010_ONLY.sql.
+--
 -- HOW TO RUN
 --   Supabase dashboard -> SQL Editor -> New query -> paste all of this -> Run.
 --
@@ -144,6 +150,31 @@ notify pgrst, 'reload schema';
 -- A "visitor" is coalesce(visitor_id, session_id) everywhere: visitor_id is the real identity,
 -- and session_id is the fallback for anyone whose browser refuses localStorage, so those visits
 -- still count as one person rather than vanishing.
+
+-- ---------------------------------------------------------------------------
+-- STOP if 010 has already run.
+--
+-- 010 replaces rpc_sections and rpc_scroll with page-aware versions that return an extra
+-- `page` column. The 006 section below recreates them in their original shape, and
+-- `create or replace` cannot change a function's OUT columns — so re-running this file on
+-- a database that has 010 dies here with "cannot change return type of existing function".
+--
+-- Failing on purpose, with a readable message, before anything is written. If the recreate
+-- succeeded it would silently un-split the two-page dashboard, which is worse than an error
+-- because nothing would look broken.
+--
+-- Rebuilding from scratch: run this file first, then APPLY_010_ONLY.sql.
+-- ---------------------------------------------------------------------------
+do $$
+begin
+  if exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+              where n.nspname = 'public' and p.proname = 'rpc_pages') then
+    raise exception using
+      message = 'Migration 010 is already applied — this file must not be re-run over it.',
+      detail  = 'The 006 section would recreate rpc_sections and rpc_scroll without their `page` column, un-splitting the two-page dashboard. Nothing has been changed.',
+      hint    = 'Nothing to do: this file is already applied. To rebuild from scratch, run it first, then APPLY_010_ONLY.sql.';
+  end if;
+end $$;
 
 -- ---------------------------------------------------------------------------
 -- Window helper. Clamped to 1..365 days so a hand-edited query string cannot ask for a scan

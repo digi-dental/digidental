@@ -367,49 +367,104 @@ journey drill-down, and the lead table with attribution.
 ## Supabase egress
 
 The free plan includes 5 GB of cached egress a month. August 2026 used 8.12 GB, a 3.12 GB
-overage, with daily peaks near 900 MB. Two things caused it, and neither was traffic volume.
+overage, with daily peaks near 900 MB.
 
-**`/api/image` used to redirect rather than serve.** It answered `302 → Supabase Storage`, so
-Vercel's edge cached a redirect worth a few hundred bytes while every actual image byte was
-pulled from Supabase by every visitor. A fixed set of files that change roughly never was
-being billed once per viewer. It now fetches upstream and returns the bytes itself under
-`s-maxage=31536000`, so the image sits in Vercel's CDN and Supabase serves it about once per
-edge location per week. The `?name=` URLs, the per-image env-var overrides and the
-expiring-token escape hatch all behave exactly as before; anything over 8 MB, or any upstream
-failure, falls back to the old redirect so an image can never break.
+**It is the videos, essentially all of it.** Measured from `storage.objects`:
 
-**The deep page pulled all four dashboard captures to show one.** The accordion keeps every
-panel in the DOM — collapsed ones are sized to nothing, not `display:none` — so `loading="lazy"`
-fetched all four the moment the section scrolled into view. A panel now gets a real `src` only
-once it has actually been opened. Measured on a full scroll of `/how-it-works/`: four captures
-before, one after.
+| bucket | object | size | referenced? |
+| --- | --- | --- | --- |
+| `digi_dental-VSL` | `denty-live.mp4` | 48 MB | yes — `?clip=demo` |
+| `digi_dental-VSL` | `digidental-vsl.mp4` | 48 MB | yes — `?clip=vsl` |
+| `digi_dental-VSL` | `Digi Dental.mp4` | 47 MB | **no — orphan, 4 Jun** |
+| `digi_dental-VSL` | `digi_dental.mp4` | 47 MB | **no — orphan, 2 Jun** |
+| `digi_dental-VSL` | `vid-testimonials.mp4` | 26 MB | **no — orphan, 7 Aug** |
+| `Images` | `profile.jpg` | 476 kB | yes |
+| `Images` | 4 dashboard captures | 219–352 kB each | yes |
 
-> The deferred panels omit `src` entirely rather than setting `src=""`. An empty src is not
+8.12 GB ÷ 48 MB is about 170 full plays of one video. The five images together are 1.6 MB —
+under 0.02% of the month. Any story about the dashboard captures driving this is wrong.
+
+**What was fixed here.** `/api/image` used to answer `302 → Supabase Storage`, so Vercel's
+edge cached a redirect worth a few hundred bytes while every image byte came from Supabase
+once per viewer. It now proxies the bytes under `s-maxage=31536000`, so Supabase serves each
+image about once per edge location per week. The `?name=` URLs, the env-var overrides and the
+expiring-token escape hatch behave as before; anything over 8 MB or any upstream failure
+falls back to the redirect. Separately, the deep page pulled all four dashboard captures to
+show one (the accordion keeps every panel in the DOM, so `loading="lazy"` fetched them all as
+the section scrolled in) — a panel now gets a real `src` only once opened. Both are real, and
+both are small next to the video.
+
+> Deferred panels omit `src` entirely rather than setting `src=""`. An empty src is not
 > "no image": it resolves against the document, and browsers fetch the page again.
 
-**Still worth doing, and not done here:**
+**`preload="metadata"` → `preload="none"` on both `<video>` elements.** On a 48 MB MP4 the
+browser was fetching part of the file on every page load, whether or not anyone pressed play.
+The cost is that the player no longer shows the first frame as a poster — it renders as its
+own background colour until play. Worth pairing with a real `poster` image; revert the one
+attribute if the blank frame is not acceptable.
 
-- **The captures are full-page PNG screenshots of a Vapi dashboard**, straight from the
-  original files. Resizing them to their real display width and saving as WebP is the single
-  biggest remaining win — likely an order of magnitude each — and it makes the pages faster
-  as well as cheaper. Once they are optimised, committing them under `uploads/` and pointing
-  `DASH_SHOTS` at static paths takes Supabase out of the image path completely: `/uploads/*`
-  is already served by Vercel with a week-long `s-maxage` (see `vercel.json`).
-- **`/api/video` still redirects, deliberately.** Buffering a marketing video through a lambda
-  would blow memory and execution time and break range requests, so seeking would stop
-  working. Video wants a CDN. The durable fix is to host the two clips somewhere that is not
-  billed as Supabase egress and point `VIDEO_VSL_URL` / `VIDEO_DEMO_URL` at them — no code
-  change needed, that indirection already exists for exactly this kind of move.
-- **The home page's VSL is `preload="metadata"`**, so every visit fetches part of the file
-  before anyone presses play. `preload="none"` would stop that, at the cost of the first frame
-  no longer showing as a poster. Worth pairing with a real `poster` image rather than doing
-  on its own.
+**What still needs a human**, because the Storage API is the only safe way to do it:
 
-To see current sizes:
+- **Delete the three orphaned videos — about 120 MB.** They are superseded uploads that
+  nothing links to (checked against the whole repo, including URL-encoded spellings).
+  Dashboard → Storage → `digi_dental-VSL`, or:
 
-```
-curl -sI "https://www.digidental.us/api/image?name=dash-metrics" | grep -i content-length
-```
+  ```
+  supabase storage rm "ss://digi_dental-VSL/Digi Dental.mp4" \
+                      "ss://digi_dental-VSL/digi_dental.mp4" \
+                      "ss://digi_dental-VSL/vid-testimonials.mp4"
+  ```
+
+  Do **not** delete rows from `storage.objects` in SQL. Supabase's own docs are explicit:
+  that leaves the file orphaned in the bucket, still stored and still billed, with no way to
+  reach it from the dashboard.
+
+- **Re-encode the two live videos.** 48 MB is enormous for web; a few minutes of 1080p H.264
+  should land near 5–10 MB. That is the single biggest lever left, worth roughly 5–10× on
+  every play, and it makes the page faster too.
+
+- **`/api/video` still redirects, deliberately.** Buffering video through a lambda would blow
+  memory and execution time and break range requests, so seeking would stop working. Video
+  wants a CDN. Host the two clips somewhere not billed as Supabase egress and point
+  `VIDEO_VSL_URL` / `VIDEO_DEMO_URL` at them — that indirection exists for exactly this move,
+  and needs no code change.
+
+## Production drift, and one live PII leak
+
+Migrations 005–009 were applied by pasting SQL into the editor, which records nothing in
+`supabase_migrations.schema_migrations` — the ledger showed only `004`. The ledger is
+therefore not evidence of what is applied; `pg_proc` is.
+
+Two things had drifted, both found by checking production directly rather than reading the
+files:
+
+1. **`010` had never been applied.** Applied 23 Aug 2026. `_dd_page`, `rpc_pages`,
+   page-aware `rpc_sections` / `rpc_scroll` and the rewritten `rpc_funnel` are live and
+   granted to `service_role` alone.
+
+2. **`007`'s revoke/grant block never reached production.** The file has it (lines 181–182);
+   the database did not. That left four `SECURITY DEFINER` functions executable by `anon`
+   and `authenticated`, reachable over PostgREST at `/rest/v1/rpc/<name>` with the
+   publishable key that ships in the browser on the live site:
+   `rpc_contact`, `rpc_clicks`, `rpc_click_totals`, and `rpc_pipeline`.
+
+   **`rpc_pipeline` returns `lead_name` and `lead_email`**, up to `lim` rows, default 300.
+   Anyone who opened the site and copied the anon key could read the lead list. Revoked
+   23 Aug 2026, along with `site_events_broadcast_insert_trigger`, which is a trigger
+   function and had no business being callable over RPC at all — triggers do not check
+   EXECUTE on the trigger function, so revoking it cannot stop the trigger firing.
+
+   All 27 functions are now `service_role` only: `anon` and `authenticated` can execute
+   none of them. `get_advisors` is clean of the nine SECURITY DEFINER warnings.
+
+**Two advisor lints are left, both deliberate.** `rls_enabled_no_policy` on `site_events` and
+`auth_attempts` is the intended design — RLS on with no policies denies everyone except
+`service_role`, which is exactly what those tables want. `function_search_path_mutable` on
+`_dd_since` and `_dd_page` is left alone on purpose: both are SECURITY **INVOKER**, so they
+carry none of the escalation risk the lint is aimed at, `anon` cannot execute them, and
+adding a `SET` clause to a SQL function blocks the planner from inlining it — a per-row cost
+on the aggregates that call `_dd_page`, to close a hole that would need `service_role`
+already. Revisit if either ever becomes SECURITY DEFINER.
 
 ## Voice demo (Vapi)
 The in-browser demo call uses the official **`@vapi-ai/web` SDK, pinned to an exact version**, loaded

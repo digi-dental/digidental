@@ -36,6 +36,13 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # TEMPORARY — diagnosing a failure that hides its own cause.
+          # The run dies ~2s in with `is_error: true`, `total_cost_usd: 0` and an empty
+          # `modelUsage`, i.e. before any model call, and the action prints only
+          # "full output hidden for security". That leaves an auth failure, a bad token,
+          # a usage limit and a config error all looking identical. This surfaces the real
+          # message. REMOVE IT once the cause is known — it un-redacts the SDK's output.
+          show_full_output: true
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
           prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'

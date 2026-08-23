@@ -364,6 +364,53 @@ journey drill-down, and the lead table with attribution.
   but that is tidiness. The password is the security.
 - Needs migrations `005` and `006` applied, otherwise there is nothing to read.
 
+## Supabase egress
+
+The free plan includes 5 GB of cached egress a month. August 2026 used 8.12 GB, a 3.12 GB
+overage, with daily peaks near 900 MB. Two things caused it, and neither was traffic volume.
+
+**`/api/image` used to redirect rather than serve.** It answered `302 → Supabase Storage`, so
+Vercel's edge cached a redirect worth a few hundred bytes while every actual image byte was
+pulled from Supabase by every visitor. A fixed set of files that change roughly never was
+being billed once per viewer. It now fetches upstream and returns the bytes itself under
+`s-maxage=31536000`, so the image sits in Vercel's CDN and Supabase serves it about once per
+edge location per week. The `?name=` URLs, the per-image env-var overrides and the
+expiring-token escape hatch all behave exactly as before; anything over 8 MB, or any upstream
+failure, falls back to the old redirect so an image can never break.
+
+**The deep page pulled all four dashboard captures to show one.** The accordion keeps every
+panel in the DOM — collapsed ones are sized to nothing, not `display:none` — so `loading="lazy"`
+fetched all four the moment the section scrolled into view. A panel now gets a real `src` only
+once it has actually been opened. Measured on a full scroll of `/how-it-works/`: four captures
+before, one after.
+
+> The deferred panels omit `src` entirely rather than setting `src=""`. An empty src is not
+> "no image": it resolves against the document, and browsers fetch the page again.
+
+**Still worth doing, and not done here:**
+
+- **The captures are full-page PNG screenshots of a Vapi dashboard**, straight from the
+  original files. Resizing them to their real display width and saving as WebP is the single
+  biggest remaining win — likely an order of magnitude each — and it makes the pages faster
+  as well as cheaper. Once they are optimised, committing them under `uploads/` and pointing
+  `DASH_SHOTS` at static paths takes Supabase out of the image path completely: `/uploads/*`
+  is already served by Vercel with a week-long `s-maxage` (see `vercel.json`).
+- **`/api/video` still redirects, deliberately.** Buffering a marketing video through a lambda
+  would blow memory and execution time and break range requests, so seeking would stop
+  working. Video wants a CDN. The durable fix is to host the two clips somewhere that is not
+  billed as Supabase egress and point `VIDEO_VSL_URL` / `VIDEO_DEMO_URL` at them — no code
+  change needed, that indirection already exists for exactly this kind of move.
+- **The home page's VSL is `preload="metadata"`**, so every visit fetches part of the file
+  before anyone presses play. `preload="none"` would stop that, at the cost of the first frame
+  no longer showing as a poster. Worth pairing with a real `poster` image rather than doing
+  on its own.
+
+To see current sizes:
+
+```
+curl -sI "https://www.digidental.us/api/image?name=dash-metrics" | grep -i content-length
+```
+
 ## Voice demo (Vapi)
 The in-browser demo call uses the official **`@vapi-ai/web` SDK, pinned to an exact version**, loaded
 from the `<helmet>` block of `how-it-works/index.html` — the only page with a demo on it, and

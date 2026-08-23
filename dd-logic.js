@@ -29,6 +29,12 @@
       return (
 class extends DCLogic {
   state = {
+    // Which dashboard captures have ever been opened. The accordion keeps all four panels in
+    // the DOM (collapsed ones are sized to nothing, not display:none), so `loading="lazy"`
+    // fetches every one the moment the section scrolls into view — four full-page screenshots
+    // to show one. Only a panel that has actually been opened gets a real src; the rest wait.
+    // A Set, because a reopened panel must not re-enter the pending state.
+    dashSeen: new Set([0]),
     heroPhase: 0, heroIdx: 0,
     scrolled: false, showSticky: false, navOpen: false,
     calcSize: '1', calcCalls: '20', calcValue: '850', faqOpen: -1,
@@ -1067,7 +1073,11 @@ class extends DCLogic {
   // practice owners actually want to see before they commit.
   pickDash(i) {
     if (this.state.dashActive === i) return;
-    this.setState({ dashActive: i });
+    // Mark it seen before the state change, so the panel opening is the same render that
+    // gives its image a src. A new Set: setState must see a different object to re-render.
+    const seen = new Set(this.state.dashSeen);
+    seen.add(i);
+    this.setState({ dashActive: i, dashSeen: seen });
     const shot = this.DASH_SHOTS[i];
     this.track('cta_click', { location: 'dashboard_' + (shot ? shot.id : i) });
   }
@@ -1479,7 +1489,11 @@ class extends DCLogic {
       proofSized: e => this.sizeDash(e),
       dashShots: this.DASH_SHOTS.map((d, i) => ({
         id: d.id, title: d.title, note: d.note,
-        src: '/api/image?name=' + d.id,
+        // undefined until the panel has been opened at least once, which drops the attribute
+        // entirely. It must not be '' — an empty src is not "no image", it resolves against
+        // the document and browsers re-request the PAGE, so three closed panels bought a
+        // second full fetch of /how-it-works/ per visit.
+        src: s.dashSeen.has(i) ? '/api/image?name=' + d.id : undefined,
         alt: 'Digi Dental dashboard: ' + d.title.toLowerCase(),
         active: s.dashActive === i,
         pick: () => this.pickDash(i),

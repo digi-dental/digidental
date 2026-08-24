@@ -35,6 +35,19 @@ jobs:
         id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
+          # Two credentials on purpose, and the order matters.
+          #
+          # CLAUDE_CODE_OAUTH_TOKEN is a Claude subscription token, so this job draws on the same
+          # allowance as interactive use. When that allowance is exhausted every run here fails in
+          # about two seconds with is_error:true, num_turns:1, total_cost_usd:0 and an empty
+          # modelUsage — a rejected request, carrying no information about the diff. That is what
+          # the run of 2026-08-23 16:09 onward was, and rotating the token did not change it.
+          #
+          # ANTHROPIC_API_KEY is a console key on its own billing, which makes this job
+          # independent of that allowance. The action forwards both through as environment
+          # variables and lets the CLI choose; an unset secret expands to the empty string, which
+          # is falsy, so the OAuth token continues to work on its own until the key is added.
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'

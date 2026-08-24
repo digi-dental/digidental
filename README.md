@@ -403,6 +403,15 @@ The cost is that the player no longer shows the first frame as a poster — it r
 own background colour until play. Worth pairing with a real `poster` image; revert the one
 attribute if the blank frame is not acceptable.
 
+**Signed URLs on public buckets.** Both routes' hardcoded fallbacks were `/object/sign/...?token=`
+URLs minted while the buckets were private. The buckets are public now and the page never
+switched over, so every asset was an authenticated read of a public file, carrying a token
+that expires in 2027. Both routes now prefer the `/object/public/...` URL — `/api/image`
+tries it and falls back to the signed URL on any non-OK response; `/api/video` HEADs it once
+per edge per hour and falls back the same way. An explicit env var still wins over both. This
+removes the expiry timebomb and puts the objects on the path Supabase's CDN caches hardest.
+It is **not** a fix for the bill on its own: 48 MB is 48 MB down either path.
+
 **What still needs a human**, because the Storage API is the only safe way to do it:
 
 - **Delete the three orphaned videos — about 120 MB.** They are superseded uploads that

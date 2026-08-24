@@ -24,6 +24,19 @@ const FALLBACK: Record<string, string> = {
   'dash-metrics': 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/sign/Images/screencapture-dashboard-vapi-ai-metrics-2026-08-10-11_57_20.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8xZjgzNDRkYS1mNzlkLTQ5MzAtOWNhZC1hOTk1NzYzYzhmN2YiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJJbWFnZXMvc2NyZWVuY2FwdHVyZS1kYXNoYm9hcmQtdmFwaS1haS1tZXRyaWNzLTIwMjYtMDgtMTAtMTFfNTdfMjAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NjM0Njk3NSwiZXhwIjoxODE3ODgyOTc1fQ.Bpdyo__gaW3U8E_sGKYQOCi_RMO1zB0gAjPcCUfyYVo',
 };
 
+// Public counterparts of the same five objects. The bucket was made public after the signed
+// URLs above were minted and the page never switched over, so it is still doing an
+// authenticated read of a public file with a token that expires in 2027. The proxy below
+// tries this path first and falls back to the signed URL on any non-OK response, so a
+// bucket that is private again simply keeps working.
+const PUBLIC_URL: Record<string, string> = {
+  profile: 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/public/Images/profile.jpg',
+  'dash-assistant': 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/public/Images/screencapture-dashboard-vapi-ai-assistants-e3c3d544-3023-4725-bc7a-cbe78b35d36c-2026-08-10-11_58_08.png',
+  'dash-call': 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/public/Images/screencapture-dashboard-vapi-ai-calls-019fc183-5849-7aac-819f-7a69a9fc4063-2026-08-10-12_03_39.png',
+  'dash-logs': 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/public/Images/screencapture-dashboard-vapi-ai-logs-2026-08-10-11_53_26.png',
+  'dash-metrics': 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/public/Images/screencapture-dashboard-vapi-ai-metrics-2026-08-10-11_57_20.png',
+};
+
 // Env override per image, so a lapsed token is fixed without touching code.
 const ENV_KEY: Record<string, string> = {
   profile: 'IMAGE_PROFILE_URL',
@@ -57,7 +70,17 @@ export default async function handler(req: any, res: any) {
     // about once per edge location per week rather than once per visit. The URL, the env-var
     // override and the expiring-token fix above all behave exactly as before.
     try {
-      const upstream = await fetch(target);
+      // Public path first when there is one and no env var was set; the signed URL stays as
+      // the fallback, so nothing breaks if the bucket is not public after all.
+      const envSet = !!(ENV_KEY[name] && process.env[ENV_KEY[name]]);
+      let upstream: any = null;
+      if (!envSet && PUBLIC_URL[name]) {
+        try {
+          const p = await fetch(PUBLIC_URL[name]);
+          if (p.ok) upstream = p;
+        } catch (e) { /* fall through to the signed URL */ }
+      }
+      if (!upstream) upstream = await fetch(target);
       if (!upstream.ok) throw new Error('upstream ' + upstream.status);
 
       const declared = Number(upstream.headers.get('content-length') || 0);

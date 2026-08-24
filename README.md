@@ -381,8 +381,30 @@ overage, with daily peaks near 900 MB.
 | `Images` | `profile.jpg` | 476 kB | yes |
 | `Images` | 4 dashboard captures | 219–352 kB each | yes |
 
-8.12 GB ÷ 48 MB is about 170 full plays of one video. The five images together are 1.6 MB —
-under 0.02% of the month. Any story about the dashboard captures driving this is wrong.
+The five images together are 1.6 MB — under 0.02% of the month. Any story about the dashboard
+captures driving this is wrong.
+
+**Measured, not inferred.** Twenty-four hours of `edge_logs` (23–24 Aug):
+
+| object | requests | bytes | cache |
+| --- | --- | --- | --- |
+| `digidental-vsl.mp4` | 34 | 947 MB | HIT |
+| `denty-live.mp4` | 5 | 106 MB | HIT |
+| bucket listings | 3 | 6 kB | DYNAMIC |
+| one dashboard capture | 1 | 0.36 MB | MISS |
+
+1.05 GB in a day, and four clients account for all of it: two mobile IPs on one Sri Lankan
+carrier sharing an Android Chrome fingerprint (754 MB, 72%), a Google Cloud host presenting a
+2012 SeaMonkey user-agent (199 MB inside a single second), and Google's `Google-Safety`
+crawler (100 MB in three). `site_events` recorded one `page_view` on each of those two days.
+So this is not viewership: it is a couple of devices reloading the page during development,
+plus two crawlers taking the file whole.
+
+Two things follow from the table. Every video response carried `cf_cache_status: HIT`, and a
+cache hit is still billed — as Cached Egress, which is precisely the line item over quota. The
+CDN is not saving money here; it *is* the metric. And 947 MB across 34 requests is 27.9 MB per
+request against a 48 MB file, which is what a missing `+faststart` looks like: with the moov
+atom written at the end, a player drags most of the file just to learn the duration.
 
 **What was fixed here.** `/api/image` used to answer `302 → Supabase Storage`, so Vercel's
 edge cached a redirect worth a few hundred bytes while every image byte came from Supabase
@@ -428,9 +450,20 @@ It is **not** a fix for the bill on its own: 48 MB is 48 MB down either path.
   that leaves the file orphaned in the bucket, still stored and still billed, with no way to
   reach it from the dashboard.
 
-- **Re-encode the two live videos.** 48 MB is enormous for web; a few minutes of 1080p H.264
-  should land near 5–10 MB. That is the single biggest lever left, worth roughly 5–10× on
-  every play, and it makes the page faster too.
+- **Re-encode the two live videos, with `-movflags +faststart`.** 48 MB is enormous for web;
+  a few minutes of H.264 should land near 5–10 MB.
+
+  ```
+  ffmpeg -i digidental-vsl.mp4 -c:v libx264 -crf 28 -preset slow -vf scale=1280:-2 \
+         -c:a aac -b:a 96k -movflags +faststart digidental-vsl-web.mp4
+  ```
+
+  This is the single biggest lever left. The size cut is worth roughly 5–10× on every play,
+  and `+faststart` separately fixes the 27.9 MB-per-request figure above by putting the moov
+  atom in front, so a player fetches what it plays instead of most of the file. It applies to
+  the crawler traffic as well — a bot that takes the whole file takes 5 MB, not 48 MB — which
+  matters because those crawlers hit `supabase.co`, a host whose `robots.txt` we do not
+  control.
 
 - **`/api/video` still redirects, deliberately.** Buffering video through a lambda would blow
   memory and execution time and break range requests, so seeking would stop working. Video

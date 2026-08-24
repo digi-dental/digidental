@@ -980,9 +980,37 @@ input[type=password],input[type=search]{
     if (d.degraded && d.degraded.length) {
       var missing = d.degraded.some(function (m) { return /schema cache|does not exist|Could not find/i.test(m); });
       $('degraded').hidden = false;
+      // Which paste-ready file creates each function, so the banner names the one to run
+      // rather than pointing at a directory of ten. Postgres reports the function it could
+      // not find, which is enough to identify the migration that adds it.
+      var FN_FILE = {
+        rpc_pages: 'APPLY_010_ONLY.sql', _dd_page: 'APPLY_010_ONLY.sql',
+        rpc_series: 'APPLY_008_ONLY.sql', rpc_click_log: 'APPLY_008_ONLY.sql',
+        rpc_monthly: 'APPLY_008_ONLY.sql', rpc_monthly_breakdown: 'APPLY_008_ONLY.sql',
+        rpc_contact: 'APPLY_007_ONLY.sql', rpc_clicks: 'APPLY_007_ONLY.sql',
+        rpc_pipeline: 'APPLY_007_ONLY.sql', rpc_click_totals: 'APPLY_007_ONLY.sql',
+        rpc_sweep: 'APPLY_009_ONLY.sql'
+      };
+      var files = [];
+      d.degraded.forEach(function (m) {
+        var hit = String(m).match(/rpc_[a-z_]+|_dd_page/);
+        var f = hit && FN_FILE[hit[0]];
+        if (f && files.indexOf(f) < 0) files.push(f);
+      });
+      // A missing function from 010 means the whole file is un-applied, and 010 also
+      // reshapes rpc_sections and rpc_scroll. Those two still answer in their old shape, so
+      // they do not error — they just quietly come back without the page split. Say so:
+      // "1 panel could not be built" badly understates a dashboard that is three panels stale.
+      var stale = files.indexOf('APPLY_010_ONLY.sql') >= 0
+        ? '<br><br>Until then the Sections and Scroll panels are still answering in their ' +
+          'pre-two-page shape, so they show both pages combined rather than split.'
+        : '';
+      var how = files.length
+        ? '<br><br>Paste <code>supabase/' + files.join('</code> and <code>supabase/') +
+          '</code> into the Supabase SQL editor and run it, then reload. Safe to run more than once.' + stale
+        : '<br><br>Run the matching migration in <code>supabase/migrations/</code>, then reload.';
       $('degraded').innerHTML = '<div><b>' + (d.degraded_count || d.degraded.length) + ' panel(s) could not be built.</b> ' +
-        esc(d.degraded.join(' · ')) +
-        (missing ? '<br><br>Run the matching migration in <code>supabase/migrations/</code>, then reload.' : '') + '</div>';
+        esc(d.degraded.join(' · ')) + (missing ? how : '') + '</div>';
     } else { $('degraded').hidden = true; }
     $('nodata').hidden = !(Number(o.visitors || 0) === 0 && Number(o.page_views || 0) === 0);
 

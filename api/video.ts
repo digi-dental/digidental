@@ -25,12 +25,47 @@ const FALLBACK: Record<string, string> = {
 
 const ENV_VAR: Record<string, string> = { vsl: 'VIDEO_VSL_URL', demo: 'VIDEO_DEMO_URL' };
 
-export default function handler(req: any, res: any) {
+// The bucket was made public after these signed URLs were minted, and the page kept using
+// the signed ones. That is worth undoing on its own terms: a signed URL is an authenticated
+// object read, it carries a token that expires (2027-07-24 and 2027-08-07 for the two above),
+// and it is not the /object/public/ path Supabase's CDN is built to cache hardest. The public
+// URL for the same object never expires and needs no token.
+//
+// Not a fix for the egress bill by itself — 48 MB is 48 MB down either path. The size of the
+// files is the bill; this removes the expiry timebomb and gives the CDN the better path.
+const PUBLIC_URL: Record<string, string> = {
+  vsl: 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/public/digi_dental-VSL/digidental-vsl.mp4',
+  demo: 'https://hctpvnqanwhxlmpmfmme.supabase.co/storage/v1/object/public/digi_dental-VSL/denty-live.mp4',
+};
+
+// Is the public path actually serving? Checked with a HEAD rather than assumed, because a
+// bucket that is private again would 400 and take both players down. The answer rides the
+// same hour-long edge cache as the redirect, so this costs one HEAD per edge per hour.
+async function publicWorks(url: string): Promise<boolean> {
+  try {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 2500);
+    const r = await fetch(url, { method: 'HEAD', signal: ctl.signal });
+    clearTimeout(t);
+    return r.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+export default async function handler(req: any, res: any) {
   const clip = String((req.query && req.query.clip) || 'vsl').toLowerCase();
   if (!Object.prototype.hasOwnProperty.call(FALLBACK, clip)) {
     return res.status(404).json({ error: 'Unknown clip. Use ?clip=vsl or ?clip=demo.' });
   }
-  const target = process.env[ENV_VAR[clip]] || FALLBACK[clip];
+
+  // Order of preference: an explicit env var always wins (that is the documented escape
+  // hatch), then the public URL if it really answers, then the signed URL as it was.
+  let target = process.env[ENV_VAR[clip]];
+  if (!target) {
+    target = (await publicWorks(PUBLIC_URL[clip])) ? PUBLIC_URL[clip] : FALLBACK[clip];
+  }
+
   // Short edge cache: long enough to be cheap, short enough that swapping the env var
   // takes effect the same day without a purge.
   res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');

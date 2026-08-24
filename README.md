@@ -223,6 +223,23 @@ carries `path`, so the two pages are separable in the data. Three sinks, one tax
    `006`'s aggregates wrong (see *Two pages, one dataset* below). Nothing breaks while you
    wait: every event already records the page it happened on, so no history is lost, and the
    Pages view says the split is unavailable rather than showing zeroes.
+
+   **The order matters, and only in one direction.** `010` reshapes `rpc_sections` and
+   `rpc_scroll` to return a `page` column, and `create or replace` cannot change a
+   function's OUT columns — so `006` (and the catch-all file that contains it) cannot be
+   re-run over a database that already has `010`. Both now refuse up front with a message
+   saying exactly that, before anything is written, rather than dying mid-file on
+   *cannot change return type of existing function*. Refusing is the right outcome in both
+   directions: had the recreate succeeded it would have put the pre-two-page shape back and
+   silently un-split the dashboard, which is worse than an error because nothing would look
+   broken. Rebuilding from scratch: catch-all first, then `APPLY_010_ONLY.sql`.
+   `APPLY_010_ONLY.sql` itself is idempotent — run it as many times as you like.
+
+   While `010` is outstanding the dashboard under-reports the problem, and the banner now
+   says so: only `rpc_pages` is missing outright, so only it errors, while `rpc_sections`
+   and `rpc_scroll` keep answering in their old shape and quietly return both pages
+   combined. One failing panel, three stale ones. The banner also names the file to paste
+   rather than pointing at the directory.
 2. Plausible — set `PLAUSIBLE_DOMAIN` in `dd-logic.js` to the live domain and the script
    loads itself; every event mirrors automatically.
 3. GA4 — drop a `gtag` snippet in and every event mirrors to it. Nothing else to wire.
@@ -346,6 +363,150 @@ journey drill-down, and the lead table with attribution.
 - The page is `noindex`, `no-store`, disallowed in `robots.txt` and refuses to be framed —
   but that is tidiness. The password is the security.
 - Needs migrations `005` and `006` applied, otherwise there is nothing to read.
+
+## Supabase egress
+
+The free plan includes 5 GB of cached egress a month. August 2026 used 8.12 GB, a 3.12 GB
+overage, with daily peaks near 900 MB.
+
+**It is the videos, essentially all of it.** Measured from `storage.objects`:
+
+| bucket | object | size | referenced? |
+| --- | --- | --- | --- |
+| `digi_dental-VSL` | `denty-live.mp4` | 48 MB | yes — `?clip=demo` |
+| `digi_dental-VSL` | `digidental-vsl.mp4` | 48 MB | yes — `?clip=vsl` |
+| `digi_dental-VSL` | `Digi Dental.mp4` | 47 MB | **no — orphan, 4 Jun** |
+| `digi_dental-VSL` | `digi_dental.mp4` | 47 MB | **no — orphan, 2 Jun** |
+| `digi_dental-VSL` | `vid-testimonials.mp4` | 26 MB | **no — orphan, 7 Aug** |
+| `Images` | `profile.jpg` | 476 kB | yes |
+| `Images` | 4 dashboard captures | 219–352 kB each | yes |
+
+The five images together are 1.6 MB — under 0.02% of the month. Any story about the dashboard
+captures driving this is wrong.
+
+**Measured, not inferred.** Twenty-four hours of `edge_logs` (23–24 Aug):
+
+| object | requests | bytes | cache |
+| --- | --- | --- | --- |
+| `digidental-vsl.mp4` | 34 | 947 MB | HIT |
+| `denty-live.mp4` | 5 | 106 MB | HIT |
+| bucket listings | 3 | 6 kB | DYNAMIC |
+| one dashboard capture | 1 | 0.36 MB | MISS |
+
+1.05 GB in a day, and four clients account for all of it: two mobile IPs on one Sri Lankan
+carrier sharing an Android Chrome fingerprint (754 MB, 72%), a Google Cloud host presenting a
+2012 SeaMonkey user-agent (199 MB inside a single second), and Google's `Google-Safety`
+crawler (100 MB in three). `site_events` recorded one `page_view` on each of those two days.
+So this is not viewership: it is a couple of devices reloading the page during development,
+plus two crawlers taking the file whole.
+
+Two things follow from the table. Every video response carried `cf_cache_status: HIT`, and a
+cache hit is still billed — as Cached Egress, which is precisely the line item over quota. The
+CDN is not saving money here; it *is* the metric. And 947 MB across 34 requests is 27.9 MB per
+request against a 48 MB file, which is what a missing `+faststart` looks like: with the moov
+atom written at the end, a player drags most of the file just to learn the duration.
+
+**What was fixed here.** `/api/image` used to answer `302 → Supabase Storage`, so Vercel's
+edge cached a redirect worth a few hundred bytes while every image byte came from Supabase
+once per viewer. It now proxies the bytes under `s-maxage=31536000`, so Supabase serves each
+image about once per edge location per week. The `?name=` URLs, the env-var overrides and the
+expiring-token escape hatch behave as before; anything over 8 MB or any upstream failure
+falls back to the redirect. Separately, the deep page pulled all four dashboard captures to
+show one (the accordion keeps every panel in the DOM, so `loading="lazy"` fetched them all as
+the section scrolled in) — a panel now gets a real `src` only once opened. Both are real, and
+both are small next to the video.
+
+> Deferred panels omit `src` entirely rather than setting `src=""`. An empty src is not
+> "no image": it resolves against the document, and browsers fetch the page again.
+
+**`preload="metadata"` → `preload="none"` on both `<video>` elements.** On a 48 MB MP4 the
+browser was fetching part of the file on every page load, whether or not anyone pressed play.
+The cost is that the player no longer shows the first frame as a poster — it renders as its
+own background colour until play. Worth pairing with a real `poster` image; revert the one
+attribute if the blank frame is not acceptable.
+
+**Signed URLs on public buckets.** Both routes' hardcoded fallbacks were `/object/sign/...?token=`
+URLs minted while the buckets were private. The buckets are public now and the page never
+switched over, so every asset was an authenticated read of a public file, carrying a token
+that expires in 2027. Both routes now prefer the `/object/public/...` URL — `/api/image`
+tries it and falls back to the signed URL on any non-OK response; `/api/video` HEADs it once
+per edge per hour and falls back the same way. An explicit env var still wins over both. This
+removes the expiry timebomb and puts the objects on the path Supabase's CDN caches hardest.
+It is **not** a fix for the bill on its own: 48 MB is 48 MB down either path.
+
+**What still needs a human**, because the Storage API is the only safe way to do it:
+
+- **Delete the three orphaned videos — about 120 MB.** They are superseded uploads that
+  nothing links to (checked against the whole repo, including URL-encoded spellings).
+  Dashboard → Storage → `digi_dental-VSL`, or:
+
+  ```
+  supabase storage rm "ss://digi_dental-VSL/Digi Dental.mp4" \
+                      "ss://digi_dental-VSL/digi_dental.mp4" \
+                      "ss://digi_dental-VSL/vid-testimonials.mp4"
+  ```
+
+  Do **not** delete rows from `storage.objects` in SQL. Supabase's own docs are explicit:
+  that leaves the file orphaned in the bucket, still stored and still billed, with no way to
+  reach it from the dashboard.
+
+- **Re-encode the two live videos, with `-movflags +faststart`.** 48 MB is enormous for web;
+  a few minutes of H.264 should land near 5–10 MB.
+
+  ```
+  ffmpeg -i digidental-vsl.mp4 -c:v libx264 -crf 28 -preset slow -vf scale=1280:-2 \
+         -c:a aac -b:a 96k -movflags +faststart digidental-vsl-web.mp4
+  ```
+
+  This is the single biggest lever left. The size cut is worth roughly 5–10× on every play,
+  and `+faststart` separately fixes the 27.9 MB-per-request figure above by putting the moov
+  atom in front, so a player fetches what it plays instead of most of the file. It applies to
+  the crawler traffic as well — a bot that takes the whole file takes 5 MB, not 48 MB — which
+  matters because those crawlers hit `supabase.co`, a host whose `robots.txt` we do not
+  control.
+
+- **`/api/video` still redirects, deliberately.** Buffering video through a lambda would blow
+  memory and execution time and break range requests, so seeking would stop working. Video
+  wants a CDN. Host the two clips somewhere not billed as Supabase egress and point
+  `VIDEO_VSL_URL` / `VIDEO_DEMO_URL` at them — that indirection exists for exactly this move,
+  and needs no code change.
+
+## Production drift, and one live PII leak
+
+Migrations 005–009 were applied by pasting SQL into the editor, which records nothing in
+`supabase_migrations.schema_migrations` — the ledger showed only `004`. The ledger is
+therefore not evidence of what is applied; `pg_proc` is.
+
+Two things had drifted, both found by checking production directly rather than reading the
+files:
+
+1. **`010` had never been applied.** Applied 23 Aug 2026. `_dd_page`, `rpc_pages`,
+   page-aware `rpc_sections` / `rpc_scroll` and the rewritten `rpc_funnel` are live and
+   granted to `service_role` alone.
+
+2. **`007`'s revoke/grant block never reached production.** The file has it (lines 181–182);
+   the database did not. That left four `SECURITY DEFINER` functions executable by `anon`
+   and `authenticated`, reachable over PostgREST at `/rest/v1/rpc/<name>` with the
+   publishable key that ships in the browser on the live site:
+   `rpc_contact`, `rpc_clicks`, `rpc_click_totals`, and `rpc_pipeline`.
+
+   **`rpc_pipeline` returns `lead_name` and `lead_email`**, up to `lim` rows, default 300.
+   Anyone who opened the site and copied the anon key could read the lead list. Revoked
+   23 Aug 2026, along with `site_events_broadcast_insert_trigger`, which is a trigger
+   function and had no business being callable over RPC at all — triggers do not check
+   EXECUTE on the trigger function, so revoking it cannot stop the trigger firing.
+
+   All 27 functions are now `service_role` only: `anon` and `authenticated` can execute
+   none of them. `get_advisors` is clean of the nine SECURITY DEFINER warnings.
+
+**Two advisor lints are left, both deliberate.** `rls_enabled_no_policy` on `site_events` and
+`auth_attempts` is the intended design — RLS on with no policies denies everyone except
+`service_role`, which is exactly what those tables want. `function_search_path_mutable` on
+`_dd_since` and `_dd_page` is left alone on purpose: both are SECURITY **INVOKER**, so they
+carry none of the escalation risk the lint is aimed at, `anon` cannot execute them, and
+adding a `SET` clause to a SQL function blocks the planner from inlining it — a per-row cost
+on the aggregates that call `_dd_page`, to close a hole that would need `service_role`
+already. Revisit if either ever becomes SECURITY DEFINER.
 
 ## Voice demo (Vapi)
 The in-browser demo call uses the official **`@vapi-ai/web` SDK, pinned to an exact version**, loaded
@@ -500,6 +661,30 @@ Findings closed from the security audit, and what each one actually prevented:
 until the buckets are public and `IMAGE_*_URL` / `VIDEO_*_URL` are set — emptying them now
 breaks every image and both videos. They are download-only and expire 2027-08-10;
 `npm run test:security` pins them to those two files so the count can only go down.
+
+## The booking modal asks by tap, not by keyboard
+
+Six questions, and the three that qualify a lead — country, monthly call volume, number of
+locations — are now ranges you pick rather than fields you fill. Picking is the whole
+interaction: the chip you tap advances the step itself, so those steps carry no Continue
+button to press afterwards. Only the name, the practice, the email and the phone still take
+keys. Country used to be a `<select>`; locations used to be a number input, which asked a
+multi-site owner to be exact about something a range answers just as well.
+
+**The locations labels lead with their number on purpose** — `1`, `2`, `3–5`, `6+`. Two
+places decide whether a lead is multi-site, and both do it by reading the stored string with
+`parseInt(locations, 10) > 1`: the verdict copy in `dd-logic.js` and the qualified flag in
+`api/notify-lead.ts`, which is what colours the lead email and the `form_submit` event.
+`"3–5"` parses to 3 and still qualifies; `"a few"` would not. Relabel these and both stop
+working silently, which is why `test/booking.test.mjs` asserts the parse rather than the
+label.
+
+The last step is two buttons rather than a button and a footnote: pick a strategy-call slot,
+or open WhatsApp. Someone who will not open a calendar will still send a message.
+
+`npm run test:booking` drives the whole flow on both pages in headless Chromium — every tap
+step advancing on its own, the payload that reaches `/api/notify-lead`, and stepping Back
+into a question already answered.
 
 ## Conversion changes
 From the marketing audit. Every one is placement or framing — no commercial term moved.

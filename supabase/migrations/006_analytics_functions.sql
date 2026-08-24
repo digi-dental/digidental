@@ -15,6 +15,32 @@
 -- still count as one person rather than vanishing.
 
 -- ---------------------------------------------------------------------------
+-- STOP if 010 has already run.
+--
+-- 010 replaces rpc_sections and rpc_scroll with page-aware versions that return an extra
+-- `page` column. This file recreates them in their original shape, and `create or replace`
+-- cannot change a function's OUT columns — so re-running this file on a database that has
+-- 010 dies partway through with "cannot change return type of existing function", after
+-- some of the functions above it have already been rewritten.
+--
+-- Failing here instead is deliberate, and better in both directions: nothing has been
+-- changed yet when it fires, and if the drop-and-recreate DID succeed it would silently
+-- un-split the dashboard, which is worse than an error because nothing would look broken.
+--
+-- Rebuilding from scratch: run this file first, then 010.
+-- ---------------------------------------------------------------------------
+do $$
+begin
+  if exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+              where n.nspname = 'public' and p.proname = 'rpc_pages') then
+    raise exception using
+      message = 'Migration 010 is already applied — 006 must not be re-run over it.',
+      detail  = 'This file would recreate rpc_sections and rpc_scroll without their `page` column, un-splitting the two-page dashboard. Nothing has been changed.',
+      hint    = 'Nothing to do: 006 is already applied. To rebuild from scratch, run 006 first, then 010.';
+  end if;
+end $$;
+
+-- ---------------------------------------------------------------------------
 -- Window helper. Clamped to 1..365 days so a hand-edited query string cannot ask for a scan
 -- of all history.
 -- ---------------------------------------------------------------------------

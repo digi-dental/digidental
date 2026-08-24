@@ -651,7 +651,7 @@
        assistant is configured before it answers anything. -->
   <div style="width:100%;max-width:1140px;margin:96px auto 0;border-top:1px solid #22344E;padding-top:72px;display:flex;flex-wrap:wrap;gap:clamp(32px,5vw,64px);align-items:center;justify-content:center">
     <div style="flex:0 1 300px;display:flex;flex-direction:column;align-items:center;gap:14px">
-      <video data-clip="demo_recording" controls="controls" preload="metadata" playsInline="{{ true }}" src="/api/video?clip=demo" onPlay="{{ trackDemoVideo }}" style="width:min(300px,80vw);aspect-ratio:9/16;border-radius:16px;border:1px solid #22344E;background:#08131F;box-shadow:0 18px 44px rgba(0,0,0,0.35);display:block;object-fit:cover"></video>
+      <video data-clip="demo_recording" controls="controls" preload="none" playsInline="{{ true }}" src="/api/video?clip=demo" onPlay="{{ trackDemoVideo }}" style="width:min(300px,80vw);aspect-ratio:9/16;border-radius:16px;border:1px solid #22344E;background:#08131F;box-shadow:0 18px 44px rgba(0,0,0,0.35);display:block;object-fit:cover"></video>
       <div style="font-size:13px;color:#8A9BB5;text-align:center;line-height:1.6;max-width:300px;text-wrap:pretty">A recorded call, start to finish: answered, questions handled, appointment booked.</div>
     </div>
     <div style="flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:18px;text-align:left">
@@ -1051,29 +1051,28 @@
           <input id="bk1" type="text" value="{{ bPractice }}" onChange="{{ setPractice }}" onKeyDown="{{ bookingKey }}" placeholder="Riverside Family Dental" autoFocus="{{ true }}" style="font-size:20px;padding:12px 2px;border:none;border-bottom:2px solid #D8D2C4;background:none;outline:none;color:#0A1A2F" style-focus="border-bottom-color:#0F8B80">
         </sc-if>
         <sc-if value="{{ st2 }}" hint-placeholder-val="{{ false }}">
-          <label for="bk2" style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Which country is your practice in?</label>
-          <select id="bk2" value="{{ bCountry }}" onChange="{{ setCountry }}" style="font-size:18px;padding:12px;border:2px solid #D8D2C4;border-radius:10px;background:#FFFFFF;color:#0A1A2F;outline:none">
-            <option value="">Select a country</option>
-            <option value="United States">United States</option>
-            <option value="Canada">Canada</option>
-            <option value="Australia">Australia</option>
-            <option value="United Kingdom">United Kingdom</option>
-            <option value="New Zealand">New Zealand</option>
-            <option value="Ireland">Ireland</option>
-            <option value="Other">Other</option>
-          </select>
+          <div id="bk2q" style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Which country is your practice in?</div>
+          <div class="dd-chips" role="group" aria-labelledby="bk2q">
+            <sc-for list="{{ countryChips }}" as="c" hint-placeholder-count="7">
+              <button onClick="{{ c.pick }}" aria-pressed="{{ c.pressed }}" class="dd-chip" style="border:1.5px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
         </sc-if>
         <sc-if value="{{ st3 }}" hint-placeholder-val="{{ false }}">
-          <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Roughly how many calls per month?</div>
-          <div style="display:flex;flex-wrap:wrap;gap:12px">
+          <div id="bk3q" style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Roughly how many calls per month?</div>
+          <div class="dd-chips" role="group" aria-labelledby="bk3q">
             <sc-for list="{{ volumeChips }}" as="c" hint-placeholder-count="4">
-              <button onClick="{{ c.pick }}" style="padding:12px 22px;border-radius:999px;border:1.5px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:15px;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums">{{ c.label }}</button>
+              <button onClick="{{ c.pick }}" aria-pressed="{{ c.pressed }}" class="dd-chip" style="border:1.5px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }}">{{ c.label }}</button>
             </sc-for>
           </div>
         </sc-if>
         <sc-if value="{{ st4 }}" hint-placeholder-val="{{ false }}">
-          <label for="bk4" style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">How many locations?</label>
-          <input id="bk4" type="{{ numType }}" min="1" value="{{ bLocations }}" onChange="{{ setLocations }}" onKeyDown="{{ bookingKey }}" placeholder="1" autoFocus="{{ true }}" style="font-size:20px;padding:12px 2px;border:none;border-bottom:2px solid #D8D2C4;background:none;outline:none;color:#0A1A2F;font-variant-numeric:tabular-nums;width:120px" style-focus="border-bottom-color:#0F8B80">
+          <div id="bk4q" style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">How many locations?</div>
+          <div class="dd-chips" role="group" aria-labelledby="bk4q">
+            <sc-for list="{{ locationChips }}" as="c" hint-placeholder-count="4">
+              <button onClick="{{ c.pick }}" aria-pressed="{{ c.pressed }}" class="dd-chip" style="border:1.5px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};min-width:82px">{{ c.label }}</button>
+            </sc-for>
+          </div>
         </sc-if>
         <sc-if value="{{ st5 }}" hint-placeholder-val="{{ false }}">
           <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:600">Best email and phone?</div>
@@ -1089,8 +1088,11 @@
             <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:600" data-dyn="">{{ qualifyTitle }}</div>
             <p style="font-size:14.5px;line-height:1.65;color:#3D4F66;margin:0;max-width:400px;text-wrap:pretty" data-dyn="">{{ qualifyLead }}{{ qualifyBody }}</p>
             <a href="{{ calendlyUrl }}" target="_blank" rel="noopener" onClick="{{ trackCalendlyModal }}" style="display:inline-block;background:#0F8B80;color:#FAF9F6;border-radius:10px;padding:15px 32px;font-size:15px;font-weight:600;text-decoration:none;box-shadow:0 6px 18px rgba(10,26,47,0.18);transition:background-color .25s,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s" style-hover="background:#0B6E66;color:#FAF9F6;text-decoration:none;transform:translateY(-2px)">Pick your strategy-call time now</a>
+            <!-- The last question in the flow is a choice too, so it is two buttons rather
+                 than a button and a footnote: pick a slot, or open WhatsApp. Someone who
+                 will not open a calendar will still send a message. -->
+            <a href="https://wa.me/351912859130" target="_blank" rel="noopener" onClick="{{ trackWhatsappModal }}" data-cta="modal_whatsapp" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;background:none;color:#0F8B80;border:1.5px solid #0F8B80;border-radius:10px;padding:13px 28px;font-size:15px;font-weight:600;text-decoration:none">Or message us on WhatsApp</a>
             <div style="font-size:12.5px;color:#5A6E86" data-dyn="">{{ sentNote }}</div>
-            <a href="https://wa.me/351912859130" target="_blank" rel="noopener" style="font-size:14px">Prefer to text? WhatsApp us instead</a>
           </div>
         </sc-if>
         <!-- BUG-10: an invalid or empty field used to make Continue/Submit do nothing at all. -->
@@ -1099,9 +1101,16 @@
         </sc-if>
       </div>
       <sc-if value="{{ stNav }}" hint-placeholder-val="{{ true }}">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:36px">
-          <button onClick="{{ back }}" style="background:none;border:none;color:{{ backColor }};font-size:14px;cursor:pointer">← Back</button>
-          <button onClick="{{ next }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:13px 28px;font-size:15px;font-weight:600;cursor:pointer;animation:{{ nextAnim }}" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)" data-dyn="">{{ nextLabel }}</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:36px">
+          <button onClick="{{ back }}" style="flex:0 0 auto;background:none;border:none;color:{{ backColor }};font-size:14px;cursor:pointer;white-space:nowrap">← Back</button>
+          <!-- The tap steps have no Continue: the chip you pick advances the step itself, so
+               a button here would only ask the same question twice. -->
+          <sc-if value="{{ stPick }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1 1 auto;font-size:13px;color:#8A93A1;text-align:right;text-wrap:pretty" data-dyn="">Tap an answer to continue.</div>
+          </sc-if>
+          <sc-if value="{{ stNext }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ next }}" style="background:#0F8B80;color:#FAF9F6;border:none;border-radius:10px;padding:13px 28px;font-size:15px;font-weight:600;cursor:pointer;animation:{{ nextAnim }}" style-hover="background:#0B6E66;transform:translateY(-2px);box-shadow:0 14px 32px rgba(10,26,47,0.24)" data-dyn="">{{ nextLabel }}</button>
+          </sc-if>
         </div>
       </sc-if>
     </div>

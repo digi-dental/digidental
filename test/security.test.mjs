@@ -171,6 +171,45 @@ const check = (name, pass, detail = '') => {
   check('no signed storage token reaches the page', !/storage\/v1\/object\/sign/.test(read('index.html')));
 }
 
+// ------------------------------------------------------------- storage transforms & egress
+{
+  // `/storage/v1/render/image/...` is Supabase's on-the-fly transformer. Every distinct set of
+  // parameters is a separate billed transformation on top of the egress, and the site has no use
+  // for one: the five marketing images are fixed files served at their natural size. Nothing may
+  // point at the transformer — api/image.ts is the exception because it is what rewrites them,
+  // and prose is exempt because documenting the rule means naming the thing it forbids.
+  const tracked = [];
+  const walk = d => {
+    for (const e of fs.readdirSync(path.join(ROOT, d), { withFileTypes: true })) {
+      if (['node_modules', '.git', 'test'].includes(e.name)) continue;
+      const rel = path.join(d, e.name);
+      if (e.isDirectory()) walk(rel);
+      else if (/\.(ts|js|mjs|html|json|sql|txt|md)$/.test(e.name)) tracked.push(rel);
+    }
+  };
+  walk('.');
+  const transforming = tracked.filter(f => /storage\/v1\/render\/image/.test(read(f))
+    && !/api\/image\.ts$/.test(f) && !/\.md$/.test(f));
+  check('nothing asks Supabase to transform an image on the fly', transforming.length === 0,
+    transforming.join(', ') || 'no transform URLs');
+
+  const img = read('api/image.ts');
+  // The rewrite has to survive an env var being pasted in as a transform URL, which is the one
+  // way a transform can reappear without a code change.
+  check('/api/image rewrites transform URLs back to the object path',
+    /storage\\\/v1\\\/render\\\/image/.test(img) && /'\/storage\/v1\/object\/\$1\/'/.test(img));
+  check('/api/image drops the transform parameters',
+    ['width', 'height', 'resize', 'quality', 'format'].every(p => new RegExp(`'${p}'`).test(img)));
+  check('/api/image normalises before fetching, not after',
+    /withoutTransform\(configured\)/.test(img));
+
+  // The route used to 302 every visitor onto the bucket, so Supabase paid egress once per image
+  // per page view. Serving the bytes itself puts Vercel's CDN in front of that.
+  check('/api/image serves the bytes rather than redirecting the visitor to storage',
+    /await fetch\(target/.test(img) && /Content-Type['"]\s*,\s*type/.test(img));
+  check('/api/image is cached long enough at the edge to matter', /s-maxage=31536000/.test(img));
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} passed`);
 process.exit(failed.length ? 1 : 0);

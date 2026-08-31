@@ -1,6 +1,6 @@
 // /api/image — Vercel serverless function
 // Serves marketing images through one stable URL so the page never carries an expiring token.
-// `<img src="/api/image?name=profile">` → 302 to wherever the file actually lives.
+// `<img src="/api/image?name=profile">` → the image bytes, cached hard at the Vercel edge.
 //
 // Same reasoning as /api/video: these arrived as Supabase signed URLs whose tokens expire
 // 2027-08-10. Embedding those directly in index.html means the founder portrait and the dashboard
@@ -8,10 +8,21 @@
 // through here makes it an environment-variable change instead.
 //
 //   Permanent fix: make the `Images` bucket public in Supabase, then set the env vars below to the
-//   /object/public/... URLs. Public URLs never expire and this route stops mattering.
+//   /object/public/... URLs. Public URLs never expire and the token juggling stops mattering.
 //
 //   Interim fix: mint fresh signed URLs and set the same env vars in
 //   Vercel → Settings → Environment Variables. No redeploy of the page required.
+//
+// EGRESS: this route used to 302 straight to Supabase, which put every visitor's browser on the
+// bucket directly — one billed Supabase egress per image per view, with nothing in between. It
+// now fetches the object server-side and serves the bytes itself, so Vercel's CDN answers the
+// visitors and Supabase is read roughly once per edge region per deployment. The redirect stays
+// as the fallback for the cases the proxy cannot serve (see serveByRedirect below).
+//
+// TRANSFORMS: never point these env vars at a /storage/v1/render/image/... URL. That is Supabase's
+// on-the-fly transformer, and every distinct variant is billed as an image transformation on top
+// of the egress. withoutTransform() below rewrites any that arrive back to the plain object path,
+// so a transform URL pasted into an env var cannot re-start the meter.
 //
 // The hardcoded values are the current signed URLs, kept only as a fallback so the site keeps
 // working until the env vars are set.
@@ -33,16 +44,99 @@ const ENV_KEY: Record<string, string> = {
   'dash-metrics': 'IMAGE_DASH_METRICS_URL',
 };
 
+// A year at the edge, a day in the browser. The URL is stable and the file behind it changes
+// roughly never, so the visitor should be paying for these bytes once, not once an hour. A
+// Vercel deployment gets a fresh cache key, so swapping an env var still takes effect on deploy.
+const CACHE = 'public, max-age=86400, s-maxage=31536000, stale-while-revalidate=604800';
+
+// Supabase's on-the-fly transformer. `/storage/v1/render/image/...` resizes on request, and each
+// distinct set of parameters is a separate billed transformation — the thing this route exists to
+// never do. Any transform URL is rewritten to the plain object path and its transform parameters
+// dropped, so the original file is served instead. `token` survives: signed URLs still need it.
+const TRANSFORM_PARAMS = ['width', 'height', 'resize', 'quality', 'format'];
+
+export function withoutTransform(raw: string): string {
+  let url: URL;
+  try { url = new URL(raw); } catch { return raw; }
+  // /storage/v1/render/image/public/… → /storage/v1/object/public/… (also sign/, authenticated/)
+  url.pathname = url.pathname.replace(
+    /\/storage\/v1\/render\/image\/(public|sign|authenticated)\//,
+    '/storage/v1/object/$1/'
+  );
+  for (const p of TRANSFORM_PARAMS) url.searchParams.delete(p);
+  return url.toString();
+}
+
+// What the route used to do unconditionally, kept for the cases the proxy cannot serve: the
+// upstream is unreachable, answers with something that is not an image, or is too large to
+// buffer. The visitor still gets the picture; only the caching is worse — deliberately a short
+// cache, because a year-long one would freeze a momentary Supabase blip into the CDN and put
+// every visitor back on the bucket until the next deploy.
+const FALLBACK_CACHE = 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400';
+
+function serveByRedirect(res: any, target: string) {
+  res.setHeader('Cache-Control', FALLBACK_CACHE);
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('Location', target);
+  return res.status(302).end();
+}
+
+// Vercel buffers a serverless response before sending it, and rejects one over ~4.5MB. Anything
+// heavier is redirected rather than dropped. These captures are well under it; the guard is here
+// so replacing one with a 10MB PNG degrades to the old behaviour instead of 500ing.
+const MAX_BYTES = 4 * 1024 * 1024;
+const UPSTREAM_TIMEOUT_MS = 8000;
+
 export default async function handler(req: any, res: any) {
   try {
     const name = String((req.query && req.query.name) || '').trim();
-    const target = (ENV_KEY[name] && process.env[ENV_KEY[name]]) || FALLBACK[name];
-    if (!target) return res.status(404).json({ error: 'Unknown image.' });
+    const configured = (ENV_KEY[name] && process.env[ENV_KEY[name]]) || FALLBACK[name];
+    if (!configured) return res.status(404).json({ error: 'Unknown image.' });
 
-    // Cached hard at the edge: these change roughly never, and a redirect per view is wasteful.
-    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=604800, stale-while-revalidate=604800');
+    const target = withoutTransform(configured);
+
+    res.setHeader('Cache-Control', CACHE);
     res.setHeader('Referrer-Policy', 'no-referrer');
-    return res.redirect(302, target);
+
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), UPSTREAM_TIMEOUT_MS);
+    let upstream: any;
+    try {
+      upstream = await fetch(target, {
+        signal: ctl.signal,
+        // The visitor's own validators, so a browser holding the file gets a 304 and no bytes move.
+        headers: req.headers && req.headers['if-none-match']
+          ? { 'if-none-match': String(req.headers['if-none-match']) }
+          : {},
+      });
+    } finally { clearTimeout(timer); }
+
+    if (upstream.status === 304) return res.status(304).end();
+    if (!upstream.ok) {
+      console.error('[image] upstream', upstream.status, 'for', name);
+      return serveByRedirect(res, target);
+    }
+
+    const type = upstream.headers.get('content-type') || '';
+    // This route serves pictures. Refusing anything else keeps a mistyped env var from putting
+    // arbitrary content on our own origin, where the site's CSP would trust it.
+    if (!type.startsWith('image/')) {
+      console.error('[image] upstream is not an image:', type, 'for', name);
+      return serveByRedirect(res, target);
+    }
+
+    const declared = Number(upstream.headers.get('content-length') || 0);
+    if (declared > MAX_BYTES) return serveByRedirect(res, target);
+
+    const body = Buffer.from(await upstream.arrayBuffer());
+    if (body.byteLength > MAX_BYTES) return serveByRedirect(res, target);
+
+    const etag = upstream.headers.get('etag');
+    if (etag) res.setHeader('ETag', etag);
+    res.setHeader('Content-Type', type);
+    res.setHeader('Content-Length', String(body.byteLength));
+    if (req.method === 'HEAD') return res.status(200).end();
+    return res.status(200).end(body);
   } catch (e: any) {
     console.error('[image] failed:', e && e.message);
     return res.status(500).json({ error: 'Could not resolve the image.' });

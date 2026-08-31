@@ -1,0 +1,18 @@
+{
+  "version": "2026-08",
+  "market": "Arizona East Valley (Chandler, Gilbert, Tempe, Mesa, Scottsdale, Queen Creek)",
+  "criteria": [
+    { "id": "independent",  "weight": 20, "test": "Independent owner-operator. Not a DSO, not corporate-managed. One decision-maker." },
+    { "id": "doctor_count", "weight": 15, "test": "2-4 dentists under one roof. Solo scores low (call volume), 5+ scores low (drifts toward DSO)." },
+    { "id": "high_ticket",  "weight": 20, "test": "Sedation, implants/All-on-4, Invisalign. A missed call is a $3-5k case, not a $150 cleaning." },
+    { "id": "active_mktg",  "weight": 15, "test": "Running new-patient promos: $ exam offers, free consults, gift cards, dedicated landing pages, call-tracking numbers." },
+    { "id": "phone_gap",    "weight": 20, "test": "Documented coverage hole: no Saturday/evening, weekday closures, voicemail after close, one line serving 2+ locations." },
+    { "id": "growth",       "weight": 10, "test": "Recent trigger: new location, new associate, ownership change, added sedation/implant line, rebrand." }
+  ],
+  "hard_disqualifiers": [
+    "DSO / corporate-managed group",
+    "Under ~200 inbound calls per month",
+    "Requires named PMS integration, BAA/HIPAA certification, or multilingual support as a precondition"
+  ],
+  "target_band": "75-90+ qualifies for outreach"
+}

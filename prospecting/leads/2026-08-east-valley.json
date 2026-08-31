@@ -1,0 +1,125 @@
+{
+  "generated": "2026-08-31",
+  "model_version": "2026-08",
+  "market": "Arizona East Valley",
+  "method": "Web research against the ICP scoring model. Direct site crawling was blocked by session egress policy; every field below is sourced from search-indexed page content and public directory listings.",
+  "leads": [
+    {
+      "rank": 1,
+      "score": 92,
+      "practice": "Riggs Family Dental",
+      "city": "Chandler + Gilbert, AZ",
+      "site": "https://www.riggsfamilydental.com/",
+      "owner": "Dr. Carlos Lopez (founded 2011)",
+      "dentists": ["Dr. Carlos Lopez", "Dr. Mark Lamborn", "Dr. Jennifer Bailey"],
+      "doctor_count": 3,
+      "locations": [
+        { "name": "Chandler", "address": "3960 E Riggs Rd, Ste 5, Chandler, AZ 85249", "phone": "(480) 566-8349",
+          "hours": "Mon 8-5, Tue-Thu 7-4, Fri 7-12, Sat-Sun closed" },
+        { "name": "Gilbert", "address": "2487 S Gilbert Rd #105, Gilbert, AZ 85295", "phone": "(480) 916-9548",
+          "hours": "Mon-Thu 8-5, Fri-Sun CLOSED" }
+      ],
+      "tracking_numbers": ["(855) 637-9920", "(480) 732-1888"],
+      "high_ticket": ["sedation", "dental implants", "Invisalign", "cosmetic/veneers", "wisdom teeth"],
+      "promos": ["$99 new-patient exam + x-rays + treatment plan", "$1,000 off + free whitening event", "Thrive Dental Plan memberships"],
+      "phone_gap": "Gilbert is dark Friday through Sunday — three consecutive days. Chandler closes Friday noon. Two locations, four published numbers, zero after-hours coverage.",
+      "growth_trigger": "Second location; dedicated new-patient funnel at go.riggsfamilydental.com",
+      "scores": { "independent": 20, "doctor_count": 15, "high_ticket": 18, "active_mktg": 15, "phone_gap": 18, "growth": 6 },
+      "why": "Textbook ICP. Three docs, two sites, elective-heavy, and a paid new-patient funnel with call-tracking numbers — they already believe inbound calls are revenue. Gilbert being closed Fri-Sun means a 72-hour hole every single week on a line that paid traffic is pointed at.",
+      "open_with": "Ask what happens to a Gilbert implant enquiry that calls Friday afternoon.",
+      "contact": "Dr. Carlos Lopez (owner, financial buyer); office manager as champion"
+    },
+    {
+      "rank": 2,
+      "score": 91,
+      "practice": "Glisten Dental",
+      "city": "Mesa + Gilbert + Glendale, AZ",
+      "site": "https://glistendentalmesa.com/",
+      "owner": "Dr. Revan Dawood (founder, lead dentist)",
+      "dentists": ["Dr. Revan Dawood", "Dr. Carlos Rogel", "Dr. Parsa Owtad"],
+      "doctor_count": 3,
+      "locations": [
+        { "name": "Mesa", "address": "633 N Gilbert Rd, Mesa, AZ 85203", "phone": "(602) 932-2555",
+          "hours": "Mon 8-5, Tue 8-5, Wed CLOSED, Thu 8-5, Fri 8-4, Sat-Sun closed" },
+        { "name": "Gilbert", "address": "Gilbert, AZ", "phone": "(480) 331-4955", "hours": "n/a" },
+        { "name": "Glendale", "address": "Glendale, AZ", "phone": "(480) 630-4446", "hours": "n/a" }
+      ],
+      "high_ticket": ["minimal/moderate sedation", "implant placement + restoration", "Invisalign", "smile design"],
+      "promos": ["$89 new-patient exam + digital x-rays + cleaning (all three locations)"],
+      "phone_gap": "Mesa is closed Wednesday — a mid-week business day where every inbound call hits voicemail — plus both weekend days. Three sites, three separate numbers, no shared after-hours coverage.",
+      "growth_trigger": "Scaled to three locations across the Valley; actively adding associates (team bios still being filled in)",
+      "scores": { "independent": 20, "doctor_count": 12, "high_ticket": 19, "active_mktg": 14, "phone_gap": 17, "growth": 9 },
+      "why": "Founder-owned and visibly expanding — three sites, one owner, no committee. Dr. Dawood is personally certified in Invisalign, implants and sedation, so the high-ticket work runs through her chair. The Wednesday closure is the tell: a full business day of paid-traffic calls going to voicemail.",
+      "open_with": "Ask where Wednesday's Mesa calls go, and what that costs across three locations.",
+      "contact": "Dr. Revan Dawood (founder/owner)"
+    },
+    {
+      "rank": 3,
+      "score": 89,
+      "practice": "Shumway Dental Care",
+      "city": "Chandler, AZ (serves Chandler + Gilbert)",
+      "site": "https://www.mychandlerdentists.com/",
+      "owner": "Shumway family (multi-generational, independent)",
+      "dentists": ["Dr. Andy Shumway", "Dr. Joel Shumway", "Dr. Tyler Shumway"],
+      "doctor_count": 3,
+      "locations": [
+        { "name": "Chandler", "address": "3150 S Gilbert Rd, Ste 1, Chandler, AZ 85286", "phone": "(480) 824-7778",
+          "hours": "Mon 7-3, Tue 8-5, Wed 8-5, Thu 7-4, Fri 7-3, Sat-Sun closed" }
+      ],
+      "tracking_numbers": ["(480) 820-3400", "(480) 659-7800"],
+      "high_ticket": ["sedation / sleep dentistry", "dental implants", "Invisalign", "cosmetic"],
+      "promos": ["FREE initial dental implant consultation + CT scan ($245 value)"],
+      "phone_gap": "Closed both weekend days; Monday and Friday close at 3pm. Three published phone numbers with no after-hours answer point.",
+      "growth_trigger": "Third-generation dentist (Dr. Tyler) added to the roster; dedicated implant-consult campaign",
+      "scores": { "independent": 20, "doctor_count": 15, "high_ticket": 18, "active_mktg": 15, "phone_gap": 16, "growth": 5 },
+      "why": "Family-owned means one dinner-table decision, no procurement. The free implant consult + CT offer is the single most expensive lead magnet on this list — every one of those calls is a $3-5k case in motion, and they stop being answerable at 3pm Friday until Monday morning.",
+      "open_with": "Ask what a free-implant-consult lead is worth, then what happens to the ones that call at 4pm Friday.",
+      "contact": "Dr. Andy / Dr. Joel Shumway (owners)"
+    },
+    {
+      "rank": 4,
+      "score": 88,
+      "practice": "Bellissimo Dentistry & Implant Center",
+      "city": "Chandler, AZ",
+      "site": "https://www.bellissimodentistry.com/",
+      "owner": "Dr. Alexander Matheson + Dr. Samantha Holder (30 yrs combined)",
+      "dentists": ["Dr. Alexander Matheson", "Dr. Samantha Holder"],
+      "doctor_count": 2,
+      "locations": [
+        { "name": "Chandler", "address": "2815 E Ocotillo Rd, Ste 3, Chandler, AZ 85249", "phone": "(480) 935-5900",
+          "hours": "Mon-Thu 8-4, Fri-Sun CLOSED" }
+      ],
+      "high_ticket": ["IV sedation", "oral conscious sedation", "nitrous oxide", "dental implants", "Teeth-in-a-Day / All-on-4", "veneers", "CandidPro aligners"],
+      "promos": ["$59 emergency exam + x-ray for new patients"],
+      "phone_gap": "BIGGEST GAP ON THE LIST. Open Mon-Thu 8-4 only — 32 hours covered out of 168. Closed Friday, Saturday and Sunday. 136 hours a week where an All-on-4 enquiry cannot reach a human.",
+      "growth_trigger": "Positioned as an implant center; full three-tier sedation stack",
+      "scores": { "independent": 20, "doctor_count": 14, "high_ticket": 20, "active_mktg": 11, "phone_gap": 20, "growth": 3 },
+      "why": "The strongest high-ticket stack in the set — IV sedation plus All-on-4 means individual cases in the $20-30k range — paired with the worst coverage. They advertise same-day emergency care while being unreachable 81% of the week. Two owners, both clinical, nobody free to answer.",
+      "open_with": "They sell same-day emergencies but are closed Fri-Sun. Ask where Friday's emergency calls land.",
+      "contact": "Dr. Alexander Matheson or Dr. Samantha Holder (co-owners)"
+    },
+    {
+      "rank": 5,
+      "score": 82,
+      "practice": "Brown Road Dental",
+      "city": "Mesa, AZ",
+      "site": "https://www.brownroaddental.com/",
+      "owner": "Dr. John Cismas (bought the practice in 2025)",
+      "dentists": ["Dr. John Cismas (owner)"],
+      "doctor_count": "2-4 (roster in transition post-acquisition; verify on call)",
+      "locations": [
+        { "name": "Mesa", "address": "855 E Brown Rd, Ste 4, Mesa, AZ 85203", "phone": "(480) 834-6100",
+          "hours": "Mon-Thu 8-5, Fri 8-2, Sat-Sun closed" }
+      ],
+      "high_ticket": ["sedation", "dental implants", "oral & maxillofacial surgery (in-house)", "orthodontics", "cosmetic"],
+      "promos": ["None confirmed — verify on call"],
+      "phone_gap": "Closed both weekend days, Friday ends at 2pm. A 70-year-old patient base generating call volume against a front desk covering ~37 hours.",
+      "growth_trigger": "OWNERSHIP CHANGE 2025 — Dr. Cismas bought a practice operating since 1955. Strongest urgency trigger on the list.",
+      "scores": { "independent": 20, "doctor_count": 10, "high_ticket": 18, "active_mktg": 8, "phone_gap": 16, "growth": 10 },
+      "why": "New owner, 70-year-old patient base, in-house oral surgery. A dentist who just bought a practice is the most motivated buyer in dentistry — he is carrying acquisition debt and every unanswered call is money he personally financed. In-house oral surgery means high-value cases already route through this line.",
+      "open_with": "Congratulate him on the acquisition, then ask how many inherited-patient calls got missed last month.",
+      "contact": "Dr. John Cismas (new owner — financial buyer, high urgency)",
+      "caveat": "Doctor count and current promos are the two unverified fields. Confirm both before the pitch."
+    }
+  ]
+}

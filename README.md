@@ -422,6 +422,24 @@ height matches the natural ratio exactly, so nothing is cropped or letterboxed.
 Supabase signed URLs expire **2027-08-10**. Set `IMAGE_*_URL` env vars, or make the bucket public,
 and the expiry stops mattering. The founder portrait uses the same route.
 
+**Storage egress.** `/api/image` used to answer with a 302 to Supabase, which put every visitor's
+browser on the bucket directly: one billed Supabase egress per image per page view, with nothing
+cacheable in between. It now fetches the object server-side and returns the bytes itself under
+`s-maxage=31536000`, so Vercel's CDN serves the visitors and Supabase is read roughly once per edge
+region per deployment. If the fetch fails, the upstream answers with something that is not an
+image, or the file is over 4MB, the route falls back to the old redirect under a one-hour cache —
+the picture still loads, only the caching is worse. A side effect worth having: the signed token
+no longer reaches the browser at all.
+
+**Never use a transform URL.** `https://…/storage/v1/render/image/…` is Supabase's on-the-fly
+transformer, and every distinct set of parameters is a billed image transformation *on top of* the
+egress. These five files are fixed captures served at their natural size, so there is nothing to
+transform. `withoutTransform()` in `api/image.ts` rewrites any transform URL back to
+`/storage/v1/object/…` and strips `width`, `height`, `resize`, `quality` and `format` before
+fetching, so pasting one into an `IMAGE_*_URL` env var cannot restart that meter.
+`test/security.test.mjs` fails if a transform URL appears anywhere else in the repo, and
+`test/render.test.mjs` fails if a page fetches the same image twice in one session.
+
 ## Before launch checklist
 No `PLACEHOLDER` strings remain in rendered copy. What is still open, in priority order:
 

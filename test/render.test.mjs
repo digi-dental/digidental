@@ -39,11 +39,23 @@ function headersFor(urlPath) {
   return out;
 }
 
+// Origin hits per image name. Supabase bills egress per byte served, so what matters is how
+// many times the origin was actually asked for a picture — not what the browser reports it
+// pulled from its own cache. Counted here, asserted in the storage-requests block below.
+const imageHits = new Map();
+
 const server = http.createServer((req, res) => {
   const u = decodeURIComponent(req.url.split('?')[0]);
   const extra = headersFor(u);
-  // Stand in for the storage redirect so the panels have real images to size themselves to.
-  if (u.startsWith('/api/image')) { res.writeHead(200, { ...extra, 'Content-Type': 'image/png' }); return res.end(SPRITE); }
+  // Stand in for the storage proxy so the panels have real images to size themselves to.
+  // The Cache-Control matches what api/image.ts sends, because whether a second view costs
+  // a second fetch is exactly what is being measured.
+  if (u.startsWith('/api/image')) {
+    const name = new URL(req.url, 'http://x').searchParams.get('name') || '(unnamed)';
+    imageHits.set(name, (imageHits.get(name) || 0) + 1);
+    res.writeHead(200, { ...extra, 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=86400' });
+    return res.end(SPRITE);
+  }
   if (u.startsWith('/api/')) { res.writeHead(200, { ...extra, 'Content-Type': 'application/json' }); return res.end('{"ok":true}'); }
   // Directory-index resolution, the way Vercel serves static output: /how-it-works/ and
   // /how-it-works both come from how-it-works/index.html.
@@ -334,6 +346,50 @@ for (const [label, viewport, collapsedIsZero] of [
     document.documentElement.scrollWidth - document.documentElement.clientWidth);
   check(`${label}: no horizontal overflow`, overflow <= 0, `${overflow}px`);
   check(`${label}: no page errors`, errors.length === 0, errors[0] || 'none');
+  await ctx.close();
+}
+
+// ============================================================ storage requests
+// Every /api/image hit ends at a file in Supabase Storage, and Supabase bills egress per byte.
+// A page that asks for the same picture twice — a re-render that reassigns src, a fresh signed
+// URL minted per view — doubles that bill for nothing, which is what put this project into
+// overage. One origin hit per image per session is the contract.
+{
+  imageHits.clear();
+  const { page, ctx, errors } = await open({ at: '/how-it-works/' });
+  await page.evaluate(() => document.querySelector('[data-section="dashboard"]').scrollIntoView());
+  await page.waitForTimeout(1400);
+
+  // Churn the state the way a visitor does. Each of these re-runs render(), which rebuilds the
+  // dashShots array and the founder card from scratch; none of it may refetch a picture.
+  for (const i of [2, 3, 4, 1]) {
+    await page.evaluate(k => document.querySelectorAll('.dd-dash-panel')[k - 1].click(), i);
+    await page.waitForTimeout(400);
+  }
+  await page.evaluate(() => document.querySelector('[data-section="founder"]').scrollIntoView());
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(600);
+
+  check('deep page: the storage-backed images are requested at all', imageHits.size > 0,
+    `${imageHits.size} distinct images`);
+  const repeated = [...imageHits.entries()].filter(([, n]) => n > 1);
+  check('deep page: no storage-backed image is fetched twice', repeated.length === 0,
+    repeated.map(([n, c]) => `${n} x${c}`).join(', ') || `${imageHits.size} images, one hit each`);
+  check('deep page: no page errors while re-rendering', errors.length === 0, errors[0] || 'none');
+  await ctx.close();
+}
+
+{
+  imageHits.clear();
+  const { page, ctx } = await open({ at: '/' });
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(1200);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(600);
+  const repeated = [...imageHits.entries()].filter(([, n]) => n > 1);
+  check('home page: no storage-backed image is fetched twice', repeated.length === 0,
+    repeated.map(([n, c]) => `${n} x${c}`).join(', ') || `${imageHits.size} images, one hit each`);
   await ctx.close();
 }
 
